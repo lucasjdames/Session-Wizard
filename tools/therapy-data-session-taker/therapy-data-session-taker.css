@@ -1,0 +1,1790 @@
+/* Dark mode: Bolus Therapy Session Data component font and border standardization */
+[data-theme='dark'] .bolus-table,
+[data-theme='dark'] .bolus-table th,
+[data-theme='dark'] .bolus-table td {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .bolus-table th {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+}
+/* Dark mode: fix for pace-offer-receive, pace-radio-group, and swallow-data-container */
+[data-theme='dark'] .pace-offer-receive {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .pace-radio-group label {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .pace-radio-group label:hover {
+    background: color-mix(in srgb, var(--color-accent-alt) 10%, var(--color-surface-alt));
+    border-color: var(--color-accent);
+}
+[data-theme='dark'] .swallow-data-container {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 2px rgba(0, 0, 0, 0.20);
+}
+
+/* Dark mode: enhanced section headers */
+[data-theme='dark'] .swallow-section-header {
+
+/* Centralized pullout tab styles for Session Timer & Counter */
+.tds-pullout {
+    position: fixed;
+    right: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease, top 0.25s ease;
+    transform: translateX(200px); /* closed by default */
+}
+
+.tds-pullout.open {
+    transform: translateX(0);
+}
+
+.tds-pullout-tab {
+    position: absolute;
+    left: -56px; /* make stick-out match wider emoji tab */
+    /* allow JS to set vertical placement via element.style.top */
+    width: 56px;
+    height: 88px; /* compact height for emoji-only tab */
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.tds-pullout-tab .tds-tab-text {
+    /* hide the vertical text labels — we'll use emoji-only tabs */
+    display: none;
+}
+
+/* Emoji icon styling for the tab */
+.tds-pullout-tab .tds-tab-icon {
+    font-size: 22px; /* larger emoji */
+    line-height: 1;
+    color: white;
+    display: block;
+    transform-origin: center;
+}
+
+.tds-pullout-panel {
+    width: 200px;
+    background: var(--color-surface, white);
+    border: 1px solid var(--color-border, #e3e7ed);
+    border-radius: 8px 0 0 8px;
+    box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tds-pullout-tab:hover {
+    transform: translateX(-2px);
+    box-shadow: -4px 0 12px rgba(0,0,0,0.2);
+}
+    color: var(--color-text);
+    border-bottom-color: var(--color-border);
+}
+
+/* Defensive, high-specificity enforcement for pullout layout.
+   This ensures the Timer/Counter remain fixed, constrained, and behave
+   correctly even if other rules are missing or overridden (eg. stale SW).
+*/
+html body .tds-pullout, body > .tds-pullout {
+    /* Re-assert fixed positioning and right anchoring; allow JS inline styles to control top/transform */
+    position: fixed !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    /* Do NOT force top/transform here; the JS sets inline styles for precise placement and toggling */
+    transition: transform 0.3s ease, top 0.25s ease !important;
+    box-sizing: border-box !important;
+    max-width: 240px !important;
+}
+
+html body .tds-pullout.open, body > .tds-pullout.open {
+    /* Allow JS to set transform when toggling; keep a mild fallback */
+    transform: translateX(0);
+}
+
+/* Panel content must be a narrow column */
+html body .tds-pullout-panel, body > .tds-pullout .tds-pullout-panel {
+    width: 200px !important;
+    min-width: 160px !important;
+    max-width: 240px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    border-radius: 8px 0 0 8px !important;
+}
+
+/* Tab stick-out appearance */
+html body .tds-pullout-tab, body > .tds-pullout .tds-pullout-tab {
+    position: absolute !important;
+    left: -56px !important;
+    width: 56px !important;
+    height: 88px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    cursor: pointer !important;
+    border-radius: 8px 0 0 8px !important;
+}
+
+/* Ensure tab text orientation stays vertical and readable */
+html body .tds-pullout-tab .tds-tab-text {
+    /* hidden — emoji-only tabs */
+    display: none !important;
+}
+
+/* Keep panels above other UI elements */
+html body .tds-pullout, html body .tds-pullout * {
+    z-index: 1000 !important;
+}
+
+/* Dark mode: enhanced analysis container */
+[data-theme='dark'] .swallow-analysis-container {
+    background: var(--color-surface-alt);
+    border-color: var(--color-border);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 2px rgba(0, 0, 0, 0.20);
+}
+
+[data-theme='dark'] .swallow-analysis-container::before {
+    background: linear-gradient(90deg, #2a2a2a, #404040);
+}
+
+/* Dark mode: enhanced trials container */
+[data-theme='dark'] .trials-container {
+    background: var(--color-surface-alt);
+    border-color: var(--color-border);
+}
+
+/* Dark mode: enhanced stats display */
+[data-theme='dark'] .swallow-stats-display {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+}
+
+[data-theme='dark'] .stats-row:not(:last-child) {
+    border-bottom-color: var(--color-border);
+}
+/* Universal dark mode overrides for Therapy Session Data Taker */
+[data-theme='dark'] .main-layout {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+[data-theme='dark'] .side-panel {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+}
+[data-theme='dark'] .template-area {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+[data-theme='dark'] .template-dropzone {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+}
+[data-theme='dark'] .tdst-container {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+[data-theme='dark'] .preset-dropdown,
+[data-theme='dark'] .search-field,
+[data-theme='dark'] .pace-comments,
+[data-theme='dark'] .swallow-level-input,
+[data-theme='dark'] .instructions-text,
+[data-theme='dark'] .stats-row strong,
+[data-theme='dark'] .criteria-select,
+[data-theme='dark'] .criteria-label {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .swallow-trial-input {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .preset-dropdown:focus,
+[data-theme='dark'] .search-field:focus,
+[data-theme='dark'] .swallow-level-input:focus,
+[data-theme='dark'] .criteria-select:focus,
+[data-theme='dark'] .swallow-trial-input:focus {
+    border-color: var(--color-text);
+    box-shadow: 0 0 0 2px rgba(64, 64, 64, 0.25);
+}
+[data-theme='dark'] .component-controls .duplicate-btn {
+    background: var(--color-success);
+    color: #fff;
+}
+[data-theme='dark'] .component-controls .duplicate-btn:hover {
+    background: color-mix(in srgb, var(--color-success) 85%, black);
+}
+[data-theme='dark'] .component-controls .delete-btn {
+    background: var(--color-error);
+    color: #fff;
+}
+[data-theme='dark'] .component-controls .delete-btn:hover {
+    background: color-mix(in srgb, var(--color-error) 85%, black);
+}
+[data-theme='dark'] .srt-add-row-btn,
+[data-theme='dark'] .srt-add-col-btn,
+[data-theme='dark'] .pace-add-row-btn {
+    background: var(--color-surface-alt);
+    color: var(--color-accent);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .srt-add-row-btn:hover,
+[data-theme='dark'] .srt-add-col-btn:hover,
+[data-theme='dark'] .pace-add-row-btn:hover {
+    background: color-mix(in srgb, var(--color-accent-alt) 15%, var(--color-surface-alt));
+    border-color: var(--color-accent);
+}
+[data-theme='dark'] .srt-row-delete,
+[data-theme='dark'] .pace-row-delete {
+    background: var(--color-error);
+    color: #fff;
+}
+[data-theme='dark'] .srt-row-delete:hover,
+[data-theme='dark'] .pace-row-delete:hover {
+    background: color-mix(in srgb, var(--color-error) 85%, black);
+}
+[data-theme='dark'] .swallow-data-container,
+[data-theme='dark'] .swallow-analysis-container,
+[data-theme='dark'] .swallow-criteria-container {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .status-indicator {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+
+/* Dark mode: subtle color coding for trial results */
+[data-theme='dark'] .trial-success {
+    background: rgba(34,197,94,0.08);
+    color: var(--color-success, #86efac);
+    border: 1px solid rgba(34,197,94,0.12);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.2px;
+}
+
+[data-theme='dark'] .trial-fail {
+    background: rgba(239,68,68,0.06);
+    color: var(--color-error, #fca5a5);
+    border: 1px solid rgba(239,68,68,0.12);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.2px;
+}
+[data-theme='dark'] .swallow-instructions,
+[data-theme='dark'] .search-results-info {
+    background: var(--color-surface-alt);
+    color: #7db3ff;
+    border-color: var(--color-border);
+}
+/* Dark mode: radio button column and statistics boxes in PACE table */
+[data-theme='dark'] .pace-table td.radio-col {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .pace-table .stats-box,
+[data-theme='dark'] .srt-table .stats-box {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-sm);
+}
+/* Dark mode overrides for PACE and SRT tables */
+[data-theme='dark'] .pace-table,
+[data-theme='dark'] .srt-table {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .pace-table th,
+[data-theme='dark'] .srt-table th {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+}
+[data-theme='dark'] .pace-table td,
+[data-theme='dark'] .srt-table td {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+/* Dark mode overrides for text boxes and special components */
+[data-theme='dark'] .tdst-input,
+[data-theme='dark'] .tdst-textarea,
+[data-theme='dark'] input,
+[data-theme='dark'] textarea {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+    resize: vertical;
+    word-break: break-word;
+    white-space: pre-wrap;
+     -webkit-user-select: none;
+     -moz-user-select: none;
+     -ms-user-select: none;
+     user-select: none;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+[data-theme='dark'] .tdst-input:focus,
+[data-theme='dark'] .tdst-textarea:focus,
+[data-theme='dark'] input:focus,
+[data-theme='dark'] textarea:focus {
+    border-color: var(--color-text);
+    background: var(--color-surface);
+    color: var(--color-text);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(64, 64, 64, 0.25);
+}
+[data-theme='dark'] .template-component {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .notes-textarea {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+/* Dark mode overrides for hardcoded colors */
+[data-theme='dark'] .pace-table {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+}
+[data-theme='dark'] .pace-table th {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+}
+[data-theme='dark'] .status-pass {
+    background: color-mix(in srgb, var(--color-success) 15%, var(--color-surface));
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+[data-theme='dark'] .status-fail {
+    background: color-mix(in srgb, var(--color-error) 15%, var(--color-surface));
+    color: var(--color-error);
+    border-color: var(--color-error);
+}
+[data-theme='dark'] .status-in-progress {
+    background: color-mix(in srgb, var(--color-warning) 15%, var(--color-surface));
+    color: var(--color-warning);
+    border-color: var(--color-warning);
+     /* normalize for older browsers */
+     min-height: 0 !important;
+}
+[data-theme='dark'] .draggable-item:hover, [data-theme='dark'] .draggable-group:hover {
+    background: var(--color-surface-alt);
+    border-color: var(--color-accent);
+}
+[data-theme='dark'] .draggable-item, [data-theme='dark'] .draggable-group {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+[data-theme='dark'] .component-label, [data-theme='dark'] .component-label-editable, [data-theme='dark'] .component-label-editing {
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+}
+.template-dropzone {
+    min-height: 500px; 
+    background: var(--color-surface-alt) !important; 
+    border: 2px dashed var(--color-border) !important; 
+    border-radius: var(--radius-md); 
+    padding: var(--spacing-lg); 
+    display: flex; 
+    flex-direction: column; 
+    gap: var(--spacing-md);
+    position: relative; /* allow absolute children (placeholder) to center correctly */
+}
+
+.dropzone-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    /* Use theme text color so placeholder remains readable in both light/dark */
+    color: var(--color-text-muted, rgba(255,255,255,0.9));
+    pointer-events: none; /* let interactions pass to dropzone */
+    max-width: 60%;
+}
+
+.dropzone-placeholder.hidden {
+    display: none;
+}
+
+.placeholder-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.75;
+}
+
+.dropzone-placeholder p {
+    font-size: 1.1rem;
+    margin: 0 0 var(--spacing-xs) 0;
+}
+
+.dropzone-placeholder small {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    display: block;
+    margin-top: 8px;
+    color: rgba(255,255,255,0.9);
+}
+
+
+/* SRT Session Data table mark styles */
+.srt-mark {
+    cursor: pointer;
+    font-size: 18px;
+    margin: 0 4px;
+    color: #bfc8d6;
+    transition: color 0.2s, background 0.2s;
+    border-radius: 50%;
+    padding: 2px 6px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Bolus table (screen) - cleaner, less heavy borders and better spacing */
+.bolus-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px; /* space rows for breathing room */
+}
+
+.bolus-table thead th {
+    background: var(--color-surface-alt, #f3f4f6);
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text, #111827);
+    border-radius: 6px;
+}
+
+.bolus-table tbody tr {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e6e9ee);
+    border-radius: 6px;
+}
+
+.bolus-table td {
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+
+.bolus-table .muted { color: var(--color-text-muted, #6b7280); font-size: 0.95rem; }
+
+/* Clear template button */
+.clear-template-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.clear-template-btn:hover {
+    background: #c82333;
+}
+
+/* (removed duplicate broken block) */
+.srt-correct.active {
+    color: #2ecc40;
+    background: #eafbe7;
+    font-weight: bold;
+}
+.srt-incorrect.active {
+    color: #ff4d4d;
+    background: #ffeaea;
+    font-weight: bold;
+}
+
+/* Component controls styles */
+.component-controls {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center; /* Vertically center the buttons */
+}
+.component-controls .delete-btn {
+    order: 2; /* Ensure delete is on the right */
+}
+
+.component-controls .duplicate-btn {
+    order: 1; /* Ensure duplicate is on the left */
+    background: #2ecc40; /* Green background */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: background 0.2s;
+}
+
+.component-controls .delete-btn {
+    order: 2;
+    margin-right: 8px; /* Space between delete and edge */
+    margin-bottom: auto; /* Align delete button to the top */
+    background-color: red; /* Red background */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: background 0.2s;
+
+}
+.component-controls .duplicate-btn:hover {
+    background: #28a745; /* Darker green on hover */
+}
+
+/* SRT Session Data table styles */
+.srt-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background: var(--tdst-surface, var(--color-surface, #f8fafc));
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    margin-top: 8px;
+    font-size: 14px;
+    overflow: hidden;
+    border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+}
+.srt-table th {
+    background: var(--tdst-surface-alt, var(--color-surface-alt, #e3e7ed));
+    font-weight: 600;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+    border-right: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+    text-align: left;
+}
+.srt-table th:last-child {
+    border-right: none;
+}
+.srt-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--tdst-border, var(--color-border, #e3e7ed));
+    border-right: 1px solid var(--tdst-border, var(--color-border, #e3e7ed));
+    text-align: center;
+}
+.srt-table td:last-child {
+    border-right: none;
+}
+.srt-add-row-btn, .srt-add-col-btn {
+    background: linear-gradient(90deg, var(--tdst-surface-alt, var(--color-surface-alt, #e3e7ed)) 0%, var(--tdst-surface, var(--color-surface, #f8fafc)) 100%);
+    color: var(--tdst-text, var(--color-text, #333333));
+    border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 16px;
+    cursor: pointer;
+    transition: background 0.2s, border 0.2s;
+}
+.srt-add-row-btn:hover, .srt-add-col-btn:hover {
+    background: color-mix(in srgb, var(--tdst-accent-alt, var(--color-accent-alt, #d1e7dd)) 60%, var(--tdst-surface, var(--color-surface, #f8fafc)) 40%);
+    border-color: var(--tdst-border-hover, var(--color-border, #333333));
+}
+.srt-row-delete {
+    background: var(--tdst-error, var(--color-error, #ff4d4d));
+    color: var(--tdst-error-text, #fff);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    cursor: button;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: background 0.2s;
+}
+.srt-row-delete:hover {
+    background: color-mix(in srgb, var(--tdst-error, var(--color-error, #ff4d4d)) 85%, black);
+}
+
+/* SRT Session Data table mark styles */
+.srt-mark {
+    cursor: pointer;
+    font-size: 18px;
+    margin: 0 4px;
+    color: var(--tdst-muted, var(--color-border, #bfc8d6));
+    transition: color 0.2s, background 0.2s, transform 0.2s;
+    border-radius: 50%;
+    padding: 2px 6px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.srt-mark:focus {
+    outline: 2px solid #2196f3;
+    outline-offset: 2px;
+    transform: scale(1.2);
+}
+.srt-correct.active {
+    color: #2ecc40;
+    background: #eafbe7;
+    font-weight: bold;
+}
+.srt-incorrect.active {
+    color: #ff4d4d;
+    background: #ffeaea;
+    font-weight: bold;
+}
+
+/* Component input styles */
+.tdst-input {
+    border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.tdst-input:focus {
+    border-color: var(--tdst-focus, var(--color-text, #333333));
+    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.1);
+}
+.tdst-textarea {
+    border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+    word-break: break-word;
+    white-space: pre-wrap;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.tdst-textarea:focus {
+    border-color: var(--tdst-focus, var(--color-text, #333333));
+    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.1);
+}
+
+/* Swallow Data Component Styles */
+.swallow-data-container {
+    background: var(--tdst-surface, var(--color-surface, #f8fafc));
+    border-radius: 4px;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid var(--tdst-border, var(--color-border, #e1e8ed));
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Section headers within swallow data */
+.swallow-section-header {
+    font-weight: 600;
+    color: var(--tdst-text, var(--color-text, #374151));
+    margin: 8px 0 6px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--tdst-border, var(--color-border, #e5e7eb));
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.swallow-section-header:first-child {
+    margin-top: 0;
+}
+
+.swallow-level-container {
+    margin-bottom: 8px;
+}
+
+.swallow-label {
+    display: block;
+    font-weight: 600;
+    /* Use theme text color to ensure visibility in light/dark themes */
+    color: var(--color-text, #222);
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* Defensive: ensure labels inside component-content are visible and not collapsed */
+.component-content .swallow-label {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Dark-mode explicit fallback for labels in case variables aren't available */
+[data-theme='dark'] .swallow-label {
+    color: var(--color-text, #e6e6e6) !important;
+}
+
+.swallow-level-input {
+    width: 100%;
+    border: 1px solid #bfc8d6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.swallow-level-input:focus {
+    border-color: #333333;
+    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.1);
+}
+
+.swallow-criteria-container {
+    background: #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.criteria-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.criteria-row:last-child {
+    margin-bottom: 0;
+}
+
+.criteria-label {
+    font-weight: 600;
+    color: #222;
+    min-width: 100px;
+    font-size: 14px;
+}
+
+.criteria-select {
+    border: 1px solid #bfc8d6;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+    background: white;
+    outline: none;
+    min-width: 60px;
+}
+
+.criteria-select:focus {
+    border-color: #333333;
+}
+
+.criteria-text {
+    font-size: 14px;
+    color: #555;
+}
+
+.swallow-data-field-container {
+    margin-bottom: 8px;
+}
+
+.swallow-trial-input {
+    width: 100%;
+    border: 1px solid #d7dde4;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    font-family: inherit; /* keep UI font consistent; reserve monospace only for compact badges */
+    outline: none;
+    transition: border-color 0.18s ease;
+    resize: vertical;
+}
+
+.swallow-trial-input:focus {
+    border-color: #4b5563;
+    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.06);
+}
+
+.swallow-analysis-container {
+    background: white;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #e3e7ed;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 1px 2px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+.swallow-analysis-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    border-radius: 4px 8px 0 0;
+}
+
+.swallow-status-display {
+    margin-bottom: 12px;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 120px;
+}
+
+.status-pass {
+    background: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+.status-fail {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-in-progress {
+    background: #fff3cd;
+    color: #664d03;
+    border: 1px solid #ffecb5;
+}
+
+.swallow-trial-breakdown {
+    margin-bottom: 12px;
+}
+
+.breakdown-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #222;
+}
+
+.trials-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    margin: 8px 0;
+}
+.trial-success {
+    background: rgba(34,197,94,0.08);
+    color: var(--color-success, #16a34a);
+    border: 1px solid rgba(34,197,94,0.12);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.2px;
+}
+
+.trial-fail {
+    background: rgba(239,68,68,0.06);
+    color: var(--color-error, #dc2626);
+    border: 1px solid rgba(239,68,68,0.12);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.2px;
+}
+
+.stats-row {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    flex-wrap: wrap;
+    padding: 6px 0;
+}
+
+.stats-row:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+}
+
+.stats-row span {
+    color: #555;
+}
+
+.stats-row strong {
+    color: #222;
+}
+
+.swallow-instructions {
+    background: #e7f3ff;
+    border-radius: 6px;
+    padding: 12px;
+    border-left: 2px solid #333333;
+}
+
+.instructions-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #333;
+}
+
+.instructions-text strong {
+    color: #7db3ff;
+}
+
+@media (max-width: 768px) {
+    .criteria-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .stats-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .trials-container {
+        gap: 2px;
+    }
+}
+
+.pace-add-row-btn {
+    background: linear-gradient(90deg, #e3e7ed 0%, #f8fafc 100%);
+    color: #333333;
+    border: 1px solid #bfc8d6;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, border 0.2s;
+}
+.pace-add-row-btn:hover {
+    background: #d1e7dd;
+    border-color: #333333;
+}
+.pace-row-delete {
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: background 0.2s;
+}
+.pace-row-delete:hover {
+    background: #d90429;
+}
+.pace-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background: #f8fafc;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    margin-top: 8px;
+    font-size: 14px;
+    overflow: hidden;
+    border: 1px solid #bfc8d6;
+}
+.pace-table th {
+    background: #e3e7ed;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-bottom: 1px solid #bfc8d6;
+    border-right: 1px solid #bfc8d6;
+    text-align: left;
+}
+.pace-table th:last-child {
+    border-right: none;
+}
+.pace-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #e3e7ed;
+    border-right: 1px solid #e3e7ed;
+    vertical-align: top; /* helps multi-line cells start at top */
+}
+.pace-table td:last-child {
+    border-right: none;
+}
+.pace-offer-receive {
+    font-size: 14px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid #bfc8d6;
+    background: #fff;
+}
+.pace-radio-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.pace-radio-group label {
+    font-size: 14px;
+    background: #f6f8fa;
+    border-radius: 6px;
+    padding: 2px 8px;
+    cursor: pointer;
+    border: 1px solid #e3e7ed;
+    transition: background 0.2s, border 0.2s;
+}
+.pace-radio-group input[type="radio"] {
+    margin-right: 4px;
+}
+.pace-radio-group label:hover {
+    background: #e3e7ed;
+    border-color: #bfc8d6;
+}
+.pace-radio-group input[type="radio"]:focus + span,
+.pace-radio-group input[type="radio"]:focus {
+    outline: 2px solid #2196f3;
+    outline-offset: 2px;
+}
+.pace-comments {
+    width: 100%;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #bfc8d6;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+/* Ensure wrapping and nicer behavior for practice-table textareas */
+.practice-table .pace-comments {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.drop-indicator {
+    height: 0px;
+    border-top: 1px solid #333333;
+    margin: 0 0 4px 0;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+}
+/* Therapy Data Session Taker Styles */
+.tdst-container {
+
+
+    body {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(120deg, #f6f8fa 0%, #e3e7ed 100%);
+        color: #222;
+    }
+
+    .main-layout {
+        height: 100vh;
+    }
+
+    .side-panel {
+        background: var(--color-surface-alt);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        padding: var(--spacing-lg);
+    }
+
+    .preset-dropdown {
+        font-size: 17px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-text);
+        margin-bottom: var(--spacing-sm);
+        box-shadow: var(--shadow-xs);
+        transition: all 0.2s var(--ease);
+        outline: none;
+        font-weight: 500;
+    }
+    .preset-dropdown:focus {
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
+    }
+
+    .search-field {
+        font-size: 14px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-text);
+        margin-bottom: var(--spacing-sm);
+        box-shadow: var(--shadow-xs);
+        transition: all 0.2s var(--ease);
+        outline: none;
+        font-weight: 400;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .search-field:focus {
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent);
+    }
+    .search-field:focus {
+        border-color: #333333;
+        box-shadow: 0 0 0 2px #b3d1ff;
+    }
+    .search-field::placeholder {
+        color: #999;
+        font-style: italic;
+    }
+
+    .search-results-info {
+        background: #e7f3ff;
+        color: #333333;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        font-weight: 500;
+        text-align: center;
+        border: 1px solid #b3d1ff;
+    }
+
+    .no-search-results {
+        text-align: center;
+        padding: 12px 8px;
+        color: #666;
+    }
+
+    .no-results-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+
+    .no-results-text {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #444;
+    }
+
+    .no-results-hint {
+        font-size: 14px;
+        color: #888;
+        font-style: italic;
+    }
+
+    .draggable-item mark {
+        background: #ffeb3b;
+        color: #333;
+        padding: 1px 2px;
+        border-radius: 2px;
+        font-weight: 600;
+    }
+
+    .draggable-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .draggable-item, .draggable-group {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        padding: var(--spacing-sm);
+        font-size: 17px;
+        font-weight: 500;
+        box-shadow: var(--shadow-sm);
+        cursor: grab;
+        transition: all 0.2s var(--ease);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+        letter-spacing: 0.01em;
+    }
+    .draggable-item:hover, .draggable-group:hover {
+        background: var(--color-surface-hover);
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+    }
+    .draggable-item:active, .draggable-group:active {
+        transform: scale(0.98);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .template-area {
+        background: var(--color-bg);
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+    }
+
+    .template-dropzone {
+        min-height: 500px;
+        background: var(--color-surface-alt);
+        border: 2px dashed var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-lg);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+        transition: all 0.2s var(--ease);
+        box-shadow: var(--shadow-sm);
+    }
+    .template-dropzone:active, .template-dropzone.dragover {
+        background: color-mix(in srgb, var(--color-accent) 5%, var(--color-surface-alt));
+        border-color: var(--color-accent);
+    }
+
+    .template-component {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 0;
+        position: relative;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        transition: all 0.2s var(--ease);
+    }
+    .template-component:hover {
+        box-shadow: var(--shadow-md);
+    }
+    .template-component:active {
+        transform: scale(0.98);
+    }
+
+    .component-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-bottom: 2px solid var(--color-border);
+        background: linear-gradient(135deg, var(--color-surface-alt) 0%, color-mix(in srgb, var(--color-surface-alt) 95%, var(--color-border)) 100%);
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .component-title {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        font-weight: 600;
+        color: var(--color-text);
+        flex: 1;
+        padding-left: var(--spacing-xs);
+    }
+
+    .component-content {
+        padding: var(--spacing-md);
+    }
+
+    .component-controls {
+        display: flex;
+        gap: var(--spacing-xs);
+    }
+
+    .component-label,
+    .component-label-editable {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--color-text);
+        flex: 1;
+    }
+
+    .component-label-editable {
+        cursor: pointer;
+        padding: 2px 4px;
+        border-radius: var(--radius-xs);
+        border: 1px solid transparent;
+        transition: all 0.2s var(--ease);
+    }
+
+    .component-label-editable:hover {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+    }
+
+    .component-label {
+        font-size: 18px;
+        font-weight: 600;
+        color: #222;
+        margin-right: 12px;
+        letter-spacing: 0.01em;
+    }
+
+    .component-label-editable {
+        font-size: 18px;
+        font-weight: 600;
+        color: #222;
+        margin-right: 12px;
+        letter-spacing: 0.01em;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 2px 4px;
+        transition: border-color 0.2s, background-color 0.2s;
+        outline: none;
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .component-label-editable:hover {
+        border-color: #ddd;
+        background-color: #f8f9fa;
+    }
+
+    .component-label-editable:focus {
+        border-color: #333333;
+        background-color: #fff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .component-label-editing {
+        font-size: 18px;
+        font-weight: 600;
+        color: #222;
+        margin-right: 12px;
+        letter-spacing: 0.01em;
+        border: 1px solid #333333;
+        border-radius: 4px;
+        padding: 2px 4px;
+        background-color: #fff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        outline: none;
+        min-width: 150px;
+    }
+
+
+    .drag-handle {
+        cursor: grab;
+        font-size: 16px;
+        color: var(--color-text-soft);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+        transition: all 0.2s var(--ease);
+        padding: var(--spacing-xs);
+        border-radius: var(--radius-xs);
+        margin-left: var(--spacing-xs);
+    }
+    .drag-handle:hover {
+        color: var(--color-text);
+        background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+    }
+    .drag-handle:active {
+        cursor: grabbing;
+        color: var(--color-text);
+        background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+        transform: scale(0.95);
+    }
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+.tdst-section label {
+    font-weight: 500;
+    color: var(--color-text-soft, #4f5b6b);
+    margin-bottom: 0.1em;
+}
+
+.copy-btn-row {
+    display: flex;
+    gap: 1.2em;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+    .tdst-container {
+        padding: 1.2rem 0.5rem;
+    }
+    .tdst-form {
+        gap: 1rem;
+    }
+}
+
+/* ========================================
+   IMPROVED TYPOGRAPHY & SPACING
+   ======================================== */
+/* Better line heights for readability */
+body, .template-component, .swallow-data-container, .swallow-analysis-container {
+    line-height: 1.5;
+    /* Use Inter as the standard UI font; index.html already preloads Inter */
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Consistent text hierarchy */
+h1, h2, h3, .section-header, .swallow-section-header {
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+/* Improved form element spacing */
+input, textarea, select {
+    line-height: 1.4;
+}
+
+/* Better label spacing */
+label {
+    line-height: 1.4;
+    margin-bottom: 0.25em;
+}
+
+/* ========================================
+   PRINT STYLES - Elegant & Compact Design
+   ======================================== */
+@media print {
+    /* Reset for clean print layout */
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    
+    /* Hide interactive elements */
+    .back-btn,
+    .side-panel,
+    .preset-dropdown,
+    .draggable-list,
+    .component-controls,
+    .drag-handle,
+    button:not(.print-keep),
+    .copy-btn-row,
+    [data-theme-toggle],
+    .theme-toggle {
+        display: none !important;
+    }
+    
+    /* Page setup */
+    @page {
+        margin: 0.75in;
+        size: letter;
+    }
+    
+    body {
+        font-size: 11pt;
+        line-height: 1.4;
+        color: #000;
+        background: #fff;
+    }
+    
+    /* Main container optimization */
+    .main-container {
+        padding: 0 !important;
+    }
+    
+    .main-layout {
+        display: block !important;
+    min-height: 0 !important;
+    }
+    
+    .template-area {
+        padding: 0 !important;
+        background: #fff !important;
+    }
+    
+    /* Header styling */
+    h1 {
+        font-size: 16pt;
+        font-weight: 600;
+        color: #000;
+        text-align: center;
+        margin: 0 0 12pt 0;
+        border-bottom: 1pt solid #000;
+        padding-bottom: 6pt;
+    }
+    
+    /* Meta information (patient, date) */
+    .meta-row {
+        margin-bottom: 12pt;
+        gap: 8pt;
+        font-size: 10pt;
+    }
+    
+    .meta-label {
+        font-weight: 600;
+        color: #000;
+    }
+    
+    .meta-inputbox {
+        border: none;
+        border-bottom: 1pt solid #000;
+        background: transparent;
+        padding: 2pt 0;
+        font-size: 10pt;
+    }
+    
+    /* Section headers - clean and compact */
+    .swallow-section-header,
+    .section-header {
+        font-size: 12pt;
+        font-weight: 600;
+        color: #000;
+        margin: 8pt 0 4pt 0;
+        padding: 0;
+        border-bottom: 0.5pt solid #333;
+    }
+    
+    /* Container styling - minimal borders */
+    .swallow-data-container,
+    .swallow-analysis-container,
+    .template-component {
+        background: #fff !important;
+        border: 0.5pt solid #333 !important;
+        border-radius: 0 !important;
+        margin-bottom: 6pt;
+        padding: 6pt !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Table styling - clean and readable for print */
+    .bolus-table,
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 4pt 0;
+    }
+
+    .bolus-table th,
+    .bolus-table td,
+    th, td {
+        border: 0.35pt solid #666;
+        padding: 4pt 6pt;
+        font-size: 9pt;
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    .bolus-table th,
+    th {
+        background: #f7f7f7 !important;
+        font-weight: 600;
+        text-align: left;
+    }
+    
+    /* Form elements - clean styling */
+    .pace-offer-receive,
+    .pace-radio-group label {
+        background: #fff !important;
+        border: 0.5pt solid #333 !important;
+        padding: 2pt 4pt !important;
+        margin: 1pt !important;
+        font-size: 9pt;
+    }
+    
+    /* Radio buttons and checkboxes */
+    input[type="radio"],
+    input[type="checkbox"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 8pt;
+        height: 8pt;
+        border: 0.5pt solid #000;
+        margin-right: 3pt;
+        vertical-align: middle;
+    }
+    
+    input[type="radio"]:checked,
+    input[type="checkbox"]:checked {
+        background: #000;
+    }
+    
+    input[type="radio"] {
+        border-radius: 50%;
+    }
+    
+    /* Text inputs and textareas */
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        background: #fff !important;
+        border: none !important;
+        border-bottom: 0.5pt solid #333 !important;
+        padding: 1pt 0 !important;
+        font-size: 9pt;
+        color: #000 !important;
+    }
+    
+    /* Labels and text */
+    label {
+        font-size: 9pt;
+        font-weight: 500;
+        color: #000;
+    }
+    
+    /* Remove all color backgrounds except subtle accents */
+    .success-badge,
+    .error-badge,
+    .warning-badge {
+        background: #f8f8f8 !important;
+        color: #000 !important;
+        border: 0.5pt solid #333 !important;
+        padding: 1pt 3pt !important;
+        font-size: 8pt;
+    }
+    
+    /* Typography adjustments */
+    p {
+        font-size: 10pt;
+        margin: 0 0 4pt 0;
+        color: #000;
+    }
+    
+    /* Compact spacing throughout */
+    .template-dropzone {
+        /* For print, use neutral background but don't force white which can break contrast
+           with dark-mode overrides; rely on explicit print theme if needed. */
+        border: none !important;
+        padding: 0 !important;
+        background: var(--print-bg, #fff) !important;
+        color: #000 !important;
+    }
+    
+    /* Ensure proper page breaks */
+    .swallow-data-container,
+    .swallow-analysis-container {
+        page-break-inside: avoid;
+    }
+    
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+    
+    /* Remove any remaining blue accents */
+    * {
+        border-color: #333 !important;
+    }
+}
+
+    /* Custom Data Table: config-options (ensure readable in light mode and inherit theme variables)
+       Uses tool-specific fallbacks defined in the same file (:root --tdst-*) which map to
+       the global theme variables when available. */
+    .config-options {
+        background: var(--tdst-surface-alt, var(--color-surface-alt, #f3f4f6));
+        color: var(--tdst-text, var(--color-text, #222));
+        border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
+    .config-options .option-row {
+        display:flex; align-items:center; gap:8px; padding:6px 4px;
+        background: transparent;
+    }
+
+    /* Ensure option rows and inputs use theme-aware variables. Use !important sparingly to override inline styles when necessary. */
+    .config-options .option-row {
+        background: var(--tdst-surface-raised, var(--tdst-surface, var(--color-surface, #fff)));
+        border: 1px solid var(--tdst-border-subtle, var(--tdst-border, var(--color-border, #bfc8d6)));
+        padding: 8px;
+        border-radius: 6px;
+    }
+
+    .config-options input[type='text'],
+    .config-options select,
+    .config-options textarea {
+        background: var(--tdst-input-bg, var(--tdst-surface, var(--color-surface, #fff))) !important;
+        color: var(--tdst-text, var(--color-text, #222)) !important;
+        border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6)) !important;
+        padding: 6px 8px;
+        border-radius: 4px;
+        font-size: 0.95rem;
+    }
+
+    /* Numeric 'Value' inputs used for averaging in the Config menu.
+       JavaScript injects inline styles with dark-mode colors; add a
+       higher-specificity CSS rule so light-mode users see readable inputs.
+       We keep variables prefixed with --tdst-* to allow global overrides. */
+    .config-options input[type='number'] {
+        background: var(--tdst-input-bg, var(--tdst-surface, var(--color-surface, #fff))) !important;
+        color: var(--tdst-text, var(--color-text, #222)) !important;
+        border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6)) !important;
+        padding: 6px 8px !important;
+        border-radius: 4px !important;
+        width: 70px !important; /* match JS width */
+        font-size: 0.95rem !important;
+    -webkit-appearance: textfield; /* prevent spinner styling differences */
+    appearance: textfield;
+    }
+
+    /* Placeholder color for numeric inputs (some browsers show placeholders for number inputs as well) */
+    .config-options input[type='number']::placeholder {
+        color: var(--tdst-muted, var(--color-border, #9aa4b2));
+    }
+
+    .config-options input[type='text']::placeholder,
+    .config-options textarea::placeholder {
+        color: var(--tdst-muted, var(--color-border, #9aa4b2));
+    }
+
+    .config-options label {
+        color: var(--tdst-text, var(--color-text, #222));
+        font-weight:500;
+    }
+

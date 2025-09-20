@@ -1,0 +1,309 @@
+/* Editable Subheader Styles */
+.pm-editable-subheader td {
+    background: var(--color-surface-alt) !important;
+    padding: var(--spacing-md) var(--spacing-sm);
+    text-align: left;
+}
+
+.pm-subheader-input {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text);
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.4em 0.7em;
+    width: 98%;
+    max-width: 350px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+[data-theme='dark'] .pm-subheader-input {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.pm-subheader-input:focus {
+    border-color: var(--color-accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.12);
+}
+
+/* Progress Monitor Specific Styles */
+
+/* --- Shared visual alignment (typography, headers, tables) --- */
+body, .pm-summary-measure, .pm-table, .tool-container {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+}
+
+h1, h2, h3, .pm-summary-label, .pm-subheader {
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.3;
+}
+
+/* Form field spacing */
+.pm-fields {
+    margin-bottom: var(--spacing-lg);
+}
+
+.pm-summary-measure {
+    margin: var(--spacing-lg) 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+}
+
+.pm-summary-label {
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.95rem;
+}
+
+.pm-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.pm-radio-group label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.pm-radio-group input[type="radio"] {
+    margin-top: 0.1em;
+    accent-color: var(--color-accent);
+}
+
+.pm-other-input {
+    margin-left: var(--spacing-sm);
+    padding: 0.4em 0.6em;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    width: 200px;
+}
+
+.pm-other-input:focus {
+    border-color: var(--color-accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+/* Progress Monitor Table Styles */
+.pm-table-section {
+    margin: var(--spacing-xl) 0;
+}
+
+.pm-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    font-size: 0.85rem;
+}
+
+.pm-table th, .pm-table td {
+    border: 1px solid var(--color-border);
+    padding: var(--spacing-sm);
+    /* align tables like other tools for readability */
+    text-align: left;
+    background: var(--color-surface-alt);
+}
+
+.pm-table th {
+    background: var(--color-surface-alt);
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.pm-date-input {
+    width: 100%;
+    max-width: 100px;
+    padding: 0.3em 0.5em;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+}
+
+.pm-date-input:focus {
+    border-color: var(--color-accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.1);
+}
+
+.pm-add-date-btn {
+    background: #2ecc40; /* Green background */
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s var(--ease);
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.pm-add-date-btn:hover {
+    background: #28a745; /* Darker green on hover */
+    transform: scale(1.1);
+}
+
+
+.pm-table-input {
+    width: 100%;
+    min-width: 80px;
+    padding: 0.4em 0.5em;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    resize: none;
+    overflow: hidden;
+}
+
+.pm-table-input:focus {
+    border-color: var(--color-accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.1);
+}
+
+.pm-label-input {
+    font-weight: 600;
+    min-width: 150px !important;
+    max-width: 250px !important;
+}
+
+.pm-add-row-btn {
+    background: #2ecc40; /* Green background */
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s var(--ease);
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.pm-add-row-btn:hover {
+    background: #28a745; /* Darker green on hover */
+    transform: scale(1.1);
+}
+
+/* Delete button styles */
+.pm-del-date-btn, .pm-del-row-btn {
+    background: #dc3545; /* Red background */
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s var(--ease);
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.pm-del-date-btn:hover, .pm-del-row-btn:hover {
+    background: #c82333; /* Darker red on hover */
+    transform: scale(1.1);
+}
+
+/* Print styles */
+@media print {
+    .back-btn, .button-row {
+        display: none !important;
+    }
+    
+    .tool-container {
+        box-shadow: none;
+        margin: 0;
+        padding: var(--spacing-md);
+    }
+    
+    .pm-table {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+
+.pm-subheader {
+    background-color: var(--gray-200);
+    color: var(--gray-800);
+    font-weight: bold;
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+[data-theme="dark"] .pm-subheader {
+    background-color: var(--gray-700);
+    color: var(--gray-100);
+    border-bottom-color: var(--primary-dark-color);
+}
+
+/* Visual: pull subheader and meta-row outside of the light tool container to sit on page background */
+.pm-page-header {
+    background: var(--app-header-bg, transparent); /* let page bg show */
+    padding: 0 0 0 var(--spacing-lg);
+    margin-bottom: calc(var(--spacing-md) * -1);
+}
+
+.pm-subheader,
+.pm-meta-row {
+    max-width: none;
+    margin: 0; /* reset so it can visually sit outside */
+    border-radius: 0;
+}
+
+.pm-meta-row {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+    padding: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
+    color: var(--color-text);
+}
+
+/* ensure inputs look like they're on the page background */
+.pm-meta-row .pm-date-input, .pm-meta-row .pm-subheader-input {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Utility helpers */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.main-container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-lg); }
+.hidden { display: none !important; }

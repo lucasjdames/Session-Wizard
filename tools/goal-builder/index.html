@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Builder</title>
+        <style>
+            :root{ --critical-bg:#f5f7fa; --critical-surface:#ffffff; --critical-border:#d8dee6; --critical-text:#1f2630; }
+            html,body{ background:var(--color-bg, var(--critical-bg)); color:var(--color-text, var(--critical-text)); }
+            .app-header{ background:rgba(255,255,255,.85); border-bottom:1px solid var(--color-border, var(--critical-border)); height:var(--app-header-height,64px); }
+            .app-header .branding .back-btn{ background:var(--color-accent,#4f8cff); color:#fff; }
+        </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Prefetch main shell assets to speed up back navigation -->
+    <link rel="prefetch" href="/index.html" as="document">
+    <link rel="prefetch" href="/assets/css/main.css" as="style">
+    <link rel="prefetch" href="/assets/js/main.js" as="script">
+    <link rel="preload" href="/assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="goal-builder.css">
+    <script src="../../assets/js/theme.js"></script>
+    <script defer src="../../assets/js/shared/dom-utils.js"></script>
+    <script defer src="../../assets/js/prefetch-back.js"></script>
+    <script defer src="goal-builder.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="branding">
+            <a href="../../index.html" class="back-btn back-btn-inline-reset">← Session Wizard</a>
+        </div>
+        <div class="header-actions">
+            <button id="themeToggle" class="ghost-btn" aria-pressed="false" aria-label="Toggle theme">🌙</button>
+        </div>
+    </header>
+    <div class="main-container">
+        <div class="gb-page-header">
+            <h1>Goal Builder</h1>
+            <p class="tool-description">Create SMART goals and build goal attainment scales.</p>
+            <div class="meta-row gb-meta-row">
+                <label for="patientName" class="meta-label">Patient:</label>
+                <input type="text" id="patientName" class="meta-inputbox" placeholder="Enter patient name..." aria-label="Patient name" />
+                <label for="goalDate" class="meta-label">Date:</label>
+                <input type="date" id="goalDate" class="meta-inputbox" aria-label="Date" />
+            </div>
+        </div>
+
+        <!-- Three stacked cards on the page background: Aim, SMART Builder, GAS Builder -->
+        <div class="card aim-card">
+            <div class="aim-row">
+                <label for="aim" class="form-label">Aim</label>
+                <textarea id="aim" class="form-textarea" rows="2" placeholder="Describe the overall aim or significance of the intervention to the client."></textarea>
+            </div>
+        </div>
+
+        <div class="card sgb-card">
+            <h2>SMART Goal Builder</h2>
+            <div class="sgb-blocks-row">
+                <h3>Drag blocks below to build your goal:</h3>
+                <div class="sgb-blocks">
+                    <div class="sgb-block" draggable="true" data-block="AGENT" title="Who's doing the task [Relevant]">AGENT</div>
+                    <div class="sgb-block" draggable="true" data-block="TASK" title="What meaningful thing will they do [Specific and Relevant]">TASK</div>
+                    <div class="sgb-block" draggable="true" data-block="LEVEL OF SUPPORT" title="How much help will they need to do it [Achievable]">LEVEL OF SUPPORT</div>
+                    <div class="sgb-block" draggable="true" data-block="ACCURACY" title="How accurate or reliable does their performance need to be [Measurable]">ACCURACY</div>
+                    <div class="sgb-block" draggable="true" data-block="FREQUENCY" title="How often or how many times will they need to do it [Measurable]">FREQUENCY</div>
+                    <div class="sgb-block" draggable="true" data-block="CONTEXT" title="Where, when, and under what circumstances [Specific/Time-Bound]">CONTEXT</div>
+                    <div class="sgb-block" draggable="true" data-block="TIME FRAME" title="By when should the goal be achieved [Time-Bound]">TIME FRAME</div>
+                </div>
+            </div>
+            <div class="sgb-drop-area-row">
+                <div id="sgb-drop-area" class="sgb-drop-area">
+                    <span class="sgb-drop-placeholder">Drag blocks here in order, then fill in details.</span>
+                </div>
+                <div id="sgb-goal-sentence" class="sgb-goal-sentence"></div>
+            </div>
+            <div class="dropdown-header" onclick="toggleSection('smart-checklist', this)" role="button" aria-expanded="false">
+                <span class="dropdown-label">SMART Target Checklist</span>
+                <span class="caret">▼</span>
+            </div>
+            <div id="smart-checklist" class="dropdown-content">
+                <div class="sgb-checklist">
+                    <label><input type="checkbox"> <span class="check-term">Specific</span> <span class="check-desc">– The task is described in concrete and unambiguous terms, and details of context/support/accuracy are provided.</span></label>
+                    <label><input type="checkbox"> <span class="check-term">Measurable</span> <span class="check-desc">– Progress toward the goal can be monitored using quantitative/qualitative/client-reported methods.</span></label>
+                    <label><input type="checkbox"> <span class="check-term">Attainable</span> <span class="check-desc">– The client has the prerequisite skills; the target is within the client's reach.</span></label>
+                    <label><input type="checkbox"> <span class="check-term">Relevant</span> <span class="check-desc">– The target is meaningful for the client and related to achieving their aims and/or improved autonomy/quality of life.</span></label>
+                    <label><input type="checkbox"> <span class="check-term">Time-Based</span> <span class="check-desc">– Deadline and/or frequency are specified.</span></label>
+                    <label>(Adapted from Sohlberg et al., 2023)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="card gas-card">
+            <h2>Goal Attainment Scale Builder</h2>
+            <div class="level-selector-row">
+                <label for="levelSelector" class="form-label"><strong>Choose table type:</strong></label>
+                <select id="levelSelector" class="form-input">
+                    <option value="five">Five Level (-2 to +2)</option>
+                    <option value="four">Four Level (-1 to +2)</option>
+                </select>
+            </div>
+            <table id="gasTable" class="gas-table"></table>
+            <div class="dropdown-header" onclick="toggleSection('gas-checklist', this)" role="button" aria-expanded="false">
+                <span class="dropdown-label">GAS Criteria Checklist</span>
+                <span class="caret">▼</span>
+            </div>
+            <div id="gas-checklist" class="dropdown-content">
+                <div class="gas-checklist">
+                    <label><input type="checkbox"> The Overall Goal has been formulated using SMART principles.</label>
+                    <label><input type="checkbox"> There is a realistic timeframe for goal achievement.</label>
+                    <label><input type="checkbox"> The goal, and the distance between each level, is meaningful to the client and/or relevant to their autonomy/quality of life.</label>
+                    <label><input type="checkbox"> Each of the levels represents a realistic outcome.</label>
+                    <label><input type="checkbox"> The levels incorporate environmental factors and supports/barriers so that changes are understood in context.</label>
+                    <label><input type="checkbox"> The content of each level is:</label>
+                    <div class="checklist-child">
+                        <label><input type="checkbox"> Mutually exclusive</label>
+                        <label><input type="checkbox"> Approximately equidistant</label>
+                        <label><input type="checkbox"> Unidimensional (only one kind of change is being targeted)</label>
+                    </div>
+                    <label><input type="checkbox"> The phrasing of each level is:</label>
+                    <div class="checklist-child">
+                        <label><input type="checkbox"> Concrete</label>
+                        <label><input type="checkbox"> Specific/measurable</label>
+                        <label><input type="checkbox"> Accessible (word choice, complexity, etc.)</label>
+                    </div>
+                    <label> (Adapted from Sohlberg et al., 2023, and Bard-Pondarré et al., 2023)</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page-level actions on the dark background, bottom-right -->
+        <div class="page-actions">
+            <button id="copyClipboardBtn" class="primary-btn">Copy to Clipboard</button>
+            <button id="printPageBtn" class="secondary-btn">Printable Page</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework Tracker</title>
+        <style>
+            :root{ --critical-bg:#f5f7fa; --critical-surface:#ffffff; --critical-border:#d8dee6; --critical-text:#1f2630; }
+            html,body{ background:var(--color-bg, var(--critical-bg)); color:var(--color-text, var(--critical-text)); }
+            .app-header{ background:rgba(255,255,255,.85); border-bottom:1px solid var(--color-border, var(--critical-border)); height:var(--app-header-height,64px); }
+            .app-header .branding .back-btn{ background:var(--color-accent,#4f8cff); color:#fff; }
+        </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Prefetch main shell assets to speed up back navigation -->
+    <link rel="prefetch" href="/index.html" as="document">
+    <link rel="prefetch" href="/assets/css/main.css" as="style">
+    <link rel="prefetch" href="/assets/js/main.js" as="script">
+    <link rel="preload" href="/assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="homework-tracker.css">
+    <script src="../../assets/js/theme.js"></script>
+        <script defer src="../../assets/js/prefetch-back.js"></script>
+    <script defer src="../../assets/js/shared/dom-utils.js"></script>
+    <script defer src="homework-tracker.js"></script>
+</head>
+<body>
+    <header class="app-header no-print">
+        <div class="branding">
+            <a href="../../index.html" class="back-btn back-btn-inline-reset">← Session Wizard</a>
+        </div>
+        <!-- Header actions should be the last child of the header and contain the theme toggle -->
+        <div class="header-actions">
+            <button id="themeToggle" class="ghost-btn" aria-pressed="false" aria-label="Toggle theme">🌙</button>
+        </div>
+    </header>
+
+    <div class="main-container no-print">
+        <h1>Homework Tracker</h1>
+        <p class="tool-description">Create customizable printable home program logs.</p>
+        <!-- Log Information Panel (Top) -->
+        <div class="log-info-panel">
+            <div class="panel-section">
+                <h3>Log Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="clientName">Client Name:</label>
+                        <input type="text" id="clientName" placeholder="Enter client name...">
+                    </div>
+                    <div class="form-group">
+                        <label for="clinicianName">Clinician:</label>
+                        <input type="text" id="clinicianName" placeholder="Enter clinician name...">
+                    </div>
+                    <div class="form-group">
+                        <label for="logTitle">Log Title:</label>
+                        <input type="text" id="logTitle" placeholder="Home Program Log" value="Home Program Log">
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="numWeeks">Number of Weeks:</label>
+                        <input type="number" id="numWeeks" min="1" max="52" value="1" placeholder="1-52 weeks">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <!-- Available Components Panel -->
+            <div class="side-panel">
+                <div class="panel-section">
+                    <h3>Components</h3>
+                    <p class="section-description">Click or drag components below to build your log:</p>
+                    
+                    <div class="component-library">
+                        <div class="draggable-component" draggable="true" data-component="custom-header">
+                            <span class="component-icon">🗂️</span>
+                            <div class="component-info">
+                                <strong>Custom Header</strong>
+                                <small>Add section titles</small>
+                            </div>
+                        </div>
+                        <div class="draggable-component" draggable="true" data-component="exercise-group">
+                            <span class="component-icon">📁</span>
+                            <div class="component-info">
+                                <strong>Exercise Group</strong>
+                                <small>Group related exercises or track multiple aspects of a single task.</small>
+                            </div>
+                        </div>
+                        <div class="draggable-component" draggable="true" data-component="blank-exercise">
+                            <span class="component-icon">✏️</span>
+                            <div class="component-info">
+                                <strong>Blank Exercise</strong>
+                                <small>Empty cells for free writing</small>
+                            </div>
+                        </div>
+                        <div class="draggable-component" draggable="true" data-component="checkbox-exercise">
+                            <span class="component-icon">☑️</span>
+                            <div class="component-info">
+                                <strong>Checkbox Exercise</strong>
+                                <small>Simple completion tracking</small>
+                            </div>
+                        </div>
+                        <div class="draggable-component" draggable="true" data-component="repetition-exercise">
+                            <span class="component-icon">🔢</span>
+                            <div class="component-info">
+                                <strong>Repetition Exercise</strong>
+                                <small>Track number of repetitions</small>
+                            </div>
+                        </div>
+                        <div class="draggable-component" draggable="true" data-component="time-exercise">
+                            <span class="component-icon">⏰</span>
+                            <div class="component-info">
+                                <strong>Time-Based Exercise</strong>
+                                <small>Track duration of practice</small>
+                            </div>
+                        </div>
+                        <div class="draggable-component" draggable="true" data-component="rating-exercise">
+                            <span class="component-icon">⭐</span>
+                            <div class="component-info">
+                                <strong>Self-Rating Exercise</strong>
+                                <small>Numerical rating scale</small>
+                            </div>
+                        </div>
+                        <div class="draggable-component" draggable="true" data-component="notes-section">
+                            <span class="component-icon">🗒️</span>
+                            <div class="component-info">
+                                <strong>Notes Section</strong>
+                                <small>Free text area for comments</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>Actions</h3>
+                    <button id="clearTemplate" class="secondary-btn full-width">Clear All</button>
+                    <button id="previewMode" class="primary-btn full-width">Preview Mode</button>
+                    <button id="printBtn" class="primary-btn full-width">Print Log</button>
+                </div>
+            </div>
+
+            <!-- Template Building Area -->
+            <div class="template-area">
+                <div class="template-header">
+                    <h2>Build Your Home Program Log</h2>
+                    <p>Click or drag components from the left panel to create your custom log template.</p>
+                </div>
+                
+                <div id="templateDropzone" class="template-dropzone">
+                    <div class="dropzone-placeholder">
+                        <span class="placeholder-icon">📋</span>
+                        <p>Click or drop components here to build your log</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Preview Area -->
+    <div id="printArea" class="print-area">
+        <div class="preview-controls no-print">
+            <button id="backToEdit" class="secondary-btn">← Back to Edit</button>
+            <button id="printFromPreview" class="primary-btn">Print Log</button>
+        </div>
+        
+        <div class="print-header">
+            <h1 id="printLogTitle">Home Program Log</h1>
+            <div class="print-info">
+                <div class="print-info-row">
+                    <span><strong>Client:</strong> <span id="printClientName">_________________</span></span>
+                    <span><strong>Clinician:</strong> <span id="printClinicianName">_________________</span></span>
+                </div>
+                <div class="print-info-row">
+                    <span><strong>Start Date:</strong> <span id="printStartDate">_________________</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="printContent" class="print-content">
+            <!-- Generated content will be inserted here -->
+        </div>
+        
+        <div class="print-footer">
+            <p><em>Please complete this log as planned and bring it to your next appointment.</em></p>
+        </div>
+    </div>
+
+    <!-- Component Configuration Modal -->
+    <div id="configModal" class="modal no-print">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="configModalTitle">Configure Component</h3>
+                <button id="closeConfigModal" class="close-btn">&times;</button>
+            </div>
+            <div id="configModalBody" class="modal-body">
+                <!-- Dynamic configuration form will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button id="cancelConfig" class="secondary-btn">Cancel</button>
+                <button id="saveConfig" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay no-print"></div>
+    
+    <footer class="app-footer no-print">
+        <small>&copy; <span id="year"></span> Session Wizard. Modular SLP toolkit (alpha).</small>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Therapy Session Data Taker</title>
+		<style>
+			:root{ --critical-bg:#f5f7fa; --critical-surface:#ffffff; --critical-border:#d8dee6; --critical-text:#1f2630; }
+			html,body{ background:var(--color-bg, var(--critical-bg)); color:var(--color-text, var(--critical-text)); }
+			.app-header{ background:rgba(255,255,255,.85); border-bottom:1px solid var(--color-border, var(--critical-border)); height:var(--app-header-height,64px); }
+			.app-header .branding .back-btn{ background:var(--color-accent,#4f8cff); color:#fff; }
+		</style>
+	<link rel="preconnect" href="https://fonts.googleapis.com"/>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+	<!-- Prefetch main shell assets to speed up back navigation -->
+	<link rel="prefetch" href="/index.html" as="document">
+	<link rel="prefetch" href="/assets/css/main.css" as="style">
+	<link rel="prefetch" href="/assets/js/main.js" as="script">
+	<link rel="preload" href="/assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="stylesheet" href="../../assets/css/main.css">
+	<link rel="stylesheet" href="therapy-data-session-taker.css">
+	<script src="../../assets/js/theme.js"></script>
+	<script defer src="../../assets/js/shared/dom-utils.js"></script>
+	<script defer src="../../assets/js/prefetch-back.js"></script>
+	<script defer src="therapy-data-session-taker.js"></script>
+	<style>
+		body { margin: 0; font-family: var(--font-sans); }
+		.main-container { 
+			padding: 10px; 
+			max-width: calc(100vw - 200px);
+			margin: 0 100px;
+			min-width: 1200px;
+		}
+		.main-layout { display: flex; min-height: 70vh; gap: var(--spacing-lg); }
+		.side-panel { 
+			width: 320px; 
+			background: var(--color-surface-alt); 
+			padding: var(--spacing-lg); 
+			box-sizing: border-box; 
+			border: 1px solid var(--color-border); 
+			border-radius: var(--radius-lg);
+			display: flex; 
+			flex-direction: column;
+			height: fit-content;
+			position: sticky;
+			top: var(--spacing-lg);
+		}
+		.preset-dropdown {
+			font-family: var(--font-sans);
+			font-size: 0.95rem;
+			font-weight: 500;
+			padding: 0.5rem 0.9rem;
+			border-radius: var(--radius-sm);
+			border: 1px solid var(--Color-border, var(--color-border));
+			background: var(--color-surface) !important;
+			color: var(--color-text);
+			margin-bottom: var(--spacing-sm);
+			box-shadow: var(--shadow-sm);
+			outline: none;
+			-webkit-appearance: none; /* remove default caret */
+			-moz-appearance: none;
+			appearance: none;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: right 0.75rem center;
+			background-size: 12px 12px;
+		}
+		.draggable-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: var(--spacing-sm); }
+		.draggable-item, .draggable-group { 
+			background: var(--color-surface) !important; 
+			border: 1px solid var(--color-border) !important; 
+			border-radius: var(--radius-sm); 
+			padding: var(--spacing-sm); 
+			cursor: grab; 
+			transition: all 0.2s var(--ease);
+			-webkit-user-select: none;
+			user-select: none;
+			color: var(--color-text) !important;
+		}
+		.draggable-item:hover, .draggable-group:hover {
+			background: var(--color-surface-alt) !important;
+			transform: translateY(-1px);
+			box-shadow: var(--shadow-sm);
+			border-color: var(--color-accent) !important;
+		}
+		.template-area { 
+			flex: 1; 
+			padding: var(--spacing-lg); 
+			background: var(--color-bg); 
+			border-radius: var(--radius-lg);
+			min-width: 0; 
+		}
+		.template-dropzone { 
+			min-height: 500px; 
+			background: var(--color-surface-alt) !important; 
+			border: 2px dashed var(--color-border) !important; 
+			border-radius: var(--radius-md); 
+			padding: var(--spacing-lg); 
+			display: flex; 
+			flex-direction: column; 
+			gap: var(--spacing-md); 
+		}
+		.template-dropzone.drag-over {
+			border-color: var(--color-accent) !important;
+			background: color-mix(in srgb, var(--color-accent) 5%, var(--color-surface-alt)) !important;
+		}
+		.template-component { 
+			background: var(--color-surface) !important; 
+			border: 1px solid var(--color-border) !important; 
+			border-radius: var(--radius-md); 
+			padding: 0 !important; 
+			position: relative; 
+			display: flex; 
+			flex-direction: column;
+			transition: all 0.2s var(--ease);
+		}
+		.template-component:hover {
+			box-shadow: var(--shadow-sm);
+		}
+		.component-header {
+			background: var(--color-surface) !important;
+			border-bottom: 2px solid var(--color-border) !important;
+			padding: var(--spacing-sm) var(--spacing-md) !important;
+			display: flex !important;
+			justify-content: space-between !important;
+			align-items: center !important;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+		}
+		.component-title {
+			font-weight: 600 !important;
+			color: var(--color-text) !important;
+			margin: 0 !important;
+		}
+		.drag-handle { 
+			cursor: grab !important; 
+			margin-left: 8px !important;
+			padding: 4px 8px !important;
+			font-size: 16px !important;
+			border-radius: var(--radius-sm) !important;
+			transition: all 0.2s var(--ease) !important;
+		}
+		.drag-handle:hover {
+			background: var(--color-surface-alt) !important;
+			transform: scale(1.1) !important;
+		}
+		.drag-handle:active {
+			background: var(--color-border) !important;
+			transform: scale(0.95) !important;
+		}
+		.component-content {
+			padding: var(--spacing-md) !important;
+		}
+		.component-content input[type="text"],
+		.component-content textarea,
+		.component-content .tdst-input,
+		.component-content .tdst-textarea {
+			width: 100% !important;
+			box-sizing: border-box !important;
+			border: none !important;
+			background: transparent !important;
+			outline: none !important;
+			padding: 8px 0 !important;
+		}
+		/* Exception: Discourse Transcript should keep its border */
+		.component-content .discourse-transcript-textarea {
+			border: 1px solid var(--color-border) !important;
+			background: var(--color-surface) !important;
+			border-radius: var(--radius-sm) !important;
+			padding: 8px 12px !important;
+		}
+		.component-controls { 
+			display: flex !important; 
+			gap: 4px !important; 
+		}
+		
+		/* Back button */
+		.back-btn {
+			position: absolute;
+			top: var(--spacing-lg);
+			left: var(--spacing-lg);
+			background: var(--color-accent);
+			color: #fff;
+			font-weight: 600;
+			font-size: 0.9rem;
+			padding: 0.65em 1.2em;
+			border: none;
+			border-radius: var(--radius-sm);
+			text-decoration: none;
+			box-shadow: var(--shadow-sm);
+			transition: all 0.25s var(--ease);
+			z-index: 10;
+			display: inline-block;
+		}
+		.back-btn:hover, .back-btn:focus {
+			background: color-mix(in srgb, var(--color-accent) 85%, black);
+			box-shadow: var(--shadow-md);
+			text-decoration: none;
+			outline: none;
+			transform: translateY(-1px);
+		}
+		
+		/* Patient and Date Fields */
+		.meta-row { 
+			display: flex; 
+			align-items: center; 
+			gap: var(--spacing-md); 
+			margin-bottom: var(--spacing-lg); 
+			flex-wrap: wrap;
+		}
+		.meta-label { 
+			font-weight: 600;
+			color: var(--color-text);
+			white-space: nowrap;
+		}
+		.meta-inputbox { 
+			padding: 0.6em 0.8em;
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-sm);
+			background: var(--color-surface);
+			color: var(--color-text);
+			font-family: var(--font-sans);
+			font-size: 0.9rem;
+			box-shadow: var(--shadow-sm);
+			transition: all 0.2s var(--ease);
+		}
+		.meta-inputbox:focus {
+			border-color: var(--color-accent);
+			outline: none;
+			box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+		}
+		
+		/* Page Title */
+		h1 {
+			margin: var(--spacing-xl) 0 var(--spacing-md) 0;
+			font-size: 1.8rem;
+			font-weight: 600;
+			color: var(--color-text);
+		}
+		
+		/* Page Description */
+		p {
+			color: var(--color-text-soft);
+			margin: 0 0 var(--spacing-lg) 0;
+			font-size: 0.95rem;
+		}
+		
+		/* Tool Description */
+		.tool-description {
+			color: var(--color-text-muted);
+			margin-bottom: var(--spacing-xl);
+			font-size: 1.1rem;
+		}
+		
+		/* Panel Section Structure */
+		.panel-section {
+			margin-bottom: var(--spacing-xl);
+			padding-bottom: var(--spacing-lg);
+			border-bottom: 1px solid var(--color-border);
+		}
+		
+		.panel-section:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+		}
+		
+		.panel-section h3 {
+			margin: 0 0 var(--spacing-md) 0;
+			color: var(--color-text);
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+		
+		/* Template Header */
+		.template-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--spacing-md);
+			margin-bottom: var(--spacing-sm); /* tightened spacing so dropzone sits closer */
+		}
+		
+		.template-header h2 {
+			margin: 0 0 var(--spacing-xs) 0;
+			color: var(--color-text);
+		}
+		
+		.template-header p {
+			color: var(--color-text-muted);
+			margin: 0;
+		}
+		.template-header-text {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.template-header-actions {
+			display: flex;
+			align-items: center;
+		}
+
+		/* Search field matching the preset dropdown */
+		.preset-search {
+			font-family: var(--font-sans);
+			font-size: 0.95rem;
+			font-weight: 500;
+			padding: 0.45rem 0.75rem;
+			border-radius: var(--radius-sm);
+			border: 1px solid var(--Color-border, var(--color-border));
+			background: var(--color-surface) !important;
+			color: var(--color-text);
+			margin-bottom: var(--spacing-sm);
+			box-shadow: var(--shadow-sm);
+			outline: none;
+			width: 100%;
+			box-sizing: border-box;
+		}
+		.preset-search:focus {
+			border-color: var(--color-accent);
+			box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.08);
+			outline: none;
+		}
+		
+		/* Clear Session Template Button */
+		.clear-template-btn {
+			background: var(--color-error);
+			color: #fff;
+			font-weight: 600;
+			font-size: 0.9rem;
+			padding: 0.6em 1.3em;
+			border: none;
+			border-radius: var(--radius-sm);
+			box-shadow: var(--shadow-sm);
+			transition: all 0.25s var(--ease);
+			cursor: pointer;
+		}
+		.clear-template-btn:hover, .clear-template-btn:focus {
+			background: color-mix(in srgb, var(--color-error) 85%, black);
+			box-shadow: var(--shadow-md);
+			outline: none;
+			transform: translateY(-1px);
+		}
+		
+		/* Page-level action buttons (fixed bottom-right like Goal Builder) */
+		.page-actions {
+			position: fixed;
+			right: 24px;
+			bottom: 24px;
+			display: flex;
+			gap: 0.6rem;
+			z-index: 60;
+		}
+		/* Keep .button-row present for backward compatibility but hide it if still used elsewhere */
+		.button-row { display: none; }
+	</style>
+</head>
+<body>
+	<header class="app-header">
+		<div class="branding">
+			<a href="../../index.html" class="back-btn back-btn-inline-reset">← Session Wizard</a>
+		</div>
+		<div class="header-actions">
+			<button id="themeToggle" class="ghost-btn" aria-pressed="false" aria-label="Toggle theme">🌙</button>
+		</div>
+	</header>
+	<div class="main-container">
+		<h1>Therapy Session Data Taker</h1>
+		<p class="tool-description">Create custom session templates by dragging and dropping components.</p>
+		<div class="meta-row">
+			<label for="patientName" class="meta-label">Patient:</label>
+			<input type="text" id="patientName" class="meta-inputbox" placeholder="Enter patient name..." />
+			<label for="sessionDate" class="meta-label">Date:</label>
+			<input type="date" id="sessionDate" class="meta-inputbox" />
+		</div>
+		<div class="main-layout">
+			<aside class="side-panel">
+				<div class="panel-section">
+					<h3>Components</h3>
+					<select class="preset-dropdown" id="presetDropdown" title="Choose a template">
+						<option value="default">Default Training Session</option>
+						<option value="Discourse Treatment">Discourse Treatment</option>
+						<!-- Add more presets here -->
+					</select>
+					<input type="text" class="search-field preset-search" id="componentSearch" placeholder="Search components...">
+					<div class="draggable-list" id="draggableList">
+					<div class="draggable-item" draggable="true" data-type="Custom Text Field">Custom Text Field</div>
+					<div class="draggable-group" draggable="true" data-preset="default">Default Training Session (Group)</div>
+					<div class="draggable-group" draggable="true" data-preset="Discourse Treatment">Discourse Treatment (Group)</div>
+					<div class="draggable-item" draggable="true" data-type="Location">Location</div>
+					<div class="draggable-item" draggable="true" data-type="Target">Target</div>
+					<div class="draggable-item" draggable="true" data-type="Aim">Aim</div>
+					<div class="draggable-item" draggable="true" data-type="Check-in Info and Results of Homework">Check-in Info and Results of Homework</div>
+					<div class="draggable-item" draggable="true" data-type="Target Discourse Structure(s)">Target Discourse Structure(s)</div>
+					<div class="draggable-item" draggable="true" data-type="Theme/Subject Matter">Theme/Subject Matter</div>
+					<div class="draggable-item" draggable="true" data-type="Word List">Word List</div>
+					<div class="draggable-item" draggable="true" data-type="Sentence List">Sentence List</div>
+					<div class="draggable-item" draggable="true" data-type="Discourse Transcript">Discourse Transcript</div>
+					<div class="draggable-item" draggable="true" data-type="Session">Session</div>
+					<div class="draggable-item" draggable="true" data-type="Notes">Notes</div>
+					<div class="draggable-item" draggable="true" data-type="Comments/Observations">Comments/Observations</div>
+					<div class="draggable-item" draggable="true" data-type="Session Summary/Analysis of Progress">Session Summary/Analysis of Progress</div>
+					<div class="draggable-item" draggable="true" data-type="Feedback and Homework Provided">Feedback and Homework Provided</div>
+					<div class="draggable-item" draggable="true" data-type="Plan for Next Session">Plan for Next Session</div>
+					<!-- Add more components as needed -->
+				</div>
+			</div>
+			</aside>
+			<main class="template-area">
+				<div class="template-header">
+					<div class="template-header-text">
+						<h2>Build Your Session Template</h2>
+						<p>Click or drag components from the left panel to create your custom session template.</p>
+					</div>
+					<div class="template-header-actions">
+						<button id="clearTemplateBtn" class="clear-template-btn">Clear Session Template</button>
+					</div>
+				</div>
+				<div class="template-dropzone" id="templateDropzone">
+					<div class="dropzone-placeholder" id="dropzonePlaceholder">
+						<span class="placeholder-icon">📋</span>
+						<p>Click or drop components here to build your template</p>
+					</div>
+				</div>
+			</main>
+		</div>
+		<div class="page-actions">
+			<button id="copyClipboardBtn" class="primary-btn">Copy to Clipboard</button>
+			<button id="printPageBtn" class="secondary-btn">Printable Page</button>
+		</div>
+	</div>
+</body>
+</html>

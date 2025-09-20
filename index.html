@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="assets/img/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/icon-192.png">
+  <link rel="manifest" href="manifest.json" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Session Wizard</title>
+  <style>
+    /* Critical CSS: prevent white flash before full CSS loads. Uses CSS variables when available.
+       Keep minimal to avoid interfering with main styles; fallbacks mirror default theme values. */
+    :root{ --critical-bg:#f5f7fa; --critical-surface:#ffffff; --critical-border:#d8dee6; --critical-text:#1f2630; }
+    html,body{ background:var(--color-bg, var(--critical-bg)); color:var(--color-text, var(--critical-text)); }
+    .app-header{ background:rgba(255,255,255,.85); border-bottom:1px solid var(--color-border, var(--critical-border)); height:var(--app-header-height,64px); }
+    .app-header .branding .back-btn{ background:var(--color-accent,#4f8cff); color:#fff; }
+  </style>
+  <meta name="description" content="Session Wizard – Modular Speech-Language Pathology Goal & Session Toolkit" />
+  <link rel="stylesheet" href="assets/css/inter-local.css" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/inline-fixes.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="branding">
+      <div class="logo-circle" aria-hidden="true">
+        <img src="assets/img/icon-512.png" alt="Session Wizard logo" />
+      </div>
+      <h1 class="app-title">Session Wizard</h1>
+    </div>
+    <div class="header-actions">
+      <button id="themeToggle" class="ghost-btn" aria-pressed="false" aria-label="Toggle theme">🌙</button>
+    </div>
+  </header>
+  <main class="dashboard" id="dashboard" tabindex="-1">
+    <section class="intro">
+      <h2 class="subtitle"> Dashboard</h2>
+    </section>
+    <nav class="tool-grid" aria-label="Primary tools">
+      <button class="tool-card" data-tool="goal-builder" onclick="window.location.href='tools/goal-builder/index.html'">
+        <span class="tool-title">Goal Builder</span>
+        <span class="tool-desc">Create SMART goals and build goal attainment scales.</span>
+      </button>
+      <button class="tool-card" data-tool="therapy-data-session-taker" onclick="window.location.href='tools/therapy-data-session-taker/index.html'">
+        <span class="tool-title">Therapy Session Data Taker</span>
+        <span class="tool-desc">Customize templates for real-time session data tracking.</span>
+      </button>
+      <button class="tool-card" data-tool="progress-monitor" onclick="window.location.href='tools/progress-monitor/index.html'">
+        <span class="tool-title">Progress Monitor</span>
+        <span class="tool-desc">Compare progress from session to session.</span>
+      </button>
+      <button class="tool-card" data-tool="homework-tracker" onclick="window.location.href='tools/homework-tracker/index.html'">
+        <span class="tool-title">Homework Tracker</span>
+        <span class="tool-desc">Create customizable printable home program logs.</span>
+      </button>
+    </nav>
+  <div class="info-cards-row">
+  <section class="explainer-box">
+        <h3>What is Session Wizard?</h3>
+        <div class="explainer-content">
+          <p class="explainer-intro">
+            The Session Wizard is a toolkit designed to help clinicians with setting therapy goals, taking data in and outside of sessions, and tracking clients' progress. The tools provided are built to be cross-applicable for different clinical settings and interventions, but some components are intended for specific interventions from the world of speech-language pathology and cognitive rehabilitation.
+          </p>
+        </div>
+      </section>
+  <section class="attributions-box">
+        <h3>Attributions</h3>
+        <div class="attributions-content">
+          <p class="bibliography-intro">
+            A great deal of credit is due to <a href="https://www.guilford.com/books/Transforming-Cognitive-Rehabilitation/Sohlberg-Hamilton-Turkstra/9781462550876" target="_blank" rel="noopener noreferrer"><em>Transforming Cognitive Rehabilitation: Effective Instructional Methods</em></a> (Sohlberg, Hamilton, & Turkstra, 2023) for inspiring much of the spirit and content of this toolkit. Other works are cited in the contents of the tools when appropriate and are listed in full below.
+          </p>
+          <button class="dropdown-header" id="worksCitedToggle" type="button" aria-expanded="false" aria-controls="citationsList">
+            <span>Works Cited ▼</span>
+          </button>
+          <div class="citations" id="citationsList">
+            <p class="citation">
+              Bard-Pondarré, R., Villepinte, C., Roumenoff, F., Lebrault, H., Bonnyaud, C., Pradeau, C., Bensmail, D., Isner-Horobeti, M.-E., & Krasny-Pacini, A. (2023). Goal Attainment Scaling in rehabilitation: An educational review providing a comprehensive didactical tool box for implementing Goal Attainment Scaling. <em>Journal of Rehabilitation Medicine</em>, <em>55</em>, jrm6498. <a href="https://doi.org/10.2340/jrm.v55.6498" target="_blank" rel="noopener noreferrer">https://doi.org/10.2340/jrm.v55.6498</a>
+            </p>
+            <p class="citation">
+              Sohlberg, M. M., Hamilton, J., & Turkstra, L. (2023). <em>Transforming cognitive rehabilitation: Effective instructional methods</em>. The Guilford Press.
+            </p>
+            <p class="citation">
+              Davis, G. A. (1980). A critical look at PACE therapy. <em>Clinical Aphasiology: Proceedings of the Conference 1980</em>, 248–257. <a href="http://aphasiology.pitt.edu/567/" target="_blank" rel="noopener noreferrer">http://aphasiology.pitt.edu/567/</a>
+            </p>
+            <p class="citation">
+              Nicholas, L. E., & Brookshire, R. H. (1993). A System for Quantifying the Informativeness and Efficiency of the Connected Speech of Adults With Aphasia. <em>Journal of Speech, Language, and Hearing Research</em>, <em>36</em>(2), 338–350. <a href="https://doi.org/10.1044/jshr.3602.338" target="_blank" rel="noopener noreferrer">https://doi.org/10.1044/jshr.3602.338</a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+    </section>
+  </main>
+  <aside id="modulePanel" class="module-panel" aria-labelledby="moduleTitle" aria-hidden="true">
+    <div class="module-header">
+      <h2 id="moduleTitle">Module</h2>
+      <button id="closeModule" class="ghost-btn" aria-label="Close module">✕</button>
+    </div>
+    <div id="moduleContent" class="module-content">
+      <p class="placeholder">Module not yet implemented. Placeholder shell. 🚧</p>
+    </div>
+  </aside>
+  <div id="panelScrim" class="scrim" hidden></div>
+  <footer class="app-footer">
+    <small>&copy; <span id="year"></span> Session Wizard. Modular SLP toolkit (alpha).</small>
+  </footer>
+  <script src="assets/js/theme.js"></script>
+  <script type="module" src="assets/js/main.js"></script>
+  <script>
+    // Dropdown toggle for Works Cited
+    document.addEventListener('DOMContentLoaded', function() {
+      var toggleBtn = document.getElementById('worksCitedToggle');
+      var citationsList = document.getElementById('citationsList');
+      if (toggleBtn && citationsList) {
+        toggleBtn.addEventListener('click', function() {
+          var expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+          toggleBtn.setAttribute('aria-expanded', !expanded);
+          citationsList.style.display = expanded ? 'none' : 'block';
+          toggleBtn.querySelector('span').textContent = expanded ? 'Works Cited ▼' : 'Works Cited ▲';
+        });
+      }
+    });
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>

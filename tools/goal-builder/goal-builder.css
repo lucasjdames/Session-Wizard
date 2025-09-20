@@ -1,0 +1,535 @@
+/* Goal Builder Specific Styles */
+
+/* --- Shared visual alignment with other tools (typography, headers, tables) --- */
+/* Use the app's main UI font and improve heading consistency */
+body, .tool-container, .sgb-checklist, .gas-table {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+}
+
+h1, h2, h3, .section-header, .sgb-checklist h2 {
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+/* Visual: place header/meta outside of light tool container to sit on page bg */
+.gb-page-header {
+    background: var(--app-header-bg, transparent);
+    padding: 0 0 0 var(--spacing-lg);
+    margin-bottom: calc(var(--spacing-md) * -1);
+}
+
+.gb-meta-row {
+    display:flex; gap: var(--spacing-md); align-items:center;
+    padding: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
+    color: var(--color-text);
+}
+
+.gb-meta-row input, .gb-meta-row .form-input {
+    background: transparent; border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Utility helpers */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.main-container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-lg); }
+.hidden { display: none !important; }
+
+/* Inline-reset for header back button to appear inline within header */
+.back-btn-inline-reset { position: static; margin: 0; }
+
+/* Ensure selector width stays natural */
+#levelSelector { width: auto; }
+
+/* Vendor prefixes for user-select where present */
+.sgb-block, .draggable-item, .draggable-group {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+/* Page-level card layout: stacked cards on the dark background */
+.card {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.2rem;
+    box-shadow: 0 8px 24px rgba(3, 10, 18, 0.35);
+    margin-bottom: 1.2rem;
+}
+
+.aim-card { /* slightly smaller padding for the Aim box */
+    padding: 0.8rem 1rem;
+}
+
+.sgb-card .sgb-blocks {
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.5rem;
+}
+
+.sgb-drop-area {
+    min-height: 64px;
+    padding: 0.6rem;
+    border: 1px dashed rgba(0,0,0,0.08);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+}
+
+/* GAS card styling keeps the table full-width inside the card */
+.gas-card table.gas-table {
+    width:100%;
+}
+
+/* Page-level action buttons float on the dark page background */
+.page-actions {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display:flex;
+    gap:0.6rem;
+    z-index: 60;
+}
+
+/* Ensure the original in-card button-row isn't visible if it exists */
+.tool-container .button-row { display:none; }
+
+/* Dropdown header + slide-down animation */
+.dropdown-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    padding: 0.6rem 0.2rem;
+    color: var(--color-text);
+    user-select: none;
+    font-weight: 600;
+}
+
+.dropdown-header .dropdown-label { flex:1; }
+.dropdown-header .caret {
+    display:inline-block;
+    margin-left: 0.6rem;
+    transition: transform 240ms var(--ease);
+    font-size: 0.95rem;
+    color: var(--color-text-soft);
+}
+
+/* Closed state: collapsed with zero max-height */
+.dropdown-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 260ms var(--ease), padding 160ms var(--ease);
+    padding: 0 0; /* will expand when opened */
+}
+
+/* Open state: when parent header has aria-expanded=true we rotate caret and expand content */
+.dropdown-header[aria-expanded="true"] + .dropdown-content {
+    max-height: 1200px; /* large enough to fit content */
+    padding: var(--spacing-lg) 0;
+}
+
+.dropdown-header[aria-expanded="true"] .caret {
+    transform: rotate(180deg);
+    color: var(--color-accent);
+}
+
+/* SMART Goal Builder Specific Styles */
+
+/* Interactive Blocks */
+.sgb-blocks-row {
+    margin: var(--spacing-xl) 0 var(--spacing-lg) 0;
+}
+
+.sgb-blocks {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    margin-top: var(--spacing-sm);
+}
+
+.sgb-block {
+    background: var(--grad-accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.7em 1.2em;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    cursor: grab;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    border: 2px solid transparent;
+    transition: all 0.25s var(--ease);
+    margin-bottom: var(--spacing-sm);
+}
+
+.sgb-block:active {
+    background: color-mix(in srgb, var(--color-accent) 85%, black);
+    box-shadow: var(--shadow-md);
+    transform: scale(0.98);
+}
+
+.sgb-block:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* Drop Area */
+.sgb-drop-area-row {
+    margin-bottom: var(--spacing-xl);
+}
+
+.sgb-drop-area {
+    min-height: 80px;
+    background: var(--color-surface-alt);
+    border: 2px dashed var(--color-accent);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg) var(--spacing-md);
+    display: flex;
+    gap: 0.7em;
+    flex-wrap: wrap;
+    align-items: center;
+    transition: all 0.25s var(--ease);
+    margin-bottom: var(--spacing-sm);
+    position: relative;
+}
+
+.sgb-drop-area.dragover {
+    background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface-alt));
+    border-color: var(--color-accent);
+}
+
+.sgb-drop-placeholder {
+    color: var(--color-text-soft);
+    font-size: 0.95rem;
+    font-style: italic;
+    padding-left: 0.2em;
+}
+
+.sgb-drop-block {
+    background: var(--color-surface);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 0.5em 1em 0.5em 0.7em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-right: 0.2em;
+    margin-bottom: 0.4em;
+    position: relative;
+    min-width: 180px;
+    transition: all 0.25s var(--ease);
+}
+
+.sgb-drop-block.drag-insert {
+    box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.3);
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+}
+
+.sgb-drop-label {
+    color: var(--color-accent);
+    font-weight: 700;
+    margin-right: 0.3em;
+    font-size: 0.95em;
+}
+
+.sgb-drop-input {
+    flex: 1;
+    font-size: 0.9em;
+    padding: 0.4em 0.7em;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    transition: all 0.2s var(--ease);
+}
+
+.sgb-drop-input:focus {
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+.sgb-drop-remove {
+    background: var(--color-error);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1em;
+    width: 1.6em;
+    height: 1.6em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s var(--ease);
+}
+
+.sgb-drop-remove:hover {
+    background: color-mix(in srgb, var(--color-error) 85%, black);
+    box-shadow: var(--shadow-md);
+    transform: scale(1.1);
+}
+
+.sgb-goal-sentence {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-success);
+    background: color-mix(in srgb, var(--color-success) 10%, var(--color-surface));
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-top: var(--spacing-sm);
+    min-height: 2.2em;
+    box-shadow: var(--shadow-sm);
+    word-break: break-word;
+    transition: all 0.25s var(--ease);
+    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+}
+
+/* SMART Checklist Styles */
+.sgb-checklist {
+    margin: var(--spacing-xl) 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.sgb-checklist h2 {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-text);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.sgb-checklist label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    line-height: 1.4;
+}
+
+.sgb-checklist input[type="checkbox"] {
+    margin-right: var(--spacing-sm);
+    accent-color: var(--color-accent);
+}
+
+.check-term {
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+.check-desc {
+    color: var(--color-text-soft);
+}
+
+/* GAS Builder Specific Styles */
+
+/* Form field spacing and layout */
+.goal-meta, .timeline-meta, .level-selector-row, .aim-row {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.95rem;
+}
+
+.form-textarea {
+    width: 100%;
+    min-height: 2.2em;
+    font-size: 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.7em;
+    resize: none;
+    box-sizing: border-box;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+}
+
+.form-textarea:focus {
+    border-color: var(--color-accent);
+    outline: none;
+    background: var(--color-surface);
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+}
+
+/* Sleek GAS Table Styles */
+.gas-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: var(--spacing-xl) 0;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    font-size: 0.9rem;
+    transition: box-shadow 0.3s var(--ease);
+}
+
+.gas-table th, .gas-table td {
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--spacing-md) 0.7rem;
+    /* align tables like other tools (left-aligned) for readability */
+    text-align: left;
+    background: var(--color-surface-alt);
+    transition: background 0.2s var(--ease);
+}
+
+.gas-table th {
+    background: var(--color-surface-alt);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    border-top: 1px solid var(--color-border);
+    vertical-align: top;
+    padding-top: var(--spacing-lg);
+    padding-bottom: 0.7rem;
+}
+
+.gas-table th > div, .gas-table th > textarea {
+    display: block;
+    width: 100%;
+}
+
+.gas-table tr:last-child td {
+    border-bottom: none;
+}
+
+.header-num {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: 0.3em;
+    line-height: 1.2;
+    min-height: 1.5em;
+    text-align: center;
+}
+
+.header-input, .goal-input {
+    width: 100%;
+    min-width: 120px;
+    max-width: 100%;
+    min-height: 2.2em;
+    font-size: 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.7em;
+    resize: none;
+    box-sizing: border-box;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden !important;
+    margin-top: 0;
+}
+
+.header-input:focus, .goal-input:focus {
+    border-color: var(--color-accent);
+    outline: none;
+    background: var(--color-surface);
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+}
+
+.gas-table tr:hover td, .gas-table tr:hover th {
+    background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-alt));
+}
+
+/* GAS Checklist Styles */
+.gas-checklist {
+    margin: var(--spacing-xl) 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.gas-checklist h2 {
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-text);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.gas-checklist label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    line-height: 1.4;
+}
+
+.gas-checklist input[type="checkbox"] {
+    margin-right: var(--spacing-sm);
+    accent-color: var(--color-accent);
+}
+
+.checklist-child {
+    margin-left: var(--spacing-xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Dropdown Headers */
+.dropdown-header {
+    cursor: pointer;
+    background: var(--color-surface-alt);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--color-text);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s var(--ease);
+    border: 1px solid var(--color-border);
+}
+
+.dropdown-header:hover {
+    background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-alt));
+    border-color: var(--color-accent);
+}
+
+#smart-checklist, #gas-checklist {
+    margin: 0 0 var(--spacing-lg) 0;
+}
+
+/* Print styles */
+@media print {
+    .back-btn, .button-row {
+        display: none !important;
+    }
+    
+    .tool-container {
+        box-shadow: none;
+        margin: 0;
+        padding: var(--spacing-md);
+    }
+    
+    .sgb-blocks-row {
+        display: none !important;
+    }
+}

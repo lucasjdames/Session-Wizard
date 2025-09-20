@@ -1,0 +1,12 @@
+{
+  "name": "session-wizard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx live-server --quiet --watch=./ ./",
+    "build": "echo \"No build step yet\""
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

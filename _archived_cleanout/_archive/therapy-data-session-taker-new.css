@@ -1,0 +1,307 @@
+/* Therapy Session Data Taker Specific Styles */
+
+/* Component controls styles */
+.component-controls {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.component-controls .delete-btn {
+    order: 2;
+    margin-right: 8px;
+    margin-bottom: auto;
+    background-color: var(--color-error);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s var(--ease);
+}
+
+.component-controls .duplicate-btn {
+    order: 1;
+    background: var(--color-success);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s var(--ease);
+}
+
+.component-controls .duplicate-btn:hover {
+    background: color-mix(in srgb, var(--color-success) 85%, black);
+    transform: scale(1.1);
+}
+
+.component-controls .delete-btn:hover {
+    background: color-mix(in srgb, var(--color-error) 85%, black);
+    transform: scale(1.1);
+}
+
+/* SRT Session Data table mark styles */
+.srt-mark {
+    cursor: pointer;
+    font-size: 22px;
+    margin: 0 4px;
+    color: var(--color-text-soft);
+    transition: all 0.25s var(--ease);
+    border-radius: 50%;
+    padding: 2px 6px;
+    user-select: none;
+}
+
+.srt-correct.active {
+    color: var(--color-success);
+    background: color-mix(in srgb, var(--color-success) 15%, var(--color-surface));
+    font-weight: bold;
+}
+
+.srt-incorrect.active {
+    color: var(--color-error);
+    background: color-mix(in srgb, var(--color-error) 15%, var(--color-surface));
+    font-weight: bold;
+}
+
+/* SRT Session Data table styles */
+.srt-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-bottom: var(--spacing-xl);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    font-size: 0.9rem;
+    transition: box-shadow 0.3s var(--ease);
+}
+
+.srt-table th, .srt-table td {
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--spacing-md) 0.7rem;
+    text-align: center;
+    background: var(--color-surface-alt);
+    transition: background 0.2s var(--ease);
+}
+
+.srt-table th {
+    background: var(--color-surface-alt);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    border-top: 1px solid var(--color-border);
+    vertical-align: top;
+    padding-top: var(--spacing-lg);
+    padding-bottom: 0.7rem;
+}
+
+.srt-table th > div, .srt-table th > textarea {
+    display: block;
+    width: 100%;
+}
+
+.srt-table tr:last-child td {
+    border-bottom: none;
+}
+
+.srt-table .trial-cell {
+    font-weight: 700;
+    color: var(--color-accent);
+    background: var(--color-surface-alt);
+    width: 50px;
+    text-align: center;
+}
+
+.srt-table .data-cell {
+    width: 100px;
+    position: relative;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.srt-table .notes-cell {
+    text-align: left;
+    vertical-align: top;
+    width: auto;
+}
+
+.srt-table .notes-input {
+    width: 100%;
+    min-width: 150px;
+    min-height: 50px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.5em;
+    resize: vertical;
+    font-size: 0.9rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-sm);
+}
+
+.srt-table .notes-input:focus {
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+/* Component Block Styles */
+.trial-block, .qualitative-notes, .session-summary, .text-block {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-xl);
+    background: var(--color-surface);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s var(--ease);
+}
+
+.trial-block:hover, .qualitative-notes:hover, .session-summary:hover, .text-block:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.trial-block h3, .qualitative-notes h3, .session-summary h3, .text-block h3 {
+    color: var(--color-accent);
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+    font-weight: 600;
+}
+
+.trial-block .notes-textarea, .qualitative-notes .notes-textarea, .session-summary .notes-textarea {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    resize: vertical;
+    font-size: 0.9rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.trial-block .notes-textarea:focus, .qualitative-notes .notes-textarea:focus, .session-summary .notes-textarea:focus {
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+/* Session Summary specific styles */
+.session-summary .summary-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.session-summary .accuracy-display {
+    flex: 1;
+    min-width: 200px;
+    background: color-mix(in srgb, var(--color-success) 10%, var(--color-surface));
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    text-align: center;
+    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+}
+
+.session-summary .accuracy-display .accuracy-percentage {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-success);
+    margin-bottom: 0.5rem;
+}
+
+.session-summary .accuracy-display .accuracy-label {
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.session-summary .trial-counter {
+    flex: 1;
+    min-width: 200px;
+    background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    text-align: center;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+.session-summary .trial-counter .trial-count {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.session-summary .trial-counter .trial-label {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+/* Text Block specific styles */
+.text-block .text-content {
+    min-height: 80px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    font-size: 0.9rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    transition: all 0.2s var(--ease);
+    box-shadow: var(--shadow-sm);
+    white-space: pre-wrap;
+    word-break: break-word;
+    resize: vertical;
+    overflow-y: auto;
+}
+
+.text-block .text-content:focus {
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+/* Print styles */
+@media print {
+    .back-btn, .button-row, .component-controls, .clear-template-btn {
+        display: none !important;
+    }
+    
+    .main-container {
+        padding: var(--spacing-md);
+    }
+    
+    .trial-block, .qualitative-notes, .session-summary, .text-block, .srt-table {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
