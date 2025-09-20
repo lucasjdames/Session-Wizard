@@ -13,7 +13,7 @@ A modular web-based toolkit designed to help Speech-Language Pathologists (SLPs)
 - Progressive Web App (PWA) - works offline and can be installed
 - Responsive design for desktop and mobile devices
 - No external dependencies - runs entirely in the browser
-- Dark/light theme support - coming in a later version
+- Dark/light theme support
 
 ## Quick Start
 
