@@ -2212,8 +2212,19 @@ class HomeworkTracker {
             printArea.style.display = 'block';
         }
         
-        // Print the page
-        window.print();
+        // Print the page using DomUtils to support Electron PDF preview
+        try {
+            const printAreaHtml = printArea.innerHTML;
+            const headHtml = DomUtils && typeof DomUtils.getDefaultPrintHead === 'function' ? DomUtils.getDefaultPrintHead() : '';
+            if (window.DomUtils && typeof DomUtils.openPrintWindow === 'function') {
+                DomUtils.openPrintWindow({ title: 'Homework Print Log', bodyHtml: printAreaHtml, headHtml: headHtml, autoPrint: true });
+            } else {
+                window.print();
+            }
+        } catch (e) {
+            console.error('Print failed', e);
+            window.print();
+        }
         
         // If we were in edit mode, return to it after printing
         if (wasInEditMode) {

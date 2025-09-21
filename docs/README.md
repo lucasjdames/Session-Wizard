@@ -13,7 +13,7 @@ A modular web-based toolkit designed to help Speech-Language Pathologists (SLPs)
 - Progressive Web App (PWA) - works offline and can be installed
 - Responsive design for desktop and mobile devices
 - No external dependencies - runs entirely in the browser
-- Dark/light theme support - coming in a later version
+- Dark/light theme support
 
 ## Quick Start
 
@@ -24,6 +24,19 @@ A modular web-based toolkit designed to help Speech-Language Pathologists (SLPs)
    This starts a live server at `http://localhost:8080`
 
 2. **Production**: Simply serve the files from any web server - no build step required
+
+Desktop build
+---------------
+There is a minimal Electron wrapper under `session-wizard-desktop-build/` for creating a standalone Windows executable using `electron-builder`.
+
+From PowerShell:
+
+```powershell
+cd session-wizard-desktop-build
+npm install
+npm run start    # to run the app
+npm run build    # to create an installer (Windows)
+```
 
 ## Project Structure
 

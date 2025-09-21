@@ -491,12 +491,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
             html += `</body></html>`;
 
-            const printWin = window.open('', '_blank', 'width=900,height=900');
-            printWin.document.open();
-            printWin.document.write(html);
-            printWin.document.close();
-            printWin.focus();
-            setTimeout(() => { printWin.print(); }, 400);
+            // Use DomUtils.openPrintWindow to allow Electron to render a PDF preview, or fallback to window.print()
+            if (window.DomUtils && typeof DomUtils.openPrintWindow === 'function') {
+                DomUtils.openPrintWindow({ title: 'Printable Session Data', bodyHtml: html, headHtml: '' , autoPrint: true });
+            } else {
+                const printWin = window.open('', '_blank', 'width=900,height=900');
+                printWin.document.open();
+                printWin.document.write(html);
+                printWin.document.close();
+                printWin.focus();
+                setTimeout(() => { printWin.print(); }, 400);
+            }
         });
     }
 });

@@ -1,0 +1,53 @@
+{
+  "name": "session-wizard-desktop-build",
+  "version": "0.1.0",
+  "description": "Electron wrapper for Session Wizard web app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --windows nsis"
+  },
+  "author": "Lucas James",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^38.1.2",
+    "electron-builder": "^24.6.0"
+  },
+  "build": {
+    "appId": "com.lucasjames.sessionwizard",
+    "productName": "Session Wizard",
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "icon": "..\\assets\\img\\icon-512.png",
+    "mac": {
+      "icon": "..\\assets\\img\\icon-512.icns"
+    },
+    "files": [
+      "..\\index.html",
+      "..\\manifest.json",
+      "..\\service-worker.js",
+      "..\\assets/**/*",
+      "..\\tools/**/*",
+      "main.js",
+      "preload.js"
+    ],
+    "win": {
+      "icon": "..\\assets\\img\\icon-192.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

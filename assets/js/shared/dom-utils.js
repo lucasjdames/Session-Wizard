@@ -136,6 +136,23 @@
 	// --- Print Window Helper ---
 	// Usage: DomUtils.openPrintWindow({ title: 'Title', bodyHtml: '<div>...</div>', headHtml: '<style>...</style>' })
 	DomUtils.openPrintWindow = function({ title = 'Print', bodyHtml = '', headHtml = '', autoPrint = true } = {}){
+		// If running inside Electron and the bridge is available, use the native preview flow.
+		try {
+			if (window.electron && typeof window.electron.printHtmlToPdfPreviewFiles === 'function') {
+				// Collect stylesheet hrefs and send to main for inlining (safer for file:// origins)
+				const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(l => l.href).filter(Boolean);
+				// Include inline <style> tags as headHtml as well
+				let inlineHead = headHtml || '';
+				document.querySelectorAll('style').forEach(s => { inlineHead += `<style>${s.innerHTML}</style>`; });
+				window.electron.printHtmlToPdfPreviewFiles({ title, headHtml: inlineHead, bodyHtml, stylesheetHrefs: links }).then(res => {
+					if (!res || !res.success) console.error('PDF preview failed', res && res.error);
+				}).catch(err => console.error('PDF preview error', err));
+				return;
+			}
+		} catch (e) {
+			// continue to web flow
+		}
+
 		const win = window.open('', '_blank');
 		if (!win) {
 			alert('Popup blocked. Please allow popups to print.');
@@ -150,22 +167,22 @@
 				try { win.focus(); } catch(e){}
 				try { win.print(); } catch(e){}
 			};
-
-				// Shared minimal print CSS for tables/typography
-				DomUtils.getDefaultPrintHead = function(){
-					return `
-						<meta charset="utf-8">
-						<style>
-							html, body { background: #fff; color: #111; font-family: Segoe UI, Arial, sans-serif; }
-							h1, h2, h3 { color: #222; }
-							table { width: 100%; border-collapse: collapse; }
-							th, td { border: 1px solid #bbb; padding: 0.6em 0.4em; vertical-align: top; }
-							th { background: #e9eef5; }
-							@media print { body { padding: 12px; } }
-						</style>
-					`;
-				};
 		}
+
+		// Shared minimal print CSS for tables/typography
+		DomUtils.getDefaultPrintHead = function(){
+			return `
+				<meta charset="utf-8">
+				<style>
+					html, body { background: #fff; color: #111; font-family: Segoe UI, Arial, sans-serif; }
+					h1, h2, h3 { color: #222; }
+					table { width: 100%; border-collapse: collapse; }
+					th, td { border: 1px solid #bbb; padding: 0.6em 0.4em; vertical-align: top; }
+					th { background: #e9eef5; }
+					@media print { body { padding: 12px; } }
+				</style>
+			`;
+		};
 	};
 
 		function escapeHtml(str){
