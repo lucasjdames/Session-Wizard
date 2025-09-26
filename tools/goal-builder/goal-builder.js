@@ -220,6 +220,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- Section Dropdowns ---
 function toggleSection(id, headerEl) {
+
+{
+    // no-op placeholder so the toggleSection function body follows correctly
+}
     const el = document.getElementById(id);
     if (!el) return;
     // If header element passed, toggle its aria-expanded for accessibility and caret rotation
@@ -243,6 +247,271 @@ function toggleSection(id, headerEl) {
 }
 
 // --- Clipboard/Print Text ---
+// --- Snapshot / Restore helpers for Save/Load ---
+(function(){
+    function serializeDropBlocks() {
+        const dropArea = document.getElementById('sgb-drop-area');
+        if (!dropArea) return [];
+        return Array.from(dropArea.querySelectorAll('.sgb-drop-block')).map(b => ({
+            block: b.dataset.block,
+            value: b.querySelector('.sgb-drop-input') ? b.querySelector('.sgb-drop-input').value : '',
+            html: b.innerHTML
+        }));
+    }
+
+    function serializeGASTable() {
+        const table = document.getElementById('gasTable');
+        if (!table) return null;
+        const rows = Array.from(table.querySelectorAll('tr'));
+        const headerRow = rows[0];
+        const goalRow = rows[1];
+        const headers = Array.from(headerRow.children).map(th => ({
+            num: th.querySelector('.header-num')?.textContent || '',
+            desc: th.querySelector('.header-input')?.value || ''
+        }));
+        const goals = Array.from(goalRow.children).map(td => td.querySelector('.goal-input')?.value || '');
+        return { headers, goals };
+    }
+
+    function serializeChecklists() {
+        const result = {};
+        // SMART checklist
+        const smart = document.querySelectorAll('#smart-checklist input[type="checkbox"]');
+        result.smart = Array.from(smart).map(ch => ({ checked: !!ch.checked, label: ch.parentElement?.textContent?.trim?.() }));
+        // GAS checklist (including checklist-child items)
+        const gas = document.querySelectorAll('#gas-checklist input[type="checkbox"]');
+        result.gas = Array.from(gas).map(ch => ({ checked: !!ch.checked, label: ch.parentElement?.textContent?.trim?.() }));
+        // Dropdown expanded states (header elements with class dropdown-header)
+        result.dropdowns = {};
+        Array.from(document.querySelectorAll('.dropdown-header')).forEach(h => {
+            const next = h.nextElementSibling;
+            if (next && next.id) result.dropdowns[next.id] = (h.getAttribute('aria-expanded') === 'true');
+        });
+        // level selector value
+        result.levelSelector = document.getElementById('levelSelector') ? document.getElementById('levelSelector').value : null;
+        return result;
+    }
+
+    function prepareSnapshot() {
+        const patient = document.getElementById('patientName')?.value || '';
+        const date = document.getElementById('goalDate')?.value || '';
+        const aim = document.getElementById('aim')?.value || '';
+        const blocks = serializeDropBlocks();
+        const gas = serializeGASTable();
+        const checklists = serializeChecklists();
+        return {
+            version: 1,
+            tool: 'goal-builder',
+            created: new Date().toISOString(),
+            meta: { patient, date, aim },
+            blocks, gas, checklists
+        };
+    }
+
+    function restoreDropBlocks(blocks) {
+        const dropArea = document.getElementById('sgb-drop-area');
+        if (!dropArea) return;
+        dropArea.innerHTML = '';
+        if (!blocks || blocks.length === 0) {
+            dropArea.innerHTML = '<span class="sgb-drop-placeholder">Drag blocks here in order, then fill in details.</span>';
+            return;
+        }
+        blocks.forEach(b => {
+            const div = document.createElement('div');
+            div.className = 'sgb-drop-block';
+            div.dataset.block = b.block || '';
+            div.setAttribute('draggable', 'true');
+            // recreate structure; prefer HTML if provided for fidelity
+            if (b.html) div.innerHTML = b.html;
+            else div.innerHTML = `<span class='sgb-drop-label'>${b.block}:</span> <input type='text' class='sgb-drop-input' placeholder='Enter details...'> <button class='sgb-drop-remove' title='Remove'>&times;</button>`;
+            // If snapshot captured an input value, set it on the created element (value may be a property, not attribute)
+            try {
+                const inp = div.querySelector('.sgb-drop-input');
+                if (inp && typeof b.value !== 'undefined') {
+                    inp.value = b.value;
+                }
+            } catch (e) {}
+            dropArea.appendChild(div);
+        });
+        // Recompute SMART goal sentence from restored blocks
+        try {
+            const goalSentence = document.getElementById('sgb-goal-sentence');
+            if (goalSentence) {
+                const parts = [];
+                Array.from(dropArea.querySelectorAll('.sgb-drop-block')).forEach(block => {
+                    const v = block.querySelector('.sgb-drop-input') ? (block.querySelector('.sgb-drop-input').value || '').trim() : '';
+                    if (v) parts.push(v);
+                });
+                goalSentence.textContent = parts.join(' ');
+            }
+        } catch (e) {}
+    }
+
+    function restoreGASTable(gas) {
+        const selector = document.getElementById('levelSelector');
+        if (!gas) return;
+        const table = document.getElementById('gasTable');
+        if (!table) return;
+        // Rebuild headers and goals from gas structure
+        const headers = gas.headers || [];
+        const goals = gas.goals || [];
+        table.innerHTML = '';
+        const headerRow = document.createElement('tr');
+        headers.forEach((h, i) => {
+            const th = document.createElement('th');
+            th.innerHTML = `<div class="header-num">${h.num || ''}</div><textarea class="header-input" rows="2" style="overflow:hidden;">${h.desc || ''}</textarea>`;
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+        const goalRow = document.createElement('tr');
+        headers.forEach((_, i) => {
+            const td = document.createElement('td');
+            td.innerHTML = `<textarea class="goal-input" rows="3" placeholder="Enter goal..." style="overflow:hidden;">${goals[i] || ''}</textarea>`;
+            goalRow.appendChild(td);
+        });
+        table.appendChild(goalRow);
+        if (window.DomUtils) setTimeout(() => DomUtils.autoResizeTextareas(), 0);
+    }
+
+    function restoreChecklists(snapshotChecks) {
+        if (!snapshotChecks) return;
+        try {
+            const smartInputs = Array.from(document.querySelectorAll('#smart-checklist input[type="checkbox"]'));
+            (snapshotChecks.smart || []).forEach((s, i) => {
+                if (smartInputs[i]) smartInputs[i].checked = !!s.checked;
+            });
+        } catch (e) {}
+        try {
+            const gasInputs = Array.from(document.querySelectorAll('#gas-checklist input[type="checkbox"]'));
+            (snapshotChecks.gas || []).forEach((s, i) => {
+                if (gasInputs[i]) gasInputs[i].checked = !!s.checked;
+            });
+        } catch (e) {}
+        try {
+            // restore dropdown expanded states
+            const dropdowns = snapshotChecks.dropdowns || {};
+            Object.keys(dropdowns).forEach(id => {
+                const expanded = !!dropdowns[id];
+                const header = Array.from(document.querySelectorAll('.dropdown-header')).find(h => h.nextElementSibling && h.nextElementSibling.id === id);
+                const content = document.getElementById(id);
+                if (header) header.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                if (content) {
+                    if (expanded) { content.style.maxHeight = content.scrollHeight + 'px'; content.style.padding = ''; }
+                    else { content.style.maxHeight = '0px'; content.style.padding = '0 0'; }
+                }
+            });
+        } catch (e) {}
+        try {
+            if (snapshotChecks.levelSelector && document.getElementById('levelSelector')) {
+                // set value but do NOT dispatch change (that would rebuild the GAS table and overwrite snapshot restore)
+                document.getElementById('levelSelector').value = snapshotChecks.levelSelector;
+            }
+        } catch (e) {}
+    }
+
+    async function saveSnapshotToFile(snapshot) {
+        const filename = `goal-builder-${(snapshot.meta?.patient||'session').replace(/\s+/g,'-')}-${Date.now()}.json`;
+        // prefer electron.saveFile if available via preload
+        if (window.electron && typeof window.electron.saveFile === 'function') {
+            try {
+                const res = await window.electron.saveFile({ defaultPath: filename, filters: [{ name: 'JSON', extensions: ['json'] }], data: JSON.stringify(snapshot, null, 2) });
+                return res;
+            } catch (e) { /* fallthrough to browser save */ }
+        }
+        // browser fallback: create blob and trigger download
+        try {
+            const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            return { canceled: false };
+        } catch (e) { return { canceled: true, error: e.message } }
+    }
+
+    async function loadSnapshotFromFile() {
+        // Try electron.openFile first
+        if (window.electron && typeof window.electron.openFile === 'function') {
+            try {
+                const res = await window.electron.openFile({ filters: [{ name: 'JSON', extensions: ['json'] }] });
+                if (res && res.canceled) return null;
+                const path = res.filePaths && res.filePaths[0];
+                if (!path) return null;
+                // Use electronOn.readFile if available
+                if (window.electronOn && typeof window.electronOn.readFile === 'function') {
+                    const read = await window.electronOn.readFile(path, 'utf8');
+                    if (read && read.success) return JSON.parse(read.data);
+                    return null;
+                }
+                // fallback to fetch file using file:// URL
+                try {
+                    const text = await fetch('file:///' + path.replace(/\\/g, '/')).then(r => r.text());
+                    return JSON.parse(text);
+                } catch (e) { return null; }
+            } catch (e) { /* fallthrough to browser file picker */ }
+        }
+        // Browser fallback: file input
+        return new Promise((resolve) => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,application/json';
+            input.addEventListener('change', () => {
+                const f = input.files[0];
+                if (!f) return resolve(null);
+                const reader = new FileReader();
+                reader.onload = () => { try { resolve(JSON.parse(reader.result)); } catch (e) { resolve(null); } };
+                reader.onerror = () => resolve(null);
+                reader.readAsText(f);
+            });
+            input.click();
+        });
+    }
+
+    function restoreSnapshot(snapshot) {
+        if (!snapshot || snapshot.tool !== 'goal-builder') return false;
+        const meta = snapshot.meta || {};
+        if (document.getElementById('patientName')) document.getElementById('patientName').value = meta.patient || '';
+        if (document.getElementById('goalDate')) document.getElementById('goalDate').value = meta.date || '';
+        if (document.getElementById('aim')) document.getElementById('aim').value = meta.aim || '';
+        restoreDropBlocks(snapshot.blocks || []);
+        restoreGASTable(snapshot.gas || null);
+        restoreChecklists(snapshot.checklists || null);
+        // re-run DOM utilities to rebind events and sizing
+        setTimeout(() => {
+            if (window.DomUtils) {
+                DomUtils.autoResizeTextareas();
+            }
+            try { syncChecklistParent(); } catch (e) {}
+        }, 0);
+        return true;
+    }
+
+    // Expose to global for quick testing and internal usage
+    window.GoalBuilderSnapshot = { prepareSnapshot, restoreSnapshot, saveSnapshotToFile, loadSnapshotFromFile };
+
+    // Wire native menu events via preload-exposed electronOn
+    try {
+        if (window.electronOn && typeof window.electronOn.on === 'function') {
+            window.electronOn.on('menu:save-session', async () => {
+                const snap = prepareSnapshot();
+                await saveSnapshotToFile(snap);
+            });
+            window.electronOn.on('menu:load-session', async () => {
+                const snap = await loadSnapshotFromFile();
+                if (snap) restoreSnapshot(snap);
+            });
+        } else {
+            // fallback to listening to window events
+            window.addEventListener('menu:save-session', async () => { const snap = prepareSnapshot(); await saveSnapshotToFile(snap); });
+            window.addEventListener('menu:load-session', async () => { const snap = await loadSnapshotFromFile(); if (snap) restoreSnapshot(snap); });
+        }
+    } catch (e) { /* ignore wiring errors */ }
+
+})();
 function getClipboardText() {
     const patient = document.getElementById('patientName')?.value?.trim() || '';
     const date = document.getElementById('goalDate')?.value?.trim() || '';

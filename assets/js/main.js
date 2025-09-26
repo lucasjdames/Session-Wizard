@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const PREFETCH_URLS = [
         '/',
         '/tools/goal-builder/index.html',
-        '/tools/progress-monitor/index.html',
         '/tools/therapy-data-session-taker/index.html',
         '/tools/homework-tracker/index.html'
     ];

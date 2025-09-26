@@ -106,7 +106,6 @@ function createWindow() {
     if (process.platform === 'win32') windowIcon = path.join(__dirname, '..', 'assets', 'img', 'icon-192.ico');
     else if (process.platform === 'darwin') windowIcon = path.join(__dirname, '..', 'assets', 'img', 'icon-512.icns');
   } catch (e) {}
-
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -138,6 +137,31 @@ function createWindow() {
   win.on('show', refocus);
   win.on('restore', refocus);
   win.on('focus', refocus);
+  return win;
+}
+
+// Optional automated smoke test (no dialogs) when SW_SMOKE_TEST=1 is set in env
+async function runSmokeTest(win) {
+  try {
+    console.log('SW: smoke test starting');
+    // Give renderer a moment to fully initialize
+    await new Promise(r => setTimeout(r, 800));
+    // Ask renderer to produce a snapshot
+    const snap = await win.webContents.executeJavaScript('window.TherapyDataSnapshot && window.TherapyDataSnapshot.prepareSnapshot ? window.TherapyDataSnapshot.prepareSnapshot() : null');
+    if (!snap) { console.log('SW: no snapshot object returned'); return; }
+    console.log('SW: snapshot received, components:', (snap.components || []).length);
+
+    // Clear dropzone in renderer
+    await win.webContents.executeJavaScript("(function(){const dz=document.getElementById('templateDropzone'); if(dz){ while(dz.firstChild) dz.removeChild(dz.firstChild);} return true; })()");
+    console.log('SW: dropzone cleared');
+
+    // Restore snapshot in renderer by injecting the snapshot JSON
+    const snapJson = JSON.stringify(snap);
+    const restored = await win.webContents.executeJavaScript(`(function(s){ try{ return !!(window.TherapyDataSnapshot && window.TherapyDataSnapshot.restoreSnapshot(s)); } catch(e) { return { error: String(e) }; } })(${snapJson})`);
+    console.log('SW: restore result ->', restored);
+  } catch (e) {
+    console.error('SW: smoke test error', e);
+  }
 }
 
 app.whenReady().then(() => { createWindow(); app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); }); });
@@ -151,6 +175,190 @@ app.on('browser-window-focus', (event, window) => {
   } catch (e) {}
 });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+
+// Application menu (File > Save Session / Load Session) + Developer Tools
+try {
+  const { Menu } = require('electron');
+  const isMac = process.platform === 'darwin';
+  const template = [
+    // App menu (macOS)
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }] : []),
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Save Session...',
+          accelerator: isMac ? 'CmdOrCtrl+S' : 'Ctrl+S',
+          click: (menuItem, browserWindow) => {
+            if (browserWindow && browserWindow.webContents) browserWindow.webContents.send('menu:save-session');
+          }
+        },
+        {
+          label: 'Load Session...',
+          accelerator: isMac ? 'CmdOrCtrl+O' : 'Ctrl+O',
+          click: (menuItem, browserWindow) => {
+            if (browserWindow && browserWindow.webContents) browserWindow.webContents.send('menu:load-session');
+          }
+        },
+        { type: 'separator' },
+        isMac ? { role: 'close' } : { role: 'quit', label: 'Exit' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+} catch (e) {
+  // If menu building fails, continue silently
+}
+
+// Add Help menu (cross-platform) with About and Online Documentation
+try {
+  const { shell, Menu, MenuItem } = require('electron');
+  const isMac = process.platform === 'darwin';
+  const helpMenu = {
+    label: 'Help',
+    submenu: [
+      {
+        label: 'About',
+        click: async (menuItem, browserWindow) => {
+          try {
+            // Determine current UI theme from the focused renderer (localStorage/data-theme/matchMedia)
+            let uiTheme = 'light';
+            try {
+              const sourceWin = browserWindow || BrowserWindow.getFocusedWindow();
+              if (sourceWin && !sourceWin.isDestroyed() && sourceWin.webContents) {
+                try {
+                  uiTheme = await sourceWin.webContents.executeJavaScript(`(function(){
+                    try{
+                      const k = 'session-wizard-theme';
+                      try { const v = localStorage.getItem(k); if (v) return v; } catch(e) {}
+                      try { const attr = document.documentElement && document.documentElement.getAttribute && document.documentElement.getAttribute('data-theme'); if (attr) return attr; } catch(e) {}
+                      try { if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark'; } catch(e) {}
+                    } catch(e) {}
+                    return 'light';
+                  })()`);
+                } catch (e) { uiTheme = 'light'; }
+              }
+            } catch (e) { uiTheme = 'light'; }
+            // Read package metadata (prefer desktop-build package.json)
+            let pkg = null;
+            try {
+              const desktopPkgPath = path.join(__dirname, 'package.json');
+              if (fs.existsSync(desktopPkgPath)) pkg = JSON.parse(fs.readFileSync(desktopPkgPath, 'utf8'));
+            } catch (e) {}
+            if (!pkg) {
+              try { const rootPkgPath = path.join(__dirname, '..', 'package.json'); if (fs.existsSync(rootPkgPath)) pkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf8')); } catch (e) {}
+            }
+            const appName = (pkg && (pkg.productName || pkg.name)) || 'Session Wizard';
+            const appVersion = (pkg && pkg.version) || '0.0.0';
+            const appLicense = (pkg && pkg.license) || '';
+            const appAuthor = (pkg && (pkg.author || pkg.author && pkg.author.name)) || '';
+
+            // Choose a PNG/ICO for embedding in the HTML (use PNG as data URL for consistent in-renderer display)
+            let iconFile = path.join(__dirname, '..', 'assets', 'img', 'icon-512.png');
+            try { if (process.platform === 'win32') iconFile = path.join(__dirname, '..', 'assets', 'img', 'icon-192.png'); } catch (e) {}
+            let iconDataUrl = '';
+            try {
+              if (fs.existsSync(iconFile)) {
+                const buf = fs.readFileSync(iconFile);
+                const mime = 'image/png';
+                iconDataUrl = `data:${mime};base64,${buf.toString('base64')}`;
+              }
+            } catch (e) { iconDataUrl = ''; }
+
+            // Build theme-appropriate CSS
+            const isDark = String(uiTheme || '').toLowerCase() === 'dark';
+            const css = isDark ? `:root{color-scheme: dark} body{font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:20px; color:#ddd; background:#0d0d0f} .card{max-width:760px;margin:0 auto;padding:20px;border-radius:12px;background:#0f1113;box-shadow:0 6px 22px rgba(0,0,0,0.6);} .header{display:flex;gap:16px;align-items:center} .logo{width:72px;height:72px;border-radius:12px;background:#0f1113;display:flex;align-items:center;justify-content:center;overflow:hidden} .logo img{width:100%;height:100%;object-fit:contain} h1{margin:0;font-size:20px} .meta{color:#aaa;margin-top:6px;font-size:13px} p{line-height:1.45;color:#ddd;margin-top:14px} .footer{margin-top:18px;border-top:1px solid rgba(255,255,255,0.04);padding-top:12px;color:#bbb;font-size:13px;display:flex;justify-content:space-between;align-items:center} a{color:#7fb1ff}` : `:root{color-scheme: light} body{font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:20px; color:#222; background: #f7f7f8} .card{max-width:760px;margin:0 auto;padding:20px;border-radius:12px;background:#ffffff;box-shadow:0 6px 22px rgba(0,0,0,0.08);} .header{display:flex;gap:16px;align-items:center} .logo{width:72px;height:72px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden} .logo img{width:100%;height:100%;object-fit:contain} h1{margin:0;font-size:20px} .meta{color:#666;margin-top:6px;font-size:13px} p{line-height:1.45;color:#333;margin-top:14px} .footer{margin-top:18px;border-top:1px solid rgba(0,0,0,0.06);padding-top:12px;color:#555;font-size:13px;display:flex;justify-content:space-between;align-items:center} a{color:#0060df}`;
+
+            const aboutHtml = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>About ${escapeHtmlForFile(appName)}</title><style>${css}</style></head><body><div class="card"><div class="header"><div class="logo">${iconDataUrl?`<img src="${iconDataUrl}" alt="icon">`:' '}</div><div><h1>${escapeHtmlForFile(appName)}</h1><div class="meta">Version ${escapeHtmlForFile(appVersion)}${appAuthor?` — ${escapeHtmlForFile(appAuthor)}`:''}</div></div></div>
+            <p>
+              The Session Wizard is a toolkit designed to help clinicians with setting therapy goals, taking data in and outside of sessions, and tracking clients' progress. The tools provided are built to be cross-applicable for different clinical settings and interventions, but some components are intended for specific interventions from the world of speech-language pathology and cognitive rehabilitation.
+            </p>
+            <p>For full documentation and source code, visit <a href="https://github.com/lucasjdames/Session-Wizard" target="_blank" rel="noreferrer noopener">GitHub — Session Wizard</a>.</p>
+            <div class="footer"><div>${appLicense?`License: ${escapeHtmlForFile(appLicense)}`:''}</div><div><a href="#" id="close">Close</a></div></div></div>
+            <script>document.getElementById('close').addEventListener('click',()=>{ window.close(); });</script></body></html>`;
+
+            // Create the about window and load the generated HTML as a data URL
+            const aboutWin = new BrowserWindow({
+              width: 660,
+              height: 420,
+              resizable: false,
+              minimizable: false,
+              maximizable: false,
+              title: `About ${appName}`,
+              autoHideMenuBar: true,
+              ...(process.platform === 'darwin' ? { titleBarStyle: 'hiddenInset' } : {}),
+              icon: iconFile,
+              webPreferences: { contextIsolation: true, nodeIntegration: false }
+            });
+            aboutWin.setMenuBarVisibility(false);
+            aboutWin.removeMenu && aboutWin.removeMenu();
+            const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(aboutHtml);
+            aboutWin.loadURL(dataUrl).catch(() => { const aboutPath = path.join(__dirname, '..', 'about.html'); aboutWin.loadFile(aboutPath).catch(()=>{}); });
+          } catch (e) { /* ignore errors opening about */ }
+        }
+      },
+      {
+        label: 'Online Documentation',
+        click: () => { try { shell.openExternal('https://github.com/lucasjdames/Session-Wizard'); } catch (e) {} }
+      }
+    ]
+  };
+
+  // Try to append the Help menu to the existing application menu if present,
+  // otherwise set a new menu containing Help.
+  try {
+    const currentMenu = Menu.getApplicationMenu();
+    if (currentMenu) {
+      currentMenu.append(new MenuItem(helpMenu));
+      Menu.setApplicationMenu(currentMenu);
+    } else {
+      const newMenu = Menu.buildFromTemplate([helpMenu]);
+      Menu.setApplicationMenu(newMenu);
+    }
+  } catch (e) {
+    // ignore menu manipulation errors
+  }
+} catch (e) { /* ignore help menu setup errors */ }
+
+// Allow renderer to request reading a file path (sync via main process)
+ipcMain.handle('file:read', async (event, filePath, encoding = 'utf8') => {
+  try {
+    if (!filePath) return { success: false, error: 'No filePath provided' };
+    const data = await fs.promises.readFile(filePath, { encoding });
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
 
 // Dialog handlers
 ipcMain.handle('dialog:openFile', async (event, options) => {

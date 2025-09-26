@@ -1,85 +1,75 @@
 # Session Wizard
 
-A modular web-based toolkit designed to help Speech-Language Pathologists (SLPs) and cognitive rehabilitation clinicians set therapy goals, track client progress, and collect session data. Created by Lucas James.
+Session Wizard is a modular toolkit to help Speech-Language Pathologists (SLPs) and rehabilitation professionals create therapy goals, collect session data, and track client progress. The project is authored and maintained by Lucas James.
 
-## Features
+## What’s included
 
-- **Goal Builder**: Unified SMART Goal composer + Goal Attainment Scale (GAS) table generator
-- **Progress Monitor**: Document client progress across multiple therapy sessions (CSV import/export, print)
-- **Therapy Session Data Taker**: Customize real-time data collection templates for various interventions
-- **Homework Tracker**: Create customizable, printable home program logs with drag-and-drop components.
+- Goal Builder — SMART goal composer with Goal Attainment Scale (GAS) support
+- Therapy Session Data Taker — customizable real-time data collection templates
+- Homework Tracker — printable, customizable home program logs
+- Progress Analyzer — experimental/hidden in the dashboard; the code remains in `tools/progress-monitor/` for development and QA
 
-### 🔧 Technical Features
-- Progressive Web App (PWA) - works offline and can be installed
-- Responsive design for desktop and mobile devices
-- No external dependencies - runs entirely in the browser
-- Dark/light theme support
+### Technical highlights
 
-## Quick Start
+- Desktop-first packaging via Electron (see `session-wizard-desktop-build/`) — runs offline as a standalone desktop app
+- Responsive, accessible UI with dark/light theme support
 
-1. **Development Server**:
-   ```bash
-   npm run dev
-   ```
-   This starts a live server at `http://localhost:8080`
+## Project layout (important files)
 
-2. **Production**: Simply serve the files from any web server - no build step required
+```
+├── index.html               — Main dashboard
+├── assets/                  — CSS, JS, fonts, and images
+└── tools/                   — Individual tool modules (goal-builder, homework-tracker, therapy-data-session-taker, progress-monitor)
+```
 
-Desktop build
----------------
-There is a minimal Electron wrapper under `session-wizard-desktop-build/` for creating a standalone Windows executable using `electron-builder`.
+Notes:
+- PWA files (web `manifest.json` and `service-worker.js`) have been archived and are no longer shipped with the desktop build. They can be found in `_archived_cleanout/pwa/` if you want to restore web/PWA support.
+- Legacy or experimental artifacts are kept under `_archived_cleanout/` and excluded from active distribution.
 
-From PowerShell:
+## Building & running (desktop)
+
+1. Open `session-wizard-desktop-build/`.
+2. Install dev deps (if not already):
 
 ```powershell
 cd session-wizard-desktop-build
 npm install
-npm run start    # to run the app
-npm run build    # to create an installer (Windows)
 ```
 
-## Project Structure
+3. Start the Electron app for local testing:
 
-```
-├── index.html              # Main dashboard
-├── manifest.json           # PWA configuration
-├── service-worker.js       # Offline support
-├── assets/
-│   ├── css/               # Styles and fonts
-│   ├── fonts/             # Inter font files
-│   ├── img/               # Icons and images
-│   └── js/                # Core JavaScript
-└── tools/                 # Individual tool modules
-    ├── goal-builder/                 # SMART + GAS combined
-    ├── progress-monitor/             # Longitudinal performance tracker
-    ├── homework-tracker/             # Home program log builder
-    └── therapy-data-session-taker/   # Detailed session data capture
-
-Legacy/archived Electron and split tool folders are stored under `_archived_cleanout/` and excluded from active distribution.
-
-## Maintenance & Contribution
-
-See `CONTRIBUTING.md` for coding standards, naming conventions, and service worker update procedure.
-
-Typical maintenance workflow:
-1. Add or modify tool assets under `tools/<tool-name>/`.
-2. Bump `CACHE_NAME` + adjust `urlsToCache` in `service-worker.js` if new offline-critical files were added.
-3. Smoke test each tool (load, print/export, clipboard features, offline reload).
-4. Document noteworthy changes in `CHANGELOG.md`.
-
-## Offline Behavior
-
-The service worker precaches the dashboard, shared assets, and each tool entry page. Dynamic user-entered content is not persisted—export or copy/print before closing the page if you need a record.
+```powershell
+npm run start
 ```
 
-## Academic Foundation
+4. Create distributables with electron-builder:
 
-This toolkit is inspired by evidence-based practices from cognitive rehabilitation research, particularly *Transforming Cognitive Rehabilitation: Effective Instructional Methods* (Sohlberg, Hamilton, & Turkstra, 2023).
+```powershell
+npm run build
+```
 
-## Works Cited
+The `build.files` configuration has been adjusted to exclude archived PWA files; the bundle contains the dashboard, assets, and tools needed for the desktop app.
 
-Bard-Pondarré, R., Villepinte, C., Roumenoff, F., Lebrault, H., Bonnyaud, C., Pradeau, C., Bensmail, D., Isner-Horobeti, M.-E., & Krasny-Pacini, A. (2023). Goal Attainment Scaling in rehabilitation: An educational review providing a comprehensive didactical tool box for implementing Goal Attainment Scaling. *Journal of Rehabilitation Medicine*, *55*, jrm6498. https://doi.org/10.2340/jrm.v55.6498
+## Maintenance & contribution
 
-Davis, G. A. (1980). A critical look at PACE therapy. *Clinical Aphasiology: Proceedings of the Conference 1980*, 248–257. http://aphasiology.pitt.edu/567/
+See `docs/CONTRIBUTING.md` for coding style, testing guidance, and general workflows. A few desktop-specific notes:
 
-Sohlberg, M. M., Hamilton, J., & Turkstra, L. (2023). *Transforming cognitive rehabilitation: Effective instructional methods*. The Guilford Press.
+- Add or modify tool assets in `tools/<tool-name>/`.
+- Smoke-test each tool in the Electron app for UI, printing/export, and clipboard behavior.
+- Keep the `session-wizard-desktop-build` packaging config (`package.json` and `electron-builder.yml`) in sync when adding files that must be included in the distributable.
+
+## Offline behavior
+
+The Electron desktop build runs as a standalone application and does not rely on a service worker for offline functionality. If you need web/PWA capability later, the archived `service-worker.js` and `manifest.json` in `_archived_cleanout/pwa/` can be restored and re-integrated into `index.html` and the build configuration.
+
+## Academic foundation & works cited
+
+This toolkit is grounded in evidence-based practices from cognitive rehabilitation research, especially *Transforming Cognitive Rehabilitation: Effective Instructional Methods* (Sohlberg, Hamilton, & Turkstra, 2023).
+
+Bard-Pondarré, R., Villepinte, C., Roumenoff, F., Lebrault, H., Bonnyaud, C., Pradeau, C., Bensmail, D., Isner-Horobeti, M.-E., & Krasny-Pacini, A. (2023). Goal Attainment Scaling in rehabilitation: An educational review providing a comprehensive didactical tool box for implementing Goal Attainment Scaling. Journal of Rehabilitation Medicine, 55, jrm6498. https://doi.org/10.2340/jrm.v55.6498
+
+Sohlberg, M. M., Hamilton, J., & Turkstra, L. (2023). Transforming cognitive rehabilitation: Effective instructional methods. The Guilford Press.
+
+Davis, G. A. (1980). A critical look at PACE therapy. Clinical Aphasiology: Proceedings of the Conference 1980, 248–257. http://aphasiology.pitt.edu/567/
+
+Nicholas, L. E., & Brookshire, R. H. (1993). A System for Quantifying the Informativeness and Efficiency of the Connected Speech of Adults With Aphasia. Journal of Speech, Language, and Hearing Research, 36(2), 338–350. https://doi.org/10.1044/jshr.3602.338

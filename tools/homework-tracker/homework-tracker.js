@@ -1019,9 +1019,23 @@ class HomeworkTracker {
                 return daysSinceStart >= 0 && daysSinceStart % schedule.everyXDays === 0;
                 
             case 'specific':
+                // Determine the actual weekday for this dayIndex based on the configured start date
+                try {
+                    const startDateString = document.getElementById('startDate') ? document.getElementById('startDate').value : null;
+                    const dateObj = this.getDateForOffset(startDateString, dayIndex);
+                    if (dateObj) {
+                        // Use short weekday names to compare with schedule.daysOfWeek (e.g. 'Mon', 'Tue')
+                        const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                        return schedule.daysOfWeek.includes(dayOfWeek);
+                    }
+                } catch (e) {
+                    // fall through to legacy behavior below if anything goes wrong
+                }
+
+                // Legacy fallback: index into static array if we couldn't compute a real date
                 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                const dayOfWeek = dayNames[dayIndex % 7];
-                return schedule.daysOfWeek.includes(dayOfWeek);
+                const dayOfWeekFallback = dayNames[dayIndex % 7];
+                return schedule.daysOfWeek.includes(dayOfWeekFallback);
                 
             default:
                 return true;
@@ -2248,7 +2262,8 @@ class HomeworkTracker {
 
 // Initialize the Homework Tracker when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new HomeworkTracker();
+    // expose instance for snapshot/restore helpers
+    window.HomeworkTrackerApp = new HomeworkTracker();
     if (window.DomUtils) {
         DomUtils.initDefaultDates(['#startDate']);
     }
@@ -2259,3 +2274,100 @@ document.addEventListener('DOMContentLoaded', () => {
         yearElement.textContent = new Date().getFullYear();
     }
 });
+
+// --- Snapshot / Restore helpers for Homework Tracker ---
+(function(){
+    function prepareSnapshot() {
+        const app = window.HomeworkTrackerApp;
+        if (!app) return null;
+        const clientName = document.getElementById('clientName')?.value || '';
+        const clinicianName = document.getElementById('clinicianName')?.value || '';
+        const logTitle = document.getElementById('logTitle')?.value || '';
+        const startDate = document.getElementById('startDate')?.value || '';
+        const numWeeks = document.getElementById('numWeeks')?.value || '';
+        // deep copy components
+        const components = JSON.parse(JSON.stringify(app.components || []));
+        return {
+            version: 1,
+            tool: 'homework-tracker',
+            created: new Date().toISOString(),
+            meta: { clientName, clinicianName, logTitle, startDate, numWeeks },
+            components
+        };
+    }
+
+    function restoreSnapshot(snapshot) {
+        if (!snapshot || snapshot.tool !== 'homework-tracker') return false;
+        const app = window.HomeworkTrackerApp;
+        if (!app) return false;
+        const meta = snapshot.meta || {};
+        if (document.getElementById('clientName')) document.getElementById('clientName').value = meta.clientName || '';
+        if (document.getElementById('clinicianName')) document.getElementById('clinicianName').value = meta.clinicianName || '';
+        if (document.getElementById('logTitle')) document.getElementById('logTitle').value = meta.logTitle || '';
+        if (document.getElementById('startDate')) document.getElementById('startDate').value = meta.startDate || '';
+        if (document.getElementById('numWeeks')) document.getElementById('numWeeks').value = meta.numWeeks || '';
+        try {
+            // Replace components array and re-render
+            app.components = Array.isArray(snapshot.components) ? JSON.parse(JSON.stringify(snapshot.components)) : [];
+            app.renderTemplateComponents();
+            // Ensure placeholder visibility and preview reflect restored data
+            try { app.updatePlaceholder(); } catch (e) {}
+            try { app.updatePreview(); } catch (e) {}
+        } catch (e) { console.error('restoreSnapshot error', e); }
+        // re-run DomUtils sizing/wiring and rebind events
+        setTimeout(() => { try { if (window.DomUtils) DomUtils.autoResizeTextareas(); app.bindComponentEvents(); } catch(e){} }, 0);
+        return true;
+    }
+
+    async function saveSnapshotToFile(snapshot) {
+        const filename = `homework-tracker-${(snapshot.meta?.clientName||'session').replace(/\s+/g,'-')}-${Date.now()}.json`;
+        if (window.electron && typeof window.electron.saveFile === 'function') {
+            try {
+                const res = await window.electron.saveFile({ defaultPath: filename, filters: [{ name: 'JSON', extensions: ['json'] }], data: JSON.stringify(snapshot, null, 2) });
+                return res;
+            } catch (e) { /* fallthrough */ }
+        }
+        try {
+            const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+            return { canceled: false };
+        } catch (e) { return { canceled: true, error: e.message } }
+    }
+
+    async function loadSnapshotFromFile() {
+        if (window.electron && typeof window.electron.openFile === 'function') {
+            try {
+                const res = await window.electron.openFile({ filters: [{ name: 'JSON', extensions: ['json'] }] });
+                if (res && res.canceled) return null;
+                const path = res.filePaths && res.filePaths[0]; if (!path) return null;
+                if (window.electronOn && typeof window.electronOn.readFile === 'function') {
+                    const read = await window.electronOn.readFile(path, 'utf8');
+                    if (read && read.success) return JSON.parse(read.data);
+                    return null;
+                }
+                try { const text = await fetch('file:///' + path.replace(/\\/g, '/')).then(r => r.text()); return JSON.parse(text); } catch(e){ return null; }
+            } catch (e) { /* fallthrough */ }
+        }
+        return new Promise((resolve) => {
+            const input = document.createElement('input'); input.type = 'file'; input.accept = '.json,application/json';
+            input.addEventListener('change', () => { const f = input.files[0]; if (!f) return resolve(null); const reader = new FileReader(); reader.onload = () => { try { resolve(JSON.parse(reader.result)); } catch(e){ resolve(null);} }; reader.onerror = () => resolve(null); reader.readAsText(f); });
+            input.click();
+        });
+    }
+
+    // expose API
+    window.HomeworkTrackerSnapshot = { prepareSnapshot, restoreSnapshot, saveSnapshotToFile, loadSnapshotFromFile };
+
+    // wire menu events
+    try {
+        if (window.electronOn && typeof window.electronOn.on === 'function') {
+            window.electronOn.on('menu:save-session', async () => { const snap = prepareSnapshot(); await saveSnapshotToFile(snap); });
+            window.electronOn.on('menu:load-session', async () => { const snap = await loadSnapshotFromFile(); if (snap) restoreSnapshot(snap); });
+        } else {
+            window.addEventListener('menu:save-session', async () => { const snap = prepareSnapshot(); await saveSnapshotToFile(snap); });
+            window.addEventListener('menu:load-session', async () => { const snap = await loadSnapshotFromFile(); if (snap) restoreSnapshot(snap); });
+        }
+    } catch (e) {}
+
+})();

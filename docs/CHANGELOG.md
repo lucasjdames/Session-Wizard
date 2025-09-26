@@ -2,7 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
-The format loosely follows Keep a Changelog (unreleased header optional) and adheres to semantic, human-readable descriptions. Versions not yet established—initial development phase.
+The format loosely follows Keep a Changelog and uses semantic, human-readable descriptions.
+
+## [1.0] - 2025-09-25
+### Added
+- Desktop-first packaging and updated build configs for Electron in `session-wizard-desktop-build/`.
+### Changed
+- Web PWA artifacts (`manifest.json`, `service-worker.js`) archived to `_archived_cleanout/pwa/` and removed from active packaging.
+- Documentation refreshed: `docs/README.md`, `docs/CONTRIBUTING.md` updated to reflect desktop-first workflow and PWA archive.
+### Removed
+- Service worker registration and web manifest references removed from `index.html` and desktop packaging lists to avoid shipping PWA files with the distributable.
+
+### Notes
+- Archived PWA files remain in `_archived_cleanout/pwa/` for easy restoration if web/PWA support is re-enabled.
+
 
 ## [0.6] - 2025-09-20
 ### Added
@@ -43,6 +56,17 @@ The format loosely follows Keep a Changelog (unreleased header optional) and adh
 - Behavior remains intentionally explicit to avoid runtime surprises; observer-based auto-resize is opt-in.
 - Affected areas: Goal Builder, Progress Monitor, Homework Tracker, Therapy Data Session Taker (shared helpers adoption varies by tool complexity).
 - Quick QA: Static error checks on updated JS files passed; Goal Builder drag/drop, GAS table, and printing smoke-tested.
+
+### Experimental / Hidden tools
+
+- The `Progress Monitor` tool has been temporarily hidden from the dashboard and excluded from the service worker precache while it remains experimental. This reduces surface area for current releases while preserving the source files for further work.
+
+Re-enable guidance:
+
+1. Uncomment the Progress Monitor button in `index.html` (dashboard tool grid).
+2. Restore `/tools/progress-monitor/index.html` in the `PREFETCH_URLS` array in `assets/js/main.js` (optional prefetch).
+3. Uncomment the Progress Monitor entries in `service-worker.js` `urlsToCache` and bump `CACHE_NAME` so the SW will precache it again.
+4. Bump versions / run smoke tests.
 
 ### Rollback guidance
 If issues arise, you can revert this consolidation with minimal surface area changes:

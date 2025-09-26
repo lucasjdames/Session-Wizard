@@ -5,7 +5,7 @@ This document provides a high-level overview of the structure and runtime flow o
 ## 1. Runtime Model
 The application is a static, multi-page web app (no client-side router). Each tool lives in its own folder under `tools/` and is accessed via standard browser navigation. No build process or bundler is required. All scripts are loaded directly by the browser.
 
-Offline capability is provided by a service worker (`service-worker.js`) that precaches the shell (dashboard + active tool entry pages and core assets) and uses a network-first strategy for HTML/JS with cache fallback.
+Offline capability was previously provided by a service worker (`service-worker.js`) that precached the shell and used a network-first strategy. PWA/support has been archived for desktop packaging — the archived files live in `_archived_cleanout/pwa/` if you need to restore this behavior.
 
 ## 2. Directory Layout (Active)
 ```
@@ -16,7 +16,7 @@ assets/
 	img/                      # Icons used for PWA and UI
 tools/
 	goal-builder/             # Combined SMART Goal + Goal Attainment Scale tool
-	progress-monitor/         # Longitudinal performance tracking & CSV import/export
+	progress-monitor/         # Longitudinal performance tracking & CSV import/export (hidden/experimental)
 	therapy-data-session-taker/  # Complex data capture (discourse, swallowing, timers, etc.)
 service-worker.js
 ```

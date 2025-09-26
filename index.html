@@ -3,7 +3,6 @@
 <head>
   <link rel="icon" href="assets/img/icon-192.png" sizes="192x192" type="image/png">
   <link rel="apple-touch-icon" href="assets/img/icon-192.png">
-  <link rel="manifest" href="manifest.json" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Session Wizard</title>
@@ -45,10 +44,13 @@
         <span class="tool-title">Therapy Session Data Taker</span>
         <span class="tool-desc">Customize templates for real-time session data tracking.</span>
       </button>
+      <!-- Progress Monitor hidden until ready for release -->
+      <!--
       <button class="tool-card" data-tool="progress-monitor" onclick="window.location.href='tools/progress-monitor/index.html'">
         <span class="tool-title">Progress Monitor</span>
         <span class="tool-desc">Compare progress from session to session.</span>
       </button>
+      -->
       <button class="tool-card" data-tool="homework-tracker" onclick="window.location.href='tools/homework-tracker/index.html'">
         <span class="tool-title">Homework Tracker</span>
         <span class="tool-desc">Create customizable printable home program logs.</span>
@@ -122,25 +124,7 @@
     });
   </script>
   <script>
-    // Only register the service worker in regular browsers (skip in Electron desktop builds)
-    (function() {
-      try {
-        var isElectron = navigator.userAgent.includes('Electron') || window.electron?.isElectron;
-        if ('serviceWorker' in navigator && !isElectron) {
-          window.addEventListener('load', function() {
-            navigator.serviceWorker.register('service-worker.js').catch(function(){});
-          });
-        } else if ('serviceWorker' in navigator && isElectron) {
-          // Best-effort: unregister any previously-registered service workers (e.g., from dev)
-          navigator.serviceWorker.getRegistrations().then(function(regs) { regs.forEach(r => r.unregister()); }).catch(function(){});
-          if (window.caches) {
-            caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).catch(function(){});
-          }
-        }
-      } catch (e) {
-        // ignore
-      }
-    })();
+    <!-- PWA support removed for desktop packaging: manifest and service worker have been archived. -->
   </script>
 </body>
 </html>

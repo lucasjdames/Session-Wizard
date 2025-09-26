@@ -174,11 +174,14 @@ body {
 
 .tool-grid {
   display:grid; gap:1rem;
-  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  /* With one tool hidden the grid uses fewer columns — make cards larger by increasing the min width
+     so three cards fill the row more prominently on wider viewports. Mobile behavior preserved. */
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
 }
 .tool-card {
   border:1px solid var(--color-border); background:var(--color-surface); border-radius:var(--radius-lg);
-  padding:1rem .95rem 1.05rem; text-align:left; display:flex; flex-direction:column; gap:.55rem;
+  /* Slightly larger padding and spacing for a more prominent dashboard appearance */
+  padding:1.25rem 1rem 1.25rem; text-align:left; display:flex; flex-direction:column; gap:.75rem;
   cursor:pointer; position:relative; overflow:hidden; box-shadow:var(--shadow-sm);
   transition: border-color .3s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease);
 }
@@ -199,10 +202,18 @@ body {
 .tool-card:active { transform:translateY(0); }
 .tool-card:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
 .tool-title {
-  font-weight:600; font-size:.95rem; letter-spacing:.4px;
+  font-weight:600; font-size:1.05rem; letter-spacing:.4px;
   background:var(--grad-accent); -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-.tool-desc { font-size:.78rem; color:var(--color-text-soft); line-height:1.25; }
+.tool-desc { font-size:.9rem; color:var(--color-text-soft); line-height:1.35; }
+
+/* Reduce min width on narrow viewports to retain responsive behavior */
+@media (max-width:720px) {
+  .tool-grid { grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); }
+  .tool-card { padding:1rem .95rem 1.05rem; gap:.55rem; }
+  .tool-title { font-size:.95rem; }
+  .tool-desc { font-size:.78rem; }
+}
 
 .roadmap-hint {
   max-width:540px; background:var(--color-surface); border:1px dashed var(--color-border);

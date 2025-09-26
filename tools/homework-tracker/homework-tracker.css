@@ -113,6 +113,272 @@
     display: none;
 }
 
+/* Configuration modal visual polish: compact, centered, scrollable body */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 120;
+    padding: 1rem;
+}
+
+.modal.active { display: flex; }
+
+.modal-content {
+    width: 720px;
+    max-width: calc(100% - 2rem);
+    max-height: 80vh;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(18, 26, 33, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--color-border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.modal-header .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 6px;
+    color: var(--color-text-muted);
+}
+
+.modal-body {
+    padding: 12px 18px;
+    overflow: auto;
+    flex: 1 1 auto;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 8px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--color-border);
+    justify-content: flex-end;
+    background: linear-gradient(0deg, rgba(255,255,255,0.02), transparent);
+}
+
+/* Compact form layout inside modal */
+.config-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+    align-items: start;
+}
+
+.config-form .form-group {
+    margin: 0; /* handled by grid spacing */
+}
+
+.config-form label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+}
+
+.config-form input[type="text"],
+.config-form input[type="number"],
+.config-form select,
+.config-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: 0.95rem;
+    color: var(--color-text);
+}
+
+.config-form textarea { resize: vertical; min-height: 84px; }
+
+.config-row { grid-column: 1 / -1; display:flex; gap:12px; align-items:center; }
+
+/* Days of week: pill-style compact toggles */
+.days-of-week {
+    display: flex;
+    gap: 8px;
+    /* prefer a single row on larger viewports; allow wrap on narrow screens via media query */
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+    padding-bottom: 4px; /* breathing room for scrollbar */
+}
+
+.day-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto; /* prevent pills from stretching */
+    position: relative;
+}
+
+/* Visually hide native checkbox but keep it accessible */
+
+/* Keep the native checkbox accessible but visually hidden; render a custom
+   checkbox before the day text using the span::before pseudo-element so the
+   selection control appears first. */
+.day-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+
+.day-checkbox span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    min-width: 36px;
+}
+
+.day-checkbox span::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    flex: 0 0 auto;
+    text-align: center;
+    line-height: 16px;
+    font-size: 12px;
+}
+
+.day-checkbox input[type="checkbox"]:checked + span::before {
+    content: '\2713'; /* check mark */
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+
+/* If there is no span (guard), show the label text inline */
+.day-checkbox:not(:has(span)) { padding: 6px 10px; }
+
+/* Times-per-day compact group */
+.times-per-day-section { grid-column: 1 / -1; }
+.times-per-day-config { margin-top: 8px; }
+.time-label-input { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.time-label-input label { min-width: 64px; font-size: 0.85rem; color: var(--color-text-muted); }
+.time-label-input input { flex: 1; }
+
+/* Style the "Track multiple times per day" toggle to match pill-style selections */
+.times-per-day-section > label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.times-per-day-section > label input[type="checkbox"] {
+    /* keep it accessible but visually hidden */
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+
+.times-per-day-section > label::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    flex: 0 0 auto;
+    text-align: center;
+    line-height: 16px;
+    font-size: 12px;
+}
+
+.times-per-day-section > label:has(input[type="checkbox"]:checked) {
+    background: rgba(79,140,255,0.08);
+    border-color: var(--color-accent);
+}
+
+.times-per-day-section > label:has(input[type="checkbox"]:checked)::before {
+    content: '\2713';
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+
+/* Compact the times-per-day config controls to align visually with the pill */
+.times-per-day-config {
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+}
+
+.times-per-day-config .form-group { margin: 0; }
+
+.times-per-day-config select { width: 100%; padding: 8px 10px; border-radius: 8px; }
+
+@media (max-width: 640px) {
+    .times-per-day-config { grid-template-columns: 1fr; }
+}
+
+/* Exercise list inside group config - full width */
+.exercise-list { grid-column: 1 / -1; display:flex; flex-direction:column; gap:8px; }
+.exercise-item { display:flex; gap:8px; align-items:center; padding:8px; border-radius:8px; background:var(--color-surface); border:1px solid var(--color-border); }
+.exercise-item .exercise-meta { flex:1; display:flex; gap:8px; align-items:center; }
+.exercise-item .exercise-actions { display:flex; gap:6px; }
+
+/* Responsive: stack form on very small screens */
+@media (max-width: 640px) {
+    .modal-content { width: 100%; max-height: 92vh; }
+    .config-form { grid-template-columns: 1fr; }
+    /* allow pills to wrap on small screens */
+    .days-of-week { flex-wrap: wrap; }
+    .day-checkbox input[type="checkbox"] { width: 44px; height: 34px; }
+}
+
+
 /* Main Layout */
 .main-container {
     padding: 20px;
@@ -722,6 +988,87 @@
     flex-direction: column;
     gap: 6px;
     margin: 8px 0;
+}
+
+/* Schedule option pills: make radio options match the visual style of day pills */
+.schedule-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.schedule-option {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+/* Hide only the radio input visually but keep it accessible. Keep other inputs (number) visible. */
+.schedule-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+
+.schedule-option::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    flex: 0 0 auto;
+    margin-right: 6px;
+    text-align: center;
+    line-height: 16px;
+    font-size: 12px;
+}
+
+/* Selected state using :has to detect a checked radio inside the label */
+.schedule-option:has(input[type="radio"]:checked) {
+    /* subtle tinted background using accent with low opacity */
+    background: rgba(79,140,255,0.08); /* fallback; adjust to match --color-accent if needed */
+    border-color: var(--color-accent);
+    color: var(--color-text);
+}
+
+.schedule-option:has(input[type="radio"]:checked)::before {
+    content: '\2713';
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+
+/* Compact inline number inputs inside the interval option */
+.schedule-option input[type="number"] {
+    width: 64px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+/* Keep form friendly on small screens */
+@media (max-width: 480px) {
+    .schedule-option { padding: 6px 10px; font-size: 0.9rem; }
+    .schedule-option input[type="number"] { width: 56px; }
 }
 
 .schedule-option {

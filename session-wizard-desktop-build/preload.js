@@ -12,3 +12,16 @@ contextBridge.exposeInMainWorld('electron', {
   printHtmlToPdfPreview: (opts) => ipcRenderer.invoke('window:printHtmlToPdfPreview', opts),
   printHtmlToPdfPreviewFiles: (opts) => ipcRenderer.invoke('window:printHtmlToPdfPreviewFiles', opts)
 });
+
+// Add on(...) and readFile(...) helpers for renderer to receive menu events and request file reads
+contextBridge.exposeInMainWorld('electronOn', {
+  on: (channel, listener) => {
+    // whitelist channels the renderer is allowed to listen to
+    const allowed = ['menu:save-session', 'menu:load-session'];
+    if (!allowed.includes(channel)) return;
+    ipcRenderer.on(channel, (event, ...args) => listener(...args));
+  },
+  readFile: async (filePath, encoding = 'utf8') => {
+    return await ipcRenderer.invoke('file:read', filePath, encoding);
+  }
+});

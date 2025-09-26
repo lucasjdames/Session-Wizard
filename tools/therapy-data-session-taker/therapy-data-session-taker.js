@@ -1487,6 +1487,9 @@ class BaseComponent {
         this.element.className = 'template-component';
         // Store the actual component type for clarity and potential selectors/logic
         this.element.setAttribute('data-type', this.config.type || this.getComponentType());
+        // Keep a back-reference from DOM element to the component instance so
+        // snapshot code can capture internal component data (rows, options, etc.)
+        try { this.element._componentInstance = this; } catch (e) { /* ignore */ }
         
         // Create header container (matches Homework Builder structure)
         const headerContainer = document.createElement('div');
@@ -2907,12 +2910,14 @@ class SRTTableComponent extends BaseComponent {
     }
 
     addInterval() {
-        const newInterval = prompt('Enter new time interval label:', '');
-        if (newInterval) {
-            this.data.intervals.push(newInterval);
-            this.data.rows.forEach(row => row.marks.push(""));
-            this.renderTable();
-        }
+        // Insert a placeholder interval and render. The header will be made
+        // editable via an inline input so users can type directly in the
+        // desktop/electron build where window.prompt may be blocked.
+        const placeholder = 'New interval';
+        this.data.intervals.push(placeholder);
+        this.data.rows.forEach(row => row.marks.push(""));
+        // Render and request focus for the newly added interval header (last)
+        this.renderTable({ focusHeader: this.data.intervals.length - 1 });
     }
 
     renderTable(focusInfo = null) {
@@ -2921,9 +2926,84 @@ class SRTTableComponent extends BaseComponent {
         // Create header
         const thead = document.createElement('thead');
         const headRow = document.createElement('tr');
-        headRow.innerHTML = `<th style="width:50px">Trial</th><th style="width:60px">CVC?</th>` + 
-            this.data.intervals.map(iv => `<th class="srt-interval">${iv}</th>`).join('') + 
-            `<th style="width:40px"></th>`;
+        // Static columns
+        const trialTh = document.createElement('th');
+        trialTh.style.width = '50px';
+        trialTh.textContent = 'Trial';
+        headRow.appendChild(trialTh);
+
+        const cvcTh = document.createElement('th');
+        cvcTh.style.width = '60px';
+        cvcTh.textContent = 'CVC?';
+        headRow.appendChild(cvcTh);
+
+        // Interval headers (make them editable inline)
+        this.data.intervals.forEach((iv, headerIdx) => {
+            const th = document.createElement('th');
+            th.className = 'srt-interval';
+            th.textContent = iv;
+            th.tabIndex = 0;
+            th.title = 'Click to edit interval label';
+            th.style.userSelect = 'none';
+
+            // Make editable on click or Enter: replace with an input element
+            const startEdit = () => {
+                // Prevent creating multiple inputs
+                if (th.querySelector('input')) return;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'srt-interval-edit';
+                input.value = this.data.intervals[headerIdx] || '';
+                input.style.width = '100%';
+                input.style.boxSizing = 'border-box';
+                // When editing finishes, save value back to data and re-render
+                const finish = (commit) => {
+                    const val = input.value.trim();
+                    if (commit && val) {
+                        this.data.intervals[headerIdx] = val;
+                    }
+                    // If user left the field blank, remove the interval
+                    if (commit && !val) {
+                        this.data.intervals.splice(headerIdx, 1);
+                        this.data.rows.forEach(row => row.marks.splice(headerIdx, 1));
+                    }
+                    this.renderTable();
+                };
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        finish(true);
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        finish(false);
+                    }
+                });
+
+                input.addEventListener('blur', () => finish(true));
+
+                // Clear existing content and place input
+                th.textContent = '';
+                th.appendChild(input);
+                input.focus();
+                input.select();
+            };
+
+            th.addEventListener('click', startEdit);
+            th.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    startEdit();
+                }
+            });
+
+            headRow.appendChild(th);
+        });
+
+        const lastTh = document.createElement('th');
+        lastTh.style.width = '40px';
+        headRow.appendChild(lastTh);
+
         thead.appendChild(headRow);
         this.table.appendChild(thead);
         
@@ -2963,6 +3043,7 @@ class SRTTableComponent extends BaseComponent {
             // Interval cells
             this.data.intervals.forEach((interval, idx) => {
                 const cell = document.createElement('td');
+                cell.className = 'srt-interval';
                 const correct = document.createElement('span');
                 correct.className = 'srt-mark srt-correct' + (rowData.marks[idx] === 'correct' ? ' active' : '');
                 correct.title = 'Correct';
@@ -3063,13 +3144,36 @@ class SRTTableComponent extends BaseComponent {
         // Restore focus if focusInfo provided
         if (focusInfo) {
             setTimeout(() => {
-                const targetRow = tbody.children[focusInfo.row];
-                if (targetRow) {
-                    const intervalCell = targetRow.children[2 + focusInfo.interval]; // +2 for trial# and CVC columns
-                    if (intervalCell) {
-                        const targetMark = intervalCell.querySelector(`.srt-${focusInfo.type}`);
-                        if (targetMark) {
-                            targetMark.focus();
+                // Focus a header input if requested
+                if (typeof focusInfo.focusHeader === 'number') {
+                    const headerIndex = focusInfo.focusHeader;
+                    // Header ths are at positions: 0=trial,1=cvc, then intervals start at 2
+                    const th = this.table.querySelectorAll('thead tr th')[2 + headerIndex];
+                    if (th) {
+                        const input = th.querySelector('input.srt-interval-edit');
+                        if (input) {
+                            input.focus();
+                            input.select();
+                            return;
+                        } else {
+                            // If input not present yet, simulate click to create it
+                            th.click();
+                            const input2 = th.querySelector('input.srt-interval-edit');
+                            if (input2) { input2.focus(); input2.select(); }
+                        }
+                    }
+                }
+
+                // Otherwise, restore mark focus in the body if requested
+                if (typeof focusInfo.row === 'number' && typeof focusInfo.interval === 'number' && focusInfo.type) {
+                    const targetRow = tbody.children[focusInfo.row];
+                    if (targetRow) {
+                        const intervalCell = targetRow.children[2 + focusInfo.interval]; // +2 for trial# and CVC columns
+                        if (intervalCell) {
+                            const targetMark = intervalCell.querySelector(`.srt-${focusInfo.type}`);
+                            if (targetMark) {
+                                targetMark.focus();
+                            }
                         }
                     }
                 }
@@ -6193,6 +6297,505 @@ class EventBus {
         }
     }
 }
+
+// --- Snapshot / Restore helpers for Therapy Session Data Taker ---
+// DOM-path based serializer for component-local form state (inputs, textareas, selects, contenteditable)
+function _getPathFromRoot(root, node) {
+    const path = [];
+    let cur = node;
+    while (cur && cur !== root) {
+        const parent = cur.parentElement;
+        if (!parent) break;
+        const idx = Array.prototype.indexOf.call(parent.children, cur);
+        path.push(idx);
+        cur = parent;
+    }
+    path.reverse();
+    return path;
+}
+
+function _getNodeByPath(root, path) {
+    let cur = root;
+    for (let i = 0; i < path.length; i++) {
+        if (!cur) return null;
+        cur = cur.children[path[i]];
+    }
+    return cur || null;
+}
+
+function _serializeComponent(compEl) {
+    const state = [];
+    // find all relevant form / editable elements inside component
+    const els = compEl.querySelectorAll('input,textarea,select,[contenteditable]');
+    els.forEach(el => {
+        const relPath = _getPathFromRoot(compEl, el);
+        const tag = el.tagName && el.tagName.toLowerCase();
+        const entry = { path: relPath, tag };
+        if (tag === 'input') {
+            const t = el.type && el.type.toLowerCase();
+            entry.inputType = t;
+            if (t === 'checkbox' || t === 'radio') entry.checked = !!el.checked;
+            else entry.value = el.value || '';
+        } else if (tag === 'textarea') {
+            entry.value = el.value || '';
+        } else if (tag === 'select') {
+            // store value (preferred) and selectedIndex as fallback
+            entry.value = el.value;
+            entry.selectedIndex = el.selectedIndex;
+        } else {
+            // contenteditable or other elements
+            if (el.isContentEditable) entry.innerHTML = el.innerHTML || '';
+            else entry.value = el.value || '';
+        }
+        state.push(entry);
+    });
+    return state;
+}
+
+function prepareSnapshot() {
+    try {
+        const dropzone = document.getElementById('templateDropzone');
+        const patient = document.getElementById('patientName')?.value?.trim() || '';
+        const date = document.getElementById('sessionDate')?.value?.trim() || '';
+
+        const components = [];
+        if (dropzone) {
+            Array.from(dropzone.children).forEach(child => {
+                if (!child || child.id === 'dropzonePlaceholder' || child.classList.contains('drop-indicator')) return;
+                const type = child.getAttribute('data-type') || child.dataset.type || 'unknown';
+                // label may be in .component-label or .component-label-editable
+                const labelEl = child.querySelector('.component-label-editable, .component-label');
+                const label = labelEl ? (labelEl.textContent || labelEl.value || '').trim() : '';
+                const state = _serializeComponent(child);
+                // If the DOM element has a linked component instance, also capture
+                // its internal data model (rows, options, etc.) so we can restore
+                // complex components using their public APIs instead of only
+                // applying DOM writes.
+                let compData = null;
+                try {
+                    const inst = child && child._componentInstance;
+                    if (inst && typeof inst.getData === 'function') compData = inst.getData();
+                } catch (e) { /* ignore */ }
+                components.push({ type, label, state, data: compData });
+            });
+        }
+
+        return { version: 1, tool: 'therapy-data-session-taker', created: Date.now(), meta: { patient, date }, components };
+    } catch (e) {
+        console.error('prepareSnapshot error', e);
+        return null;
+    }
+}
+
+function _applyStateToComponentElement(compEl, state) {
+    try {
+        if (!compEl || !Array.isArray(state)) return;
+        state.forEach(entry => {
+            let target = _getNodeByPath(compEl, entry.path || []);
+                if (!target) {
+                    // The component may dynamically create rows/columns (via addRow/addCol).
+                    // Try to trigger those UI helpers (click add-row/add-col buttons) until the path exists.
+                    try {
+                        const maxAttempts = 20;
+                        let attempts = 0;
+                        const addSelector = '.pace-add-row-btn, .srt-add-row-btn, .practice-add-row-btn, .custom-add-row-btn, .pace-add-col-btn, .add-row-btn';
+                        while (!target && attempts < maxAttempts) {
+                            const addBtn = compEl.querySelector(addSelector);
+                            if (!addBtn) break;
+                            try { addBtn.click(); } catch (e) { try { addBtn.dispatchEvent(new MouseEvent('click', { bubbles: true })); } catch (ee) {} }
+                            // allow any synchronous DOM additions to complete
+                            target = _getNodeByPath(compEl, entry.path || []);
+                            attempts++;
+                        }
+                    } catch (e) { /* ignore failures while attempting to grow component */ }
+                }
+                if (!target) return;
+            // If an adapter already restored this element, skip applying the saved state
+            try { if (target.dataset && target.dataset.tdstRestored === '1') return; } catch (e) {}
+            const tag = entry.tag;
+            if (tag === 'input') {
+                const t = entry.inputType;
+                if (t === 'checkbox' || t === 'radio') target.checked = !!entry.checked;
+                else target.value = entry.value || '';
+                // ensure change/input handlers can react if necessary
+                try { target.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+            } else if (tag === 'textarea') {
+                target.value = entry.value || '';
+                try { target.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+            } else if (tag === 'select') {
+                if (typeof entry.value !== 'undefined') target.value = entry.value;
+                else if (typeof entry.selectedIndex !== 'undefined') target.selectedIndex = entry.selectedIndex;
+                try { target.dispatchEvent(new Event('change', { bubbles: true })); } catch(e) {}
+            } else {
+                if (target.isContentEditable && typeof entry.innerHTML !== 'undefined') {
+                    target.innerHTML = entry.innerHTML || '';
+                } else if (typeof entry.value !== 'undefined') {
+                    target.value = entry.value || '';
+                }
+            }
+        });
+    } catch (e) { console.error('applyState error', e); }
+}
+
+// Small per-component adapters to reconstruct complex components from their
+// saved internal data model (so we avoid prompts or fragile UI-click-growth).
+function _runComponentAdapter(type, compInstance, savedData, el) {
+    try {
+        if (!compInstance || !savedData) return;
+        // diagnostic helper: non-invasive logging during restore
+        const _log = (msg, ...args) => {
+            try {
+                if (window && window.console && typeof window.console.log === 'function') {
+                    window.console.log('[TDST][restore]', msg, ...args);
+                }
+            } catch (e) {}
+        };
+        switch ((type||'').toLowerCase()) {
+            case 'pace-table':
+            case 'pace-table': {
+                // PaceTableComponent uses this.data.rows and renderRows()
+                if (typeof compInstance.setData === 'function') compInstance.setData({ rows: savedData.rows || [] });
+                else compInstance.data = { ...compInstance.data, rows: savedData.rows || [] };
+                if (typeof compInstance.renderRows === 'function') compInstance.renderRows();
+                // After rendering, set per-row values reliably by matching row ids
+                try {
+                    const rows = savedData.rows || [];
+                    rows.forEach((row, rowIndex) => {
+                        const id = row && row.id;
+                        if (!id) return;
+                        // select offer/receive
+                        const sel = el.querySelector(`select.pace-offer-receive[data-row="${id}"]`);
+                        if (sel && typeof row.offer !== 'undefined') { sel.value = row.offer; try { sel.dataset.tdstRestored = '1'; } catch(e){}; sel.dispatchEvent(new Event('change', { bubbles: true })); _log('pace: set offer', id, row.offer); }
+                        // comments
+                        const comm = el.querySelector(`.pace-comments[data-row="${id}"]`);
+                        if (comm) { comm.value = row.comments || ''; try { comm.dataset.tdstRestored = '1'; } catch(e){}; comm.dispatchEvent(new Event('input', { bubbles: true })); _log('pace: set comments', id); }
+                        // radio level - try name-based, row-scoped, then index fallback
+                        if (row.level) {
+                            let radio = null;
+                            let matchedBy = null;
+                            // 1) name-based radio group
+                            radio = el.querySelector(`input[name="pace-level-${id}"][value="${row.level}"]`);
+                            if (radio) matchedBy = 'name';
+                            // 2) row-scoped radio lookup
+                            if (!radio) {
+                                const rowEl = el.querySelector(`[data-row="${id}"]`);
+                                if (rowEl) {
+                                    radio = rowEl.querySelector(`input[type="radio"][value="${row.level}"]`);
+                                    if (radio) matchedBy = 'row-scope';
+                                }
+                            }
+                            // 3) index-based fallback
+                            if (!radio) {
+                                try {
+                                    const tbody = el.querySelector('table.pace-table tbody');
+                                    if (tbody) {
+                                        const idx = rowIndex; // use saved order index
+                                        const tr = tbody.children[idx];
+                                        if (tr) {
+                                            radio = tr.querySelector(`input[type="radio"][value="${row.level}"]`);
+                                            if (radio) matchedBy = 'index';
+                                        }
+                                    }
+                                } catch (e) {}
+                            }
+                            if (radio) {
+                                radio.checked = true; try { radio.dataset.tdstRestored = '1'; } catch(e){}; radio.dispatchEvent(new Event('change', { bubbles: true }));
+                                _log('pace: set level', id, row.level, 'matchedBy', matchedBy);
+                            } else {
+                                _log('pace: level not applied', id, row.level);
+                            }
+                        }
+                    });
+                } catch (e) { /* ignore */ }
+                break;
+            }
+            case 'practice-data-table': {
+                if (typeof compInstance.setData === 'function') compInstance.setData({ rows: savedData.rows || [] });
+                else compInstance.data = { ...compInstance.data, rows: savedData.rows || [] };
+                if (typeof compInstance.renderRows === 'function') compInstance.renderRows();
+                // Map saved row fields by data-row id
+                try {
+                    const rows = savedData.rows || [];
+                    rows.forEach((row, rowIndex) => {
+                        const id = row && row.id;
+                        if (!id) return;
+                        const stim = el.querySelector(`[data-row="${id}"][data-type="stimulus"], textarea[data-row="${id}"]`);
+                        if (stim) { stim.value = row.stimulus || ''; try { stim.dataset.tdstRestored = '1'; } catch(e){}; stim.dispatchEvent(new Event('input', { bubbles: true })); _log('practice: set stimulus', id); }
+                        if (row.performance) {
+                            let perf = el.querySelector(`input[name="practice-performance-${id}"][value="${row.performance}"]`);
+                            let matchedBy = null;
+                            if (perf) matchedBy = 'name';
+                            if (!perf) {
+                                const rowEl = el.querySelector(`[data-row="${id}"]`);
+                                if (rowEl) { perf = rowEl.querySelector(`input[type="radio"][value="${row.performance}"]`); if (perf) matchedBy = 'row-scope'; }
+                            }
+                            if (!perf) {
+                                // index fallback
+                                try { const tbody = el.querySelector('table.practice-table tbody'); if (tbody && tbody.children[rowIndex]) { perf = tbody.children[rowIndex].querySelector(`input[type="radio"][value="${row.performance}"]`); if (perf) matchedBy = 'index'; } } catch (e) {}
+                            }
+                            if (perf) { perf.checked = true; try { perf.dataset.tdstRestored = '1'; } catch(e){}; perf.dispatchEvent(new Event('change', { bubbles: true })); _log('practice: set performance', id, row.performance, 'matchedBy', matchedBy); }
+                        }
+                        if (row.level) {
+                            let lvl = el.querySelector(`input[name="practice-level-${id}"][value="${row.level}"]`);
+                            let matchedBy = null;
+                            if (lvl) matchedBy = 'name';
+                            if (!lvl) {
+                                const rowEl = el.querySelector(`[data-row="${id}"]`);
+                                if (rowEl) { lvl = rowEl.querySelector(`input[type="radio"][value="${row.level}"]`); if (lvl) matchedBy = 'row-scope'; }
+                            }
+                            if (!lvl) {
+                                try { const tbody = el.querySelector('table.practice-table tbody'); if (tbody && tbody.children[rowIndex]) { lvl = tbody.children[rowIndex].querySelector(`input[type="radio"][value="${row.level}"]`); if (lvl) matchedBy = 'index'; } } catch (e) {}
+                            }
+                            if (lvl) { lvl.checked = true; try { lvl.dataset.tdstRestored = '1'; } catch(e){}; lvl.dispatchEvent(new Event('change', { bubbles: true })); _log('practice: set level', id, row.level, 'matchedBy', matchedBy); }
+                        }
+                        const comm = el.querySelector(`[data-row="${id}"][data-type="comments"], .pace-comments[data-row="${id}"]`);
+                        if (comm) { comm.value = row.comments || ''; try { comm.dataset.tdstRestored = '1'; } catch(e){}; comm.dispatchEvent(new Event('input', { bubbles: true })); _log('practice: set comments', id); }
+                    });
+                } catch (e) {}
+                break;
+            }
+            case 'srt-table': {
+                // Avoid prompt-driven addInterval; set intervals and rows then render
+                if (Array.isArray(savedData.intervals)) {
+                    if (typeof compInstance.setData === 'function') compInstance.setData({ intervals: savedData.intervals });
+                    else compInstance.data.intervals = savedData.intervals.slice();
+                }
+                if (Array.isArray(savedData.rows)) {
+                    if (typeof compInstance.setData === 'function') compInstance.setData({ rows: savedData.rows });
+                    else compInstance.data.rows = savedData.rows.map(r => ({ cvc: !!r.cvc, marks: Array.isArray(r.marks) ? r.marks.slice() : [] }));
+                }
+                if (typeof compInstance.renderTable === 'function') compInstance.renderTable();
+                // After rendering, set per-row cvc and marks by index
+                try {
+                    const rows = savedData.rows || [];
+                    rows.forEach((r, i) => {
+                        const tbody = el.querySelector('tbody');
+                        if (!tbody) return;
+                        const rowEl = tbody.children[i];
+                        if (!rowEl) return;
+                        const cvc = rowEl.querySelector('input.srt-cvc');
+                        if (cvc) { cvc.checked = !!r.cvc; try { cvc.dataset.tdstRestored = '1'; } catch(e){}; cvc.dispatchEvent(new Event('change', { bubbles: true })); _log('srt: set cvc', i, !!r.cvc); }
+                        if (Array.isArray(r.marks)) {
+                            // Find cells that represent intervals (td.srt-interval)
+                            const cells = rowEl.querySelectorAll('td.srt-interval');
+                            r.marks.forEach((mark, idx) => {
+                                const cell = cells[idx];
+                                if (!cell) return;
+                                const correct = cell.querySelector('.srt-mark.srt-correct');
+                                const incorrect = cell.querySelector('.srt-mark.srt-incorrect');
+                                if (mark === 'correct') { if (correct) { correct.classList.add('active'); try { correct.dataset.tdstRestored = '1'; } catch(e){} } if (incorrect) incorrect.classList.remove('active'); }
+                                else if (mark === 'incorrect') { if (incorrect) { incorrect.classList.add('active'); try { incorrect.dataset.tdstRestored = '1'; } catch(e){} } if (correct) correct.classList.remove('active'); }
+                                else { if (correct) correct.classList.remove('active'); if (incorrect) incorrect.classList.remove('active'); }
+                            });
+                            _log('srt: set marks', i, r.marks.length);
+                        }
+                    });
+                } catch (e) { /* ignore */ }
+                break;
+            }
+            case 'custom-data-table': {
+                // Restore headers, options, extraColumns, rows and visibility
+                const newData = { ...(compInstance.data || {}), ...(savedData || {}) };
+                // Ensure arrays are copied
+                if (Array.isArray(savedData.rows)) newData.rows = savedData.rows.map(r => ({ ...r }));
+                if (Array.isArray(savedData.extraColumns)) newData.extraColumns = savedData.extraColumns.map(c => ({ ...c }));
+                if (Array.isArray(savedData.dataCol1?.options)) newData.dataCol1 = savedData.dataCol1;
+                if (Array.isArray(savedData.dataCol2?.options)) newData.dataCol2 = savedData.dataCol2;
+                if (typeof compInstance.setData === 'function') compInstance.setData(newData);
+                else compInstance.data = newData;
+                if (typeof compInstance.createColumnControls === 'function') compInstance.createColumnControls();
+                if (typeof compInstance.renderTable === 'function') compInstance.renderTable();
+                // After rendering, map saved rows into DOM by id
+                try {
+                    const rows = savedData.rows || [];
+                    rows.forEach((row, rowIndex) => {
+                        const id = row && row.id;
+                        if (!id) return;
+                        const stim = el.querySelector(`textarea[data-row="${id}"]`);
+                        if (stim) { stim.value = row.stimulus || ''; try { stim.dataset.tdstRestored = '1'; } catch(e){}; stim.dispatchEvent(new Event('input', { bubbles: true })); _log('custom: set stimulus', id); }
+                        if (row.dataCol1) {
+                            let r = el.querySelector(`input[name="custom-data1-${id}"][value="${row.dataCol1}"]`);
+                            let matchedBy = null;
+                            if (r) matchedBy = 'name';
+                            if (!r) {
+                                const rowEl = el.querySelector(`[data-row="${id}"]`);
+                                if (rowEl) { r = rowEl.querySelector(`input[type="radio"][value="${row.dataCol1}"]`); if (r) matchedBy = 'row-scope'; }
+                            }
+                            if (!r) {
+                                try { const tbody = el.querySelector('table.custom-data-table tbody'); if (tbody && tbody.children[rowIndex]) { r = tbody.children[rowIndex].querySelector(`input[type="radio"][value="${row.dataCol1}"]`); if (r) matchedBy = 'index'; } } catch (e) {}
+                            }
+                            if (r) { r.checked = true; try { r.dataset.tdstRestored = '1'; } catch(e){}; r.dispatchEvent(new Event('change', { bubbles: true })); _log('custom: set dataCol1', id, row.dataCol1, 'matchedBy', matchedBy); }
+                        }
+                        if (row.dataCol2) {
+                            let r2 = el.querySelector(`input[name="custom-data2-${id}"][value="${row.dataCol2}"]`);
+                            let matchedBy2 = null;
+                            if (r2) matchedBy2 = 'name';
+                            if (!r2) {
+                                const rowEl = el.querySelector(`[data-row="${id}"]`);
+                                if (rowEl) { r2 = rowEl.querySelector(`input[type="radio"][value="${row.dataCol2}"]`); if (r2) matchedBy2 = 'row-scope'; }
+                            }
+                            if (!r2) {
+                                try { const tbody = el.querySelector('table.custom-data-table tbody'); if (tbody && tbody.children[rowIndex]) { r2 = tbody.children[rowIndex].querySelector(`input[type="radio"][value="${row.dataCol2}"]`); if (r2) matchedBy2 = 'index'; } } catch (e) {}
+                            }
+                            if (r2) { r2.checked = true; try { r2.dataset.tdstRestored = '1'; } catch(e){}; r2.dispatchEvent(new Event('change', { bubbles: true })); _log('custom: set dataCol2', id, row.dataCol2, 'matchedBy', matchedBy2); }
+                        }
+                        const comm = el.querySelector(`textarea[data-row="${id}"][data-type="comments"]`);
+                        if (comm) { comm.value = row.comments || ''; try { comm.dataset.tdstRestored = '1'; } catch(e){}; comm.dispatchEvent(new Event('input', { bubbles: true })); _log('custom: set comments', id); }
+                    });
+                } catch (e) {}
+                if (typeof compInstance.updateStats === 'function') compInstance.updateStats();
+                break;
+            }
+            default: {
+                // Generic fallback: if component exposes setData and render, use them
+                if (typeof compInstance.setData === 'function') compInstance.setData(savedData);
+                else compInstance.data = { ...compInstance.data, ...(savedData || {}) };
+                if (typeof compInstance.renderTable === 'function') compInstance.renderTable();
+                if (typeof compInstance.renderRows === 'function') compInstance.renderRows();
+                break;
+            }
+        }
+        // Ensure any DOM utilities run for textareas etc.
+        try { if (window.DomUtils) DomUtils.autoResizeTextareas({ root: el, initializeExisting: true }); } catch (e) {}
+    } catch (e) { console.warn('component adapter failure', type, e); }
+}
+
+function restoreSnapshot(snapshot) {
+    try {
+        if (!snapshot || snapshot.tool !== 'therapy-data-session-taker') return false;
+        const meta = snapshot.meta || {};
+        if (document.getElementById('patientName')) document.getElementById('patientName').value = meta.patient || '';
+        if (document.getElementById('sessionDate')) document.getElementById('sessionDate').value = meta.date || '';
+
+        const dropzone = document.getElementById('templateDropzone');
+        if (!dropzone) return false;
+
+        // Clear existing components but preserve placeholder element
+        const placeholderId = 'dropzonePlaceholder';
+        const ph = document.getElementById(placeholderId);
+        Array.from(dropzone.children).forEach(child => {
+            if (child.id === placeholderId) return;
+            if (child.classList && child.classList.contains('drop-indicator')) { child.remove(); return; }
+            child.remove();
+        });
+
+        const comps = Array.isArray(snapshot.components) ? snapshot.components : [];
+        comps.forEach(csnap => {
+            try {
+                // Pass saved internal data into the component constructor as
+                // initialData so the component can rebuild rows/columns itself.
+                const initialConfig = csnap.data ? { initialData: csnap.data } : {};
+                const compInstance = window.sessionBuilder ? window.sessionBuilder.createComponent(csnap.type, csnap.label || '', initialConfig) : null;
+                if (compInstance && typeof compInstance.createElement === 'function') {
+                    const el = compInstance.createElement();
+                    dropzone.appendChild(el);
+                    // First run a per-component adapter to reconstruct internal model
+                    try { _runComponentAdapter(csnap.type, compInstance, csnap.data, el); } catch (e) {}
+                    // then apply recorded DOM-path state
+                    _applyStateToComponentElement(el, csnap.state || []);
+                } else {
+                    // Fallback: if we cannot create a proper component instance, attempt to create a placeholder element
+                    const fallback = document.createElement('div');
+                    fallback.className = 'template-component';
+                    fallback.setAttribute('data-type', csnap.type || 'unknown');
+                    fallback.innerHTML = `<div class="component-header"><div class="component-title"><span class="component-label">${(csnap.label||csnap.type||'Component')}</span></div></div><div class="component-content"><div>Restored component (type: ${csnap.type})</div></div>`;
+                    dropzone.appendChild(fallback);
+                    _applyStateToComponentElement(fallback, csnap.state || []);
+                }
+            } catch (e) { console.error('restore component error', e); }
+        });
+
+        // Re-run DOM utilities and UI wiring to ensure textareas, placeholders, etc. are correct
+        setTimeout(() => {
+            try {
+                if (window.DomUtils) DomUtils.autoResizeTextareas();
+                if (window.sessionBuilder && typeof window.sessionBuilder.updatePlaceholder === 'function') window.sessionBuilder.updatePlaceholder();
+            } catch (e) { /* ignore */ }
+        }, 0);
+
+        return true;
+    } catch (e) {
+        console.error('restoreSnapshot error', e);
+        return false;
+    }
+}
+
+async function saveSnapshotToFile(snapshot) {
+    try {
+        const filename = `therapy-data-${(snapshot.meta?.patient||'session').replace(/\s+/g,'-')}-${Date.now()}.json`;
+        const data = JSON.stringify(snapshot, null, 2);
+        if (window.electron && typeof window.electron.saveFile === 'function') {
+            await window.electron.saveFile({ defaultPath: filename, filters: [{ name: 'JSON', extensions: ['json'] }], data });
+            return true;
+        }
+        // Browser fallback
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        return true;
+    } catch (e) { console.error('saveSnapshotToFile error', e); return false; }
+}
+
+async function loadSnapshotFromFile() {
+    try {
+        // Prefer electron open dialog path
+        if (window.electron && typeof window.electron.openFile === 'function' && window.electron.openFile) {
+            const res = await window.electron.openFile({ filters: [{ name: 'JSON', extensions: ['json'] }] });
+            if (!res || !res.filePaths || res.filePaths.length === 0) return null;
+            const path = res.filePaths[0];
+            // if preload exposes a readFile helper
+            if (window.electronOn && typeof window.electronOn.readFile === 'function') {
+                const contents = await window.electronOn.readFile(path, 'utf8');
+                // ipc preload returns an object like { success: true, data: '...' }
+                if (contents && contents.success) return JSON.parse(contents.data);
+                return null;
+            }
+            // If no readFile, attempt fetch via file:// (may not work in electron depending on sandbox)
+            try {
+                const txt = await fetch(path).then(r => r.text());
+                return JSON.parse(txt);
+            } catch (e) {
+                console.error('loadSnapshotFromFile read error', e);
+                return null;
+            }
+        }
+
+        // Browser fallback using input[type=file]
+        return await new Promise((resolve) => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,application/json';
+            input.addEventListener('change', (ev) => {
+                const f = input.files && input.files[0];
+                if (!f) return resolve(null);
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try { resolve(JSON.parse(String(reader.result))); } catch (e) { resolve(null); }
+                };
+                reader.readAsText(f);
+            });
+            input.click();
+        });
+    } catch (e) { console.error('loadSnapshotFromFile error', e); return null; }
+}
+
+// expose API and wire menu events via preload-exposed electronOn
+window.TherapyDataSnapshot = { prepareSnapshot, restoreSnapshot, saveSnapshotToFile, loadSnapshotFromFile };
+try {
+    if (window.electronOn && typeof window.electronOn.on === 'function') {
+        window.electronOn.on('menu:save-session', async () => { const snap = prepareSnapshot(); if (snap) await saveSnapshotToFile(snap); });
+        window.electronOn.on('menu:load-session', async () => { const snap = await loadSnapshotFromFile(); if (snap) restoreSnapshot(snap); });
+    }
+    window.addEventListener('menu:save-session', async () => { const snap = prepareSnapshot(); if (snap) await saveSnapshotToFile(snap); });
+    window.addEventListener('menu:load-session', async () => { const snap = await loadSnapshotFromFile(); if (snap) restoreSnapshot(snap); });
+} catch (e) { /* noop */ }
+
 
 // Initialize the application
 

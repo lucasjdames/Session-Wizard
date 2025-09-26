@@ -2,8 +2,6 @@ appId: com.lucasjames.sessionwizard
 productName: Session Wizard
 files:
   - "../index.html"
-  - "../manifest.json"
-  - "../service-worker.js"
   - "../assets/**/*"
   - "../tools/**/*"
   - "main.js"

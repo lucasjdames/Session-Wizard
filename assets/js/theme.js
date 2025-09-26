@@ -43,10 +43,7 @@ function applySavedThemeAndIcon() {
 
 window.addEventListener('pageshow', applySavedThemeAndIcon);
 window.addEventListener('load', applySavedThemeAndIcon);
-// If the active service worker changes (new SW controlling), reapply theme.
-if (navigator.serviceWorker && navigator.serviceWorker.addEventListener) {
-    navigator.serviceWorker.addEventListener('controllerchange', applySavedThemeAndIcon);
-}
+   // Service worker hooks removed — PWA support archived. Theme will still reapply on visibility/page events.
 
 // Defensive re-apply: if some late-running script or cached inline script overwrote the
 // theme after initial load, reapply saved theme after a short delay and when the page

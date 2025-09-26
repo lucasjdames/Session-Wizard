@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>About Session Wizard</title>
+  <style>
+  /* Force light mode only for About panel */
+  :root{color-scheme: light}
+  body{font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:20px; color:#222; background: #f7f7f8}
+  .card{max-width:760px;margin:0 auto;padding:20px;border-radius:12px;background:#ffffff;box-shadow:0 6px 22px rgba(0,0,0,0.08)}
+  .header{display:flex;gap:16px;align-items:center}
+  .logo{width:72px;height:72px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .logo img{width:100%;height:100%;object-fit:contain}
+  h1{margin:0;font-size:20px}
+  .meta{color:#666;margin-top:6px;font-size:13px}
+  p{line-height:1.45;color:#333;margin-top:14px}
+  .footer{margin-top:18px;border-top:1px solid rgba(0,0,0,0.06);padding-top:12px;color:#555;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  a{color:#0060df}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="logo"><img src="assets/img/icon-512.png" alt="icon"></div>
+      <div>
+        <h1>Session Wizard</h1>
+        <div class="meta">Version 0.1.0</div>
+      </div>
+    </div>
+    <p>
+      The Session Wizard is a toolkit designed to help clinicians with setting therapy goals, taking data in and outside of sessions, and tracking clients' progress. The tools provided are built to be cross-applicable for different clinical settings and interventions, but some components are intended for specific interventions from the world of speech-language pathology and cognitive rehabilitation.
+    </p>
+  <p>For full documentation and source code, visit <a href="https://github.com/lucasjdames/Session-Wizard" target="_blank" rel="noreferrer noopener">GitHub — Session Wizard</a>.</p>
+    <div class="footer"><div>License: MIT</div><div><a href="#" id="close">Close</a></div></div>
+  </div>
+  <script>document.getElementById('close').addEventListener('click',()=>{ window.close(); });</script>
+</body>
+</html>
