@@ -7,60 +7,11 @@ Session Wizard is a modular toolkit to help Speech-Language Pathologists (SLPs) 
 - Goal Builder — SMART goal composer with Goal Attainment Scale (GAS) support
 - Therapy Session Data Taker — customizable real-time data collection templates
 - Homework Tracker — printable, customizable home program logs
-- Progress Analyzer — experimental/hidden in the dashboard; the code remains in `tools/progress-monitor/` for development and QA
 
 ### Technical highlights
 
 - Desktop-first packaging via Electron (see `session-wizard-desktop-build/`) — runs offline as a standalone desktop app
 - Responsive, accessible UI with dark/light theme support
-
-## Project layout (important files)
-
-```
-├── index.html               — Main dashboard
-├── assets/                  — CSS, JS, fonts, and images
-└── tools/                   — Individual tool modules (goal-builder, homework-tracker, therapy-data-session-taker, progress-monitor)
-```
-
-Notes:
-- PWA files (web `manifest.json` and `service-worker.js`) have been archived and are no longer shipped with the desktop build. They can be found in `_archived_cleanout/pwa/` if you want to restore web/PWA support.
-- Legacy or experimental artifacts are kept under `_archived_cleanout/` and excluded from active distribution.
-
-## Building & running (desktop)
-
-1. Open `session-wizard-desktop-build/`.
-2. Install dev deps (if not already):
-
-```powershell
-cd session-wizard-desktop-build
-npm install
-```
-
-3. Start the Electron app for local testing:
-
-```powershell
-npm run start
-```
-
-4. Create distributables with electron-builder:
-
-```powershell
-npm run build
-```
-
-The `build.files` configuration has been adjusted to exclude archived PWA files; the bundle contains the dashboard, assets, and tools needed for the desktop app.
-
-## Maintenance & contribution
-
-See `docs/CONTRIBUTING.md` for coding style, testing guidance, and general workflows. A few desktop-specific notes:
-
-- Add or modify tool assets in `tools/<tool-name>/`.
-- Smoke-test each tool in the Electron app for UI, printing/export, and clipboard behavior.
-- Keep the `session-wizard-desktop-build` packaging config (`package.json` and `electron-builder.yml`) in sync when adding files that must be included in the distributable.
-
-## Offline behavior
-
-The Electron desktop build runs as a standalone application and does not rely on a service worker for offline functionality. If you need web/PWA capability later, the archived `service-worker.js` and `manifest.json` in `_archived_cleanout/pwa/` can be restored and re-integrated into `index.html` and the build configuration.
 
 ## Academic foundation & works cited
 
