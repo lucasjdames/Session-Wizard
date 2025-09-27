@@ -220,3 +220,133 @@
 	global.DomUtils = DomUtils;
 })(window);
 
+// --- Theme helpers on DomUtils ---
+(function(global){
+	if (!global.DomUtils) global.DomUtils = {};
+	const Du = global.DomUtils;
+
+	const THEME_KEY = 'session-wizard-theme';
+
+	Du.getTheme = function(){
+		try { const s = localStorage.getItem(THEME_KEY); if (s) return s; } catch(e) {}
+		const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+		return prefersDark ? 'dark' : 'light';
+	};
+
+	Du.setTheme = function(theme){
+		if (!theme) return;
+		try { document.documentElement.setAttribute('data-theme', theme); } catch(e) {}
+		try { localStorage.setItem(THEME_KEY, theme); } catch(e) {}
+		// Update any theme toggle icons if present
+		const evt = new CustomEvent('session-wizard:theme-changed', { detail: { theme } });
+		try { window.dispatchEvent(evt); } catch(e) {}
+	};
+
+	Du.toggleTheme = function(){
+		const current = document.documentElement.getAttribute('data-theme') || Du.getTheme() || 'light';
+		const next = current === 'light' ? 'dark' : 'light';
+		Du.setTheme(next);
+		return next;
+	};
+
+	// Convenience: enable dark mode immediately (for quick dev/testing)
+	Du.enableDarkMode = function(){ Du.setTheme('dark'); };
+})(window);
+
+// --- Confirm Warning Modal (reusable) ---
+// Usage: DomUtils.confirmWarning({ title, message, confirmText, cancelText }) -> Promise<boolean>
+(function(global){
+	if (!global.DomUtils) global.DomUtils = {};
+	const Du = global.DomUtils;
+
+	Du.confirmWarning = function({ title = 'Warning', message = 'This action cannot be undone.', confirmText = 'Yes, clear', cancelText = 'Cancel' } = {}){
+		return new Promise((resolve) => {
+			// Create overlay
+			const overlay = document.createElement('div');
+			overlay.className = 'domutils-confirm-overlay';
+			overlay.style.cssText = `
+				position: fixed; inset: 0; background: rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index: 99999;
+			`;
+
+			// Modal
+			const modal = document.createElement('div');
+			modal.className = 'domutils-confirm-modal';
+			// Use CSS variables so the modal inherits dark/light theme styling
+			modal.setAttribute('role', 'dialog');
+			modal.setAttribute('aria-modal', 'true');
+			modal.style.cssText = `
+				width: 520px; max-width: calc(100% - 40px); background: var(--color-surface, #fff); border-radius: 10px; padding: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.25); display:flex; gap:16px; align-items:center; border: 1px solid var(--color-border, #cfd8e3);
+				font-family: var(--font-sans, Segoe UI, Roboto, Arial, sans-serif); color: var(--color-text, #111);
+			`;
+
+			const imgWrap = document.createElement('div');
+			// Larger left column for a prominent icon
+			imgWrap.style.cssText = 'flex: 0 0 140px; display:flex; align-items:center; justify-content:center; padding-right:6px;';
+			const img = document.createElement('img');
+			img.src = '../../assets/img/icon-512-warning.png';
+			img.alt = 'Warning';
+			img.style.cssText = 'width:120px; height:120px; object-fit:contain; display:block;';
+			imgWrap.appendChild(img);
+
+			const content = document.createElement('div');
+			content.style.cssText = 'flex:1;';
+			const h = document.createElement('h3');
+			h.textContent = title;
+			h.style.margin = '0 0 8px 0';
+			h.style.fontSize = '1.1rem';
+			h.id = 'domutils-confirm-title';
+			const p = document.createElement('p');
+			p.innerHTML = message;
+			p.style.margin = '0 0 16px 0';
+			p.style.color = 'var(--color-text-muted, #5f6e7a)';
+			p.id = 'domutils-confirm-desc';
+			modal.setAttribute('aria-labelledby', h.id);
+			modal.setAttribute('aria-describedby', p.id);
+
+			const actions = document.createElement('div');
+			actions.style.cssText = 'display:flex; gap:8px; justify-content:flex-end;';
+			const cancelBtn = document.createElement('button');
+			cancelBtn.type = 'button';
+			cancelBtn.textContent = cancelText;
+			cancelBtn.style.cssText = 'background:transparent; border:1px solid var(--color-border, #cfd8e3); padding:8px 12px; border-radius:6px; cursor:pointer; color:var(--color-text);';
+			const confirmBtn = document.createElement('button');
+			confirmBtn.type = 'button';
+			confirmBtn.textContent = confirmText;
+			confirmBtn.style.cssText = 'background: var(--color-error, #ef4444); color: white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:600; box-shadow: var(--shadow-sm);';
+
+			actions.appendChild(cancelBtn);
+			actions.appendChild(confirmBtn);
+
+			content.appendChild(h);
+			content.appendChild(p);
+			content.appendChild(actions);
+
+			modal.appendChild(imgWrap);
+			modal.appendChild(content);
+			overlay.appendChild(modal);
+			document.body.appendChild(overlay);
+
+			// Focus management
+			confirmBtn.focus();
+
+			const cleanup = (result) => {
+				try { document.body.removeChild(overlay); } catch (e) {}
+				resolve(Boolean(result));
+			};
+
+			cancelBtn.addEventListener('click', () => cleanup(false));
+			overlay.addEventListener('click', (e) => {
+				if (e.target === overlay) cleanup(false);
+			});
+			confirmBtn.addEventListener('click', () => cleanup(true));
+
+			// Keyboard handling
+			const keyHandler = (e) => {
+				if (e.key === 'Escape') { cleanup(false); }
+				if (e.key === 'Enter') { cleanup(true); }
+			};
+			document.addEventListener('keydown', keyHandler, { once: true });
+		});
+	};
+})(window);
+

@@ -216,6 +216,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Clear All (Aim, SMART Goal, GAS)
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', () => {
+            // Use shared confirmation modal for consistency
+            const doClear = () => {
+                // Clear aim
+                try { const aimEl = document.getElementById('aim'); if (aimEl) { aimEl.value = ''; } } catch (e) {}
+                // Clear SMART builder blocks
+                try { const dropArea = document.getElementById('sgb-drop-area'); if (dropArea) { dropArea.innerHTML = '<span class="sgb-drop-placeholder">Drag blocks here in order, then fill in details.</span>'; } const goalSentence = document.getElementById('sgb-goal-sentence'); if (goalSentence) goalSentence.textContent = ''; } catch (e) {}
+                // Reset GAS to five-level default
+                try { const sel = document.getElementById('levelSelector'); if (sel) { sel.value = 'five'; buildTable('five'); } } catch (e) {}
+                // Clear checklists
+                try { document.querySelectorAll('#smart-checklist input[type="checkbox"]').forEach(cb => cb.checked = false); document.querySelectorAll('#gas-checklist input[type="checkbox"]').forEach(cb => cb.checked = false); } catch (e) {}
+                // Resize textareas where needed
+                try { if (window.DomUtils) DomUtils.autoResizeTextareas(); } catch (e) {}
+                // Ensure autosave state is cleared/saved so the cleared page isn't restored
+                try {
+                    if (window.__tempAutosave && typeof window.__tempAutosave.trySave === 'function') {
+                        window.__tempAutosave.trySave();
+                    } else if (window.electronSnapshot && typeof window.electronSnapshot.tempSave === 'function' && window.GoalBuilderSnapshot && typeof window.GoalBuilderSnapshot.prepareSnapshot === 'function') {
+                        // save an empty/cleared snapshot explicitly
+                        const snap = window.GoalBuilderSnapshot.prepareSnapshot();
+                        window.electronSnapshot.tempSave((location.pathname || 'goal-builder'), snap).catch(() => {});
+                    }
+                } catch (e) {}
+            };
+
+            if (window.DomUtils && typeof DomUtils.confirmWarning === 'function') {
+                DomUtils.confirmWarning({
+                    title: 'Clear all content? ',
+                    message: 'This will clear the Aim, SMART Goal and GAS builder. This action cannot be undone.',
+                    confirmText: 'Yes, clear',
+                    cancelText: 'Cancel'
+                }).then(confirmed => { if (confirmed) doClear(); });
+            } else {
+                // fallback to native confirm
+                if (confirm('Clear Aim, SMART Goal and GAS builder? This cannot be undone.')) doClear();
+            }
+        });
+    }
 });
 
 // --- Section Dropdowns ---
@@ -409,8 +451,31 @@ function toggleSection(id, headerEl) {
         } catch (e) {}
     }
 
+    function _formatSnapshotFilename(snapshot, toolName) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const meta = snapshot && snapshot.meta ? snapshot.meta : {};
+        // remove all non-alphanumeric characters and ignore whitespace (don't replace with hyphen)
+    const rawName = String(meta.patient || meta.clientName || meta.patientName || 'session');
+    // Normalize unicode and strip diacritics (NFKD), then remove non-alphanumerics
+    const normalized = rawName.normalize ? rawName.normalize('NFKD').replace(/\p{Diacritic}/gu, '') : rawName;
+    const patient = normalized.replace(/[^0-9A-Za-z]/g, '');
+        // Parse date as local for YYYY-MM-DD to avoid timezone shifts
+        let d = null;
+        if (meta.date && /^\d{4}-\d{2}-\d{2}$/.test(meta.date)) {
+            const parts = meta.date.split('-');
+            d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        } else if (meta.date) {
+            d = new Date(meta.date);
+        }
+        if (!d || isNaN(d.getTime())) d = new Date();
+        const day = String(d.getDate()).padStart(2,'0');
+        const mon = months[d.getMonth()];
+        const year = d.getFullYear();
+        return `${patient}-${day}${mon}${year}-${toolName}.json`;
+    }
+
     async function saveSnapshotToFile(snapshot) {
-        const filename = `goal-builder-${(snapshot.meta?.patient||'session').replace(/\s+/g,'-')}-${Date.now()}.json`;
+        const filename = _formatSnapshotFilename(snapshot, 'GoalBuilder');
         // prefer electron.saveFile if available via preload
         if (window.electron && typeof window.electron.saveFile === 'function') {
             try {

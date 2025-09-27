@@ -31,6 +31,15 @@ h1, h2, h3, .section-header, .sgb-checklist h2 {
     background: transparent; border: 1px solid rgba(255,255,255,0.06);
 }
 
+.page-meta-actions { display:flex; justify-content:flex-end; margin-top:8px; }
+
+/* Positioning for the Aim header actions so the button sits above the Aim card, aligned to the right */
+.aim-header-actions { display:flex; justify-content:flex-end; margin:0 0 8px 0; }
+.aim-header-actions .clear-template-btn { /* placement only; visuals come from shared stylesheet */
+    padding: 8px 16px;
+    border-radius: 6px;
+}
+
 /* Utility helpers */
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .main-container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-lg); }

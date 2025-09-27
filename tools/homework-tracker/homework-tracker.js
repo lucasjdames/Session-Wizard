@@ -53,20 +53,24 @@ class HomeworkTracker {
     bindEvents() {
         // Drag and drop events for components
         const draggableComponents = document.querySelectorAll('.draggable-component');
-        draggableComponents.forEach(component => {
-            component.addEventListener('dragstart', this.handleDragStart.bind(this));
-            // Add click event to append component
-            component.addEventListener('click', (e) => {
-                const componentType = e.currentTarget.dataset.component;
-                this.addComponent(componentType);
+        if (draggableComponents && draggableComponents.length) {
+            draggableComponents.forEach(component => {
+                component.addEventListener('dragstart', this.handleDragStart.bind(this));
+                // Add click event to append component
+                component.addEventListener('click', (e) => {
+                    const componentType = e.currentTarget.dataset.component;
+                    this.addComponent(componentType);
+                });
             });
-        });
+        }
 
         // Drop zone events
         const dropzone = document.getElementById('templateDropzone');
-        dropzone.addEventListener('dragover', this.handleDragOver.bind(this));
-        dropzone.addEventListener('drop', this.handleDrop.bind(this));
-        dropzone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        if (dropzone) {
+            dropzone.addEventListener('dragover', this.handleDragOver.bind(this));
+            dropzone.addEventListener('drop', this.handleDrop.bind(this));
+            dropzone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        }
 
         // Button events
         document.getElementById('clearTemplate').addEventListener('click', this.clearTemplate.bind(this));
@@ -97,24 +101,26 @@ class HomeworkTracker {
 
     handleDragStart(e) {
         // This handles dragging from component library
-        e.dataTransfer.setData('text/plain', e.target.dataset.component);
+        const componentType = e.currentTarget ? e.currentTarget.dataset.component : e.target.dataset.component;
+        e.dataTransfer.setData('text/plain', componentType);
         e.dataTransfer.setData('source', 'library');
-        e.target.style.opacity = '0.5';
+        (e.currentTarget || e.target).style.opacity = '0.5';
     }
 
     handleTemplateDragStart(e) {
         // This handles dragging existing template components
-        const componentId = e.target.dataset.componentId;
+        const el = e.currentTarget || e.target;
+        const componentId = el.dataset.componentId;
         e.dataTransfer.setData('text/plain', componentId);
         e.dataTransfer.setData('source', 'template');
-        e.target.style.opacity = '0.5';
+        el.style.opacity = '0.5';
         
         // Prevent event bubbling
         e.stopPropagation();
     }
 
     handleTemplateDragEnd(e) {
-        e.target.style.opacity = '1';
+        (e.currentTarget || e.target).style.opacity = '1';
     }
 
     handleGroupDragOver(e) {
@@ -552,9 +558,17 @@ class HomeworkTracker {
                     daysOfWeek: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
                 }
             },
-            'notes-section': {
-                title: 'Notes',
-                description: 'Space for additional comments'
+            'reflection-section': {
+                title: 'Reflection',
+                description: 'Space for reflection or comments',
+                // New VAS config
+                displayMode: 'both', // 'textbox' | 'vas' | 'both'
+                vas: {
+                    title: 'Visual Analog Scale',
+                    description: '',
+                    leftLabel: 'No problem',
+                    rightLabel: 'Severe problem'
+                }
             },
             'custom-header': {
                 title: 'Section Header',
@@ -571,7 +585,9 @@ class HomeworkTracker {
             this.createComponentHTML(component)
         ).join('');
 
-        dropzone.innerHTML = componentsHTML + dropzone.querySelector('.dropzone-placeholder').outerHTML;
+        const placeholder = dropzone.querySelector('.dropzone-placeholder');
+        const placeholderHTML = placeholder ? placeholder.outerHTML : '<div class="dropzone-placeholder"><span class="placeholder-icon">📋</span><p>Click or drop components here to build your log</p></div>';
+        dropzone.innerHTML = componentsHTML + placeholderHTML;
 
         // Bind events to new components
         this.bindComponentEvents();
@@ -585,7 +601,7 @@ class HomeworkTracker {
             'repetition-exercise': '🔢',
             'time-exercise': '⏱️',
             'blank-exercise': '📝',
-            'notes-section': '📄',
+            'reflection-section': '📄',
             'custom-header': '📋'
         };
 
@@ -666,7 +682,7 @@ class HomeworkTracker {
                 `;
             case 'blank-exercise':
                 return `<p class="editable-description" data-field="description">${component.config.description}</p>`;
-            case 'notes-section':
+            case 'reflection-section':
                 return `<p class="editable-description" data-field="description">${component.config.description}</p>`;
             case 'custom-header':
                 return `<div class="editable-description" data-field="description">${component.config.description || 'Add description...'}</div>`;
@@ -1003,6 +1019,57 @@ class HomeworkTracker {
                 });
             });
         }
+
+        // Reflection/VAS specific listeners
+        const showNotesCheckbox = document.getElementById('configShowNotes');
+        const showVasCheckbox = document.getElementById('configShowVas');
+    const vasConfigFieldset = document.querySelector('.vas-config');
+    const numberedScaleCheckbox = document.getElementById('configNumberedScale');
+    const numberedMinMax = document.getElementById('numberedMinMax');
+    const numberedMinInput = document.getElementById('configNumberedMin');
+    const numberedMaxInput = document.getElementById('configNumberedMax');
+
+        const updateVasVisibility = () => {
+            if (vasConfigFieldset) {
+                vasConfigFieldset.style.display = (showVasCheckbox && showVasCheckbox.checked) ? 'block' : 'none';
+            }
+        };
+
+        if (showVasCheckbox) showVasCheckbox.addEventListener('change', updateVasVisibility);
+        updateVasVisibility();
+
+        // Toggle visibility of the min/max inputs when numbered scale checkbox is toggled
+        const updateNumberedVisibility = () => {
+            if (numberedMinMax) numberedMinMax.style.display = (numberedScaleCheckbox && numberedScaleCheckbox.checked) ? 'inline-flex' : 'none';
+        };
+        if (numberedScaleCheckbox) {
+            numberedScaleCheckbox.addEventListener('change', updateNumberedVisibility);
+            updateNumberedVisibility();
+        }
+
+        // Validate min/max inputs: min must be 0 or 1, max must be 2..10, and max > min
+        const clampNumberedInputs = () => {
+            if (!numberedMinInput || !numberedMaxInput) return;
+            let min = parseInt(numberedMinInput.value);
+            let max = parseInt(numberedMaxInput.value);
+            if (Number.isNaN(min)) min = 0;
+            if (Number.isNaN(max)) max = 10;
+            // enforce ranges
+            if (min < 0) min = 0;
+            if (min > 1) min = 1;
+            if (max < 2) max = 2;
+            if (max > 10) max = 10;
+            // ensure max > min
+            if (max <= min) {
+                max = Math.min(min + 1, 10);
+            }
+            // write back adjusted values
+            numberedMinInput.value = String(min);
+            numberedMaxInput.value = String(max);
+        };
+        if (numberedMinInput) numberedMinInput.addEventListener('change', clampNumberedInputs);
+        if (numberedMaxInput) numberedMaxInput.addEventListener('change', clampNumberedInputs);
+        clampNumberedInputs();
     }
 
     isExerciseScheduled(component, dayIndex) {
@@ -1050,7 +1117,7 @@ class HomeworkTracker {
             'repetition-exercise': 'Repetition Exercise',
             'time-exercise': 'Time-Based Exercise',
             'blank-exercise': 'Blank Exercise',
-            'notes-section': 'Notes Section',
+            'reflection-section': 'Reflection Section',
             'custom-header': 'Custom Header'
         };
         return names[type] || 'Component';
@@ -1070,8 +1137,8 @@ class HomeworkTracker {
                 return this.createTimeExerciseForm(component);
             case 'blank-exercise':
                 return this.createBlankExerciseForm(component);
-            case 'notes-section':
-                return this.createNotesSectionForm(component);
+            case 'reflection-section':
+                return this.createReflectionSectionForm(component);
             case 'custom-header':
                 return this.createCustomHeaderForm(component);
             default:
@@ -1178,7 +1245,11 @@ class HomeworkTracker {
         `;
     }
 
-    createNotesSectionForm(component) {
+    createReflectionSectionForm(component) {
+        const vas = component.config.vas || {};
+        // Backwards compatibility: derive checkboxes from displayMode if explicit flags aren't present
+        const showNotes = (typeof component.config.showNotes !== 'undefined') ? component.config.showNotes : (component.config.displayMode ? (component.config.displayMode === 'textbox' || component.config.displayMode === 'both') : true);
+        const showVas = (typeof component.config.showVas !== 'undefined') ? component.config.showVas : (component.config.displayMode ? (component.config.displayMode === 'vas' || component.config.displayMode === 'both') : true);
         return `
             <div class="config-form">
                 <div class="form-group">
@@ -1189,6 +1260,36 @@ class HomeworkTracker {
                     <label>Description:</label>
                     <input type="text" id="configDescription" value="${component.config.description}">
                 </div>
+                <div class="form-group pill-toggle-group">
+                    <label class="pill-toggle"><input type="checkbox" id="configShowNotes" ${showNotes ? 'checked' : ''}><span>Notes Section</span></label>
+                    <label class="pill-toggle"><input type="checkbox" id="configShowVas" ${showVas ? 'checked' : ''}><span>Visual Analog Scale</span></label>
+                </div>
+                <fieldset class="vas-config">
+                    <legend>VAS Settings</legend>
+                    <div class="form-group">
+                        <label>VAS Title:</label>
+                        <input type="text" id="configVasTitle" value="${vas.title || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>VAS Description:</label>
+                        <input type="text" id="configVasDescription" value="${vas.description || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Left Label:</label>
+                        <input type="text" id="configVasLeft" value="${vas.leftLabel || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Right Label:</label>
+                        <input type="text" id="configVasRight" value="${vas.rightLabel || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="pill-toggle"><input type="checkbox" id="configNumberedScale" ${vas.numbered ? 'checked' : ''}><span>Numbered scale</span></label>
+                        <div id="numberedMinMax" style="display:${vas.numbered ? 'inline-flex' : 'none'}; gap:8px; align-items:center; margin-left:6px;">
+                            <label style="font-size:0.9rem;">Minimum <input id="configNumberedMin" type="number" min="0" max="1" value="${typeof vas.numberedMin === 'number' ? vas.numberedMin : 0}" style="width:64px; margin-left:6px;" /></label>
+                            <label style="font-size:0.9rem;">Maximum <input id="configNumberedMax" type="number" min="2" max="10" value="${typeof vas.numberedMax === 'number' ? vas.numberedMax : 10}" style="width:64px; margin-left:6px;" /></label>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
         `;
     }
@@ -1392,6 +1493,30 @@ class HomeworkTracker {
         const descriptionInput = document.getElementById('configDescription');
         if (descriptionInput) component.config.description = descriptionInput.value;
 
+        // Reflection-specific fields
+        if (component.type === 'reflection-section') {
+            const showNotesCheckbox = document.getElementById('configShowNotes');
+            const showVasCheckbox = document.getElementById('configShowVas');
+            component.config.showNotes = showNotesCheckbox ? !!showNotesCheckbox.checked : true;
+            component.config.showVas = showVasCheckbox ? !!showVasCheckbox.checked : true;
+
+            component.config.vas = component.config.vas || {};
+            const vasTitle = document.getElementById('configVasTitle');
+            const vasDesc = document.getElementById('configVasDescription');
+            const vasLeft = document.getElementById('configVasLeft');
+            const vasRight = document.getElementById('configVasRight');
+            if (vasTitle) component.config.vas.title = vasTitle.value;
+            if (vasDesc) component.config.vas.description = vasDesc.value;
+            if (vasLeft) component.config.vas.leftLabel = vasLeft.value;
+            if (vasRight) component.config.vas.rightLabel = vasRight.value;
+            const numberedCheckbox = document.getElementById('configNumberedScale');
+            const numberedMinInput = document.getElementById('configNumberedMin');
+            const numberedMaxInput = document.getElementById('configNumberedMax');
+            component.config.vas.numbered = numberedCheckbox ? numberedCheckbox.checked : false;
+            component.config.vas.numberedMin = numberedMinInput ? parseInt(numberedMinInput.value) : (component.config.vas.numberedMin || 0);
+            component.config.vas.numberedMax = numberedMaxInput ? parseInt(numberedMaxInput.value) : (component.config.vas.numberedMax || 10);
+        }
+
         // Get component-specific fields
         switch (component.type) {
             case 'rating-exercise':
@@ -1522,9 +1647,17 @@ class HomeworkTracker {
     }
 
     clearTemplate() {
-        this.components = [];
-        this.renderTemplateComponents();
-        this.updatePlaceholder();
+        DomUtils.confirmWarning({
+            title: 'Clear Log Template',
+            message: 'Are you sure you want to clear all components from the log template? This action cannot be undone.',
+            confirmText: 'Yes, clear',
+            cancelText: 'Cancel'
+        }).then((confirmed) => {
+            if (!confirmed) return;
+            this.components = [];
+            this.renderTemplateComponents();
+            this.updatePlaceholder();
+        });
     }
 
     updatePlaceholder() {
@@ -1691,8 +1824,8 @@ class HomeworkTracker {
                 return this.generateSimpleExerciseWeekTable(component, 'time', weekStart, weekDays, startDate);
             case 'blank-exercise':
                 return this.generateSimpleExerciseWeekTable(component, 'blank', weekStart, weekDays, startDate);
-            case 'notes-section':
-                return this.generateNotesSection(component);
+            case 'reflection-section':
+                return this.generateReflectionSection(component);
             case 'custom-header':
                 return this.generateCustomHeader(component);
             default:
@@ -1792,8 +1925,8 @@ class HomeworkTracker {
                 return this.generateSimpleExerciseTable(component, numDays, 'time');
             case 'blank-exercise':
                 return this.generateSimpleExerciseTable(component, numDays, 'blank');
-            case 'notes-section':
-                return this.generateNotesSection(component);
+            case 'reflection-section':
+                return this.generateReflectionSection(component);
             case 'custom-header':
                 return this.generateCustomHeader(component);
             default:
@@ -2183,19 +2316,67 @@ class HomeworkTracker {
         return content;
     }
 
-    generateNotesSection(component) {
-        const { title, description } = component.config;
-        
+    generateReflectionSection(component) {
+    const { title, description, displayMode = 'both', vas = {} } = component.config;
+    const showNotes = (typeof component.config.showNotes !== 'undefined') ? component.config.showNotes : (displayMode === 'textbox' || displayMode === 'both');
+    const showVas = (typeof component.config.showVas !== 'undefined') ? component.config.showVas : (displayMode === 'vas' || displayMode === 'both');
+        const vasHTML = (() => {
+            const titleHTML = `<div class="vas-title">${vas.title || ''}</div>`;
+            const descHTML = `<div class="vas-description">${vas.description || ''}</div>`;
+            let lineInner = '';
+            if (vas.numbered && typeof vas.numberedMin === 'number' && typeof vas.numberedMax === 'number' && (vas.numberedMax - vas.numberedMin) >= 1) {
+                const min = vas.numberedMin;
+                const max = vas.numberedMax;
+                const count = max - min + 1;
+                const marks = [];
+                for (let i = 0; i < count; i++) {
+                    const pos = (i / (count - 1)) * 100;
+                    marks.push(`<span class="vas-tick" style="left: ${pos}%;">` +
+                        `<span class="vas-tick-mark"></span>` +
+                        `<span class="vas-tick-label">${min + i}</span>` +
+                        `</span>`);
+                }
+                lineInner = `
+                    <div class="vas-line-container">
+                        <div class="vas-line-wrap numbered">
+                            <div class="vas-line"></div>
+                            ${marks.join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                lineInner = `
+                    <div class="vas-line-container">
+                        <div class="vas-line-wrap">
+                            <div class="vas-line"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const labelsHTML = `
+                <div class="vas-labels">
+                    <span class="vas-left">${vas.leftLabel || ''}</span>
+                    <span class="vas-right">${vas.rightLabel || ''}</span>
+                </div>
+            `;
+
+            return `<div class="vas-container">${titleHTML}${descHTML}${lineInner}${labelsHTML}</div>`;
+        })();
+
+        let contentHTML = '';
+        // Description should always be output below the title
+        const descHTML = description ? `<div class="reflection-description">${description}</div>` : '';
+
+        if (showVas) contentHTML += vasHTML;
+        if (descHTML) contentHTML += descHTML;
+        if (showNotes) contentHTML += `<div class="reflection-textbox lines-4"></div>`;
+
         return `
-            <div class="notes-section">
-                <div class="notes-header">${title}</div>
-                <div class="notes-content">
-                    <em>${description}</em>
-                    <br><br>
-                    ________________________________________________________________<br>
-                    ________________________________________________________________<br>
-                    ________________________________________________________________<br>
-                    ________________________________________________________________<br>
+            <div class="reflection-section">
+                <div class="reflection-header">${title}</div>
+                <div class="reflection-content">
+                    ${contentHTML}
                 </div>
             </div>
         `;
@@ -2319,8 +2500,29 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
+    function _formatSnapshotFilename(snapshot, toolName) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const meta = snapshot && snapshot.meta ? snapshot.meta : {};
+    const rawName = String(meta.clientName || meta.patient || meta.patientName || 'session');
+    const normalized = rawName.normalize ? rawName.normalize('NFKD').replace(/\p{Diacritic}/gu, '') : rawName;
+    const patient = normalized.replace(/[^0-9A-Za-z]/g, '');
+        let d = null;
+        const dateStr = meta.startDate || meta.date;
+        if (dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            const parts = dateStr.split('-');
+            d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        } else if (dateStr) {
+            d = new Date(dateStr);
+        }
+        if (!d || isNaN(d.getTime())) d = new Date();
+        const day = String(d.getDate()).padStart(2,'0');
+        const mon = months[d.getMonth()];
+        const year = d.getFullYear();
+        return `${patient}-${day}${mon}${year}-${toolName}.json`;
+    }
+
     async function saveSnapshotToFile(snapshot) {
-        const filename = `homework-tracker-${(snapshot.meta?.clientName||'session').replace(/\s+/g,'-')}-${Date.now()}.json`;
+        const filename = _formatSnapshotFilename(snapshot, 'HomeworkLog');
         if (window.electron && typeof window.electron.saveFile === 'function') {
             try {
                 const res = await window.electron.saveFile({ defaultPath: filename, filters: [{ name: 'JSON', extensions: ['json'] }], data: JSON.stringify(snapshot, null, 2) });

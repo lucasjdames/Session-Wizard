@@ -152,9 +152,18 @@ body {
 [data-theme='dark'] .app-header { background:rgba(27,35,45,.75); }
 .branding { display:flex; gap:.7rem; align-items:center; }
 .logo-circle {
-  width:44px; height:44px; border-radius:50%; background:var(--grad-accent); color:#fff;
+  width:44px; height:44px; border-radius:50%; background: transparent; color:#fff;
   display:grid; place-items:center; font-weight:600; letter-spacing:.5px; font-size:.85rem;
   box-shadow:var(--shadow-sm);
+}
+/* Ensure any img inside the logo circle fills the area and keeps transparency */
+.logo-circle img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: 50%;
+  background: transparent;
 }
 .app-title { margin:0; font-size:1.25rem; font-weight:600; letter-spacing:.5px; }
 .ghost-btn {
@@ -347,9 +356,6 @@ body {
   background: var(--color-accent);
   color: #fff;
   font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 0.7em 1.4em;
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -370,9 +376,6 @@ body {
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 0.7em 1.4em;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -383,6 +386,82 @@ body {
   background: var(--color-surface-alt);
   border-color: var(--color-accent);
   transform: translateY(-1px);
+}
+
+/* Shared action button base to ensure consistent font/padding/shape across tools */
+.ui-action-btn,
+.primary-btn,
+.secondary-btn,
+.clear-template-btn {
+  font-family: var(--font-sans);
+  font-weight: 500; /* medium weight used across session taker */
+  font-size: 14px; /* matches Therapy Session Data Taker */
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+/* Canonical Clear Template Button visuals (centralized) */
+.clear-template-btn {
+  background: var(--color-error);
+  color: #fff;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s var(--ease);
+}
+.clear-template-btn:hover,
+.clear-template-btn:focus {
+  background: color-mix(in srgb, var(--color-error) 85%, black);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* Canonical page-actions button styles: ensure buttons in the fixed page actions
+   area are visually identical across tools (prevents per-tool overrides from
+   introducing transparency, filters or different hover behavior). This
+   selector is intentionally specific and placed in the shared stylesheet so
+   it wins over tool-scoped styles. */
+.page-actions .primary-btn,
+.page-actions .secondary-btn {
+  /* match primary/secondary sizing and weight used elsewhere */
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.7em 1.4em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.22s var(--ease);
+  /* neutralize filters/backdrop effects that may be applied by tool CSS */
+  -webkit-filter: none !important;
+  filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  /* ensure fully opaque backgrounds */
+  background-clip: padding-box !important;
+  opacity: 1 !important;
+}
+
+.page-actions .primary-btn {
+  background: var(--color-accent) !important;
+  color: #fff !important;
+  border: none !important;
+}
+.page-actions .primary-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 85%, black) !important;
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-1px) !important;
+}
+
+.page-actions .secondary-btn {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.page-actions .secondary-btn:hover {
+  background: var(--color-surface-alt) !important;
+  border-color: var(--color-accent) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* Form input styling */

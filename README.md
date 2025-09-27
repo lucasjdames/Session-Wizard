@@ -74,5 +74,24 @@ Davis, G. A. (1980). A critical look at PACE therapy. Clinical Aphasiology: Proc
 
 Nicholas, L. E., & Brookshire, R. H. (1993). A System for Quantifying the Informativeness and Efficiency of the Connected Speech of Adults With Aphasia. Journal of Speech, Language, and Hearing Research, 36(2), 338–350. https://doi.org/10.1044/jshr.3602.338
 
+## Tutorial — quick guide
 
+This short tutorial explains the common workflows and features clinicians will use in Session Wizard.
+
+Features
+- Copy to Clipboard: produces a compact, easy-to-read text summary of the current page contents. Raw data is generally not included. Use this to paste concise clinical notes or brief progress updates into electronic health records, progress reports, or messaging systems.
+- Export to PDF: creates a print-ready PDF that preserves layout, formatting, and raw data. Use this for documentation to include in charts, to hand to clients, or to attach to emails.
+- File → Save / Load: Session Wizard preserves your work when navigating between tools during a single session. When you close the Session Wizard app, all data will be lost unless you choose to save each Session Wizard tool page individually to a local file. Files are stored locally on your device. You can use save to pause and resume a session for later use. Export (PDF/Copy) is preferred to share readable content with others. 
+- Theme toggle: click the upper right-hand corner (sun/moon emojis) to toggle between light and dark themes.
+- Full screen mode: Press F11 to toggle full-screen.
+
+Primary tools
+- Goal Builder: assemble SMART goals using drag-and-drop components. The interface guides you through measurable, time-bound, and functional goal components and helps you construct Goal Attainment Scales (GAS) to quantify outcome expectations. Use the included checklists to improve goal quality and reproducibility.
+- Therapy Session Data Taker: build or select a template for in-session data collection. Templates support a wide range of component types (text, numeric, checkboxes) and special components for common interventions (PACE, structured discourse, spaced retrieval). The custom data table lets you record trial-by-trial performance and export the resulting data for analysis or records. You can click on the Quick Tool tabs (right side of the the window) to open the Stopwatch/Timer and Clicker Counter tools.
+- Homework Tracker: design printable home-program logs by dragging exercises onto the canvas, setting labels, descriptions, and frequency. The Log Details allows you to customise identifying information and the number of weeks to print. The Exercise Group component bundles related activities into a compact layout for easy printing and client handouts. The Reflection section offers text-box or visual analog scale fields for self-reflection/rating and comments on a weekly, rather than daily, schedule.
+
+Tips
+- 
+- All save files are local. If you need to share information, prefer Export to PDF or Copy to Clipboard.
+- Save/Load isn't just for saving client data; try using it to make whole new custom templates. Configure a template to suit your needs, setting up Custom Data Tables, component titles, etc; then save and label it according to its use case so you can easily load it back up later for a new client or session.
 

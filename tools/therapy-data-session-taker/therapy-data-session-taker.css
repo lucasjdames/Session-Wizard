@@ -515,22 +515,7 @@ html body .tds-pullout, html body .tds-pullout * {
 
 .bolus-table .muted { color: var(--color-text-muted, #6b7280); font-size: 0.95rem; }
 
-/* Clear template button */
-.clear-template-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.clear-template-btn:hover {
-    background: #c82333;
-}
+/* Clear template button visuals are centralized in assets/css/main.css */
 
 /* (removed duplicate broken block) */
 .srt-correct.active {

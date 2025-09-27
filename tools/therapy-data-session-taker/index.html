@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Therapy Session Data Taker</title>
+	<title>Session Data Taker</title>
 		<style>
 			:root{ --critical-bg:#f5f7fa; --critical-surface:#ffffff; --critical-border:#d8dee6; --critical-text:#1f2630; }
 			html,body{ background:var(--color-bg, var(--critical-bg)); color:var(--color-text, var(--critical-text)); }
@@ -14,15 +14,16 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com"/>
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-	<!-- Prefetch main shell assets to speed up back navigation -->
-	<link rel="prefetch" href="/index.html" as="document">
-	<link rel="prefetch" href="/assets/css/main.css" as="style">
-	<link rel="prefetch" href="/assets/js/main.js" as="script">
-	<link rel="preload" href="/assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+	<!-- Prefetch main shell assets to speed up back navigation (use relative paths for file:// contexts) -->
+	<link rel="prefetch" href="../../index.html" as="document">
+	<link rel="prefetch" href="../../assets/css/main.css" as="style">
+	<link rel="prefetch" href="../../assets/js/main.js" as="script">
+	<link rel="preload" href="../../assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="stylesheet" href="../../assets/css/main.css">
 	<link rel="stylesheet" href="therapy-data-session-taker.css">
 	<script src="../../assets/js/theme.js"></script>
 	<script defer src="../../assets/js/shared/dom-utils.js"></script>
+	<script defer src="../../assets/js/shared/temp-autosave.js"></script>
 	<script defer src="../../assets/js/prefetch-back.js"></script>
 	<script defer src="therapy-data-session-taker.js"></script>
 	<style>
@@ -201,7 +202,7 @@
 			transform: translateY(-1px);
 		}
 		
-		/* Patient and Date Fields */
+		/* Client and Date Fields */
 		.meta-row { 
 			display: flex; 
 			align-items: center; 
@@ -365,11 +366,11 @@
 		</div>
 	</header>
 	<div class="main-container">
-		<h1>Therapy Session Data Taker</h1>
+		<h1>Session Data Taker</h1>
 		<p class="tool-description">Create custom session templates by dragging and dropping components.</p>
 		<div class="meta-row">
-			<label for="patientName" class="meta-label">Patient:</label>
-			<input type="text" id="patientName" class="meta-inputbox" placeholder="Enter patient name..." />
+			<label for="patientName" class="meta-label">Client:</label>
+			<input type="text" id="patientName" class="meta-inputbox" placeholder="Enter client name..." />
 			<label for="sessionDate" class="meta-label">Date:</label>
 			<input type="date" id="sessionDate" class="meta-inputbox" />
 		</div>
@@ -425,8 +426,8 @@
 			</main>
 		</div>
 		<div class="page-actions">
-			<button id="copyClipboardBtn" class="primary-btn">Copy to Clipboard</button>
-			<button id="printPageBtn" class="secondary-btn">Printable Page</button>
+			<button id="copyClipboardBtn" class="secondary-btn">Copy to Clipboard</button>
+			<button id="printPageBtn" class="primary-btn">Printable Page</button>
 		</div>
 	</div>
 </body>

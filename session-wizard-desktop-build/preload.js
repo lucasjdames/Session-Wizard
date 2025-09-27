@@ -25,3 +25,10 @@ contextBridge.exposeInMainWorld('electronOn', {
     return await ipcRenderer.invoke('file:read', filePath, encoding);
   }
 });
+
+// Expose temporary snapshot APIs for silent background save/load
+contextBridge.exposeInMainWorld('electronSnapshot', {
+  tempSave: async (key, data) => ipcRenderer.invoke('snapshot:tempSave', key, data),
+  tempLoad: async (key) => ipcRenderer.invoke('snapshot:tempLoad', key),
+  tempClearAll: async () => ipcRenderer.invoke('snapshot:tempClearAll')
+});

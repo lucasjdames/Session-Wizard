@@ -13,11 +13,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <!-- Prefetch main shell assets to speed up back navigation -->
-    <link rel="prefetch" href="/index.html" as="document">
-    <link rel="prefetch" href="/assets/css/main.css" as="style">
-    <link rel="prefetch" href="/assets/js/main.js" as="script">
-    <link rel="preload" href="/assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Prefetch main shell assets to speed up back navigation (use relative paths for file:// contexts) -->
+    <link rel="prefetch" href="../../index.html" as="document">
+    <link rel="prefetch" href="../../assets/css/main.css" as="style">
+    <link rel="prefetch" href="../../assets/js/main.js" as="script">
+    <link rel="preload" href="../../assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="progress-monitor.css">
     <script src="../../assets/js/theme.js"></script>
@@ -121,8 +121,8 @@
             <label class="sr-only" for="importCsvInput">Import CSV file</label>
             <input type="file" id="importCsvInput" accept=".csv" class="hidden">
             <button id="importCsvBtn" class="secondary-btn">Import from CSV</button>
-            <button id="copyClipboardBtn" class="primary-btn">Copy to Clipboard</button>
-            <button id="printPageBtn" class="secondary-btn">Printable Page</button>
+              <button id="copyClipboardBtn" class="secondary-btn">Copy to Clipboard</button>
+              <button id="printPageBtn" class="primary-btn">Printable Page</button>
         </div>
     </div>
     </div>

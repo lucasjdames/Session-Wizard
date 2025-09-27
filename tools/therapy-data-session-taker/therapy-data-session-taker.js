@@ -31,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const date = dateInput ? dateInput.value.trim() : '';
 
             // Start building printable HTML
-            let html = `<!DOCTYPE html><html><head><title>Printable Session Data</title><style>
+            let html = `<!DOCTYPE html><html><head><title>Session Data</title><style>
                 :root { --print-bg: var(--tdst-surface, var(--color-surface, #fff)); --print-text: var(--tdst-text, var(--color-text, #000)); --print-muted: var(--tdst-muted, var(--color-border, #999)); }
                 body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 16px; background: var(--print-bg); line-height: 1.5; color: var(--print-text); }
                 h1 { font-size: 1.6em; margin-bottom: 0.5em; color: var(--color-accent, #2196f3); border-bottom: 1px solid var(--color-accent, #2196f3); padding-bottom: 0.2em; font-weight: 600; }
@@ -142,8 +142,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             </style></head><body>`;
 
-            html += `<h1>Therapy Session Data</h1>`;
-            html += `<div class='meta-row'><span class='meta-label'>Patient:</span> ${patient} &nbsp; <span class='meta-label'>Date:</span> ${date}</div>`;
+            html += `<h1>Session Data</h1>`;
+            html += `<div class='meta-row'><span class='meta-label'>Client:</span> ${patient} &nbsp; <span class='meta-label'>Date:</span> ${date}</div>`;
 
             // Iterate components and render static data
             Array.from(dropzone.children).forEach(compEl => {
@@ -493,7 +493,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             // Use DomUtils.openPrintWindow to allow Electron to render a PDF preview, or fallback to window.print()
             if (window.DomUtils && typeof DomUtils.openPrintWindow === 'function') {
-                DomUtils.openPrintWindow({ title: 'Printable Session Data', bodyHtml: html, headHtml: '' , autoPrint: true });
+                DomUtils.openPrintWindow({ title: 'Session Data', bodyHtml: html, headHtml: '' , autoPrint: true });
             } else {
                 const printWin = window.open('', '_blank', 'width=900,height=900');
                 printWin.document.open();
@@ -6095,9 +6095,14 @@ class UIManager {
     }
 
     clearTemplate() {
-        const confirmed = confirm('Are you sure you want to clear all components from the session template? This action cannot be undone.');
-        
-        if (confirmed) {
+        // Use shared confirmWarning for consistent UI
+        DomUtils.confirmWarning({
+            title: 'Clear Session Template',
+            message: 'Are you sure you want to clear all components from the session template? This action cannot be undone.',
+            confirmText: 'Yes, clear',
+            cancelText: 'Cancel'
+        }).then((confirmed) => {
+            if (!confirmed) return;
             const dropzone = document.getElementById('templateDropzone');
             if (dropzone) {
                 // Remove only actual component children and drop-indicator elements,
@@ -6134,7 +6139,7 @@ class UIManager {
                 // Ensure placeholder is visible after clearing
                 this.app.updatePlaceholder();
             }
-        }
+        });
     }
 
     applyFilters() {
@@ -6722,7 +6727,29 @@ function restoreSnapshot(snapshot) {
 
 async function saveSnapshotToFile(snapshot) {
     try {
-        const filename = `therapy-data-${(snapshot.meta?.patient||'session').replace(/\s+/g,'-')}-${Date.now()}.json`;
+        // helper to format filename as [patient]-[DDMonYYYY]-[ToolName].json
+        const _formatSnapshotFilename = (snap, toolName) => {
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const meta = snap && snap.meta ? snap.meta : {};
+            const rawName = String(meta.patient || meta.clientName || meta.patientName || 'session');
+            const normalized = rawName.normalize ? rawName.normalize('NFKD').replace(/\p{Diacritic}/gu, '') : rawName;
+            const patient = normalized.replace(/[^0-9A-Za-z]/g, '');
+            // Parse ISO YYYY-MM-DD as local date to avoid timezone offset
+            let d = null;
+            if (meta.date && /^\d{4}-\d{2}-\d{2}$/.test(meta.date)) {
+                const parts = meta.date.split('-');
+                d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            } else if (meta.date) {
+                d = new Date(meta.date);
+            }
+            if (!d || isNaN(d.getTime())) d = new Date();
+            const day = String(d.getDate()).padStart(2,'0');
+            const mon = months[d.getMonth()];
+            const year = d.getFullYear();
+            return `${patient}-${day}${mon}${year}-${toolName}.json`;
+        };
+
+        const filename = _formatSnapshotFilename(snapshot, 'SessionData');
         const data = JSON.stringify(snapshot, null, 2);
         if (window.electron && typeof window.electron.saveFile === 'function') {
             await window.electron.saveFile({ defaultPath: filename, filters: [{ name: 'JSON', extensions: ['json'] }], data });

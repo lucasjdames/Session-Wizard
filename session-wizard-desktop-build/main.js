@@ -4,6 +4,18 @@ const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
 
+// Determine a platform-appropriate runtime icon once and reuse it for all
+// programmatically-created windows (prevents Electron's default icon from
+// appearing for transient print/preview windows on Windows).
+const runtimeIcon = (() => {
+  let icon = path.join(__dirname, '..', 'assets', 'img', 'icon-512.png');
+  try {
+    if (process.platform === 'win32') icon = path.join(__dirname, '..', 'assets', 'img', 'icon-192.ico');
+    else if (process.platform === 'darwin') icon = path.join(__dirname, '..', 'assets', 'img', 'icon-512.icns');
+  } catch (e) {}
+  return icon;
+})();
+
 // Small utilities
 function escapeHtmlForFile(str){
   return String(str || '').replace(/[&<>"']/g, function(c){
@@ -100,17 +112,11 @@ async function inlineFontsInCss(cssText, baseHref) {
 
 // Create main application window
 function createWindow() {
-  // Choose platform-appropriate icon: ICO for Windows, ICNS for macOS, PNG fallback for others
-  let windowIcon = path.join(__dirname, '..', 'assets', 'img', 'icon-512.png');
-  try {
-    if (process.platform === 'win32') windowIcon = path.join(__dirname, '..', 'assets', 'img', 'icon-192.ico');
-    else if (process.platform === 'darwin') windowIcon = path.join(__dirname, '..', 'assets', 'img', 'icon-512.icns');
-  } catch (e) {}
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     // Platform-appropriate icon for runtime
-    icon: windowIcon,
+    icon: runtimeIcon,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -200,14 +206,14 @@ try {
       label: 'File',
       submenu: [
         {
-          label: 'Save Session...',
+          label: 'Save Page...',
           accelerator: isMac ? 'CmdOrCtrl+S' : 'Ctrl+S',
           click: (menuItem, browserWindow) => {
             if (browserWindow && browserWindow.webContents) browserWindow.webContents.send('menu:save-session');
           }
         },
         {
-          label: 'Load Session...',
+          label: 'Load Page...',
           accelerator: isMac ? 'CmdOrCtrl+O' : 'Ctrl+O',
           click: (menuItem, browserWindow) => {
             if (browserWindow && browserWindow.webContents) browserWindow.webContents.send('menu:load-session');
@@ -306,7 +312,9 @@ try {
             <div class="footer"><div>${appLicense?`License: ${escapeHtmlForFile(appLicense)}`:''}</div><div><a href="#" id="close">Close</a></div></div></div>
             <script>document.getElementById('close').addEventListener('click',()=>{ window.close(); });</script></body></html>`;
 
-            // Create the about window and load the generated HTML as a data URL
+            // Create the about window. Prefer loading the local about.html file if it exists
+            // so manual edits to about.html are immediately reflected. If not present,
+            // fall back to the generated HTML data URL (previous behavior).
             const aboutWin = new BrowserWindow({
               width: 660,
               height: 420,
@@ -321,8 +329,24 @@ try {
             });
             aboutWin.setMenuBarVisibility(false);
             aboutWin.removeMenu && aboutWin.removeMenu();
-            const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(aboutHtml);
-            aboutWin.loadURL(dataUrl).catch(() => { const aboutPath = path.join(__dirname, '..', 'about.html'); aboutWin.loadFile(aboutPath).catch(()=>{}); });
+            const aboutPath = path.join(__dirname, '..', 'about.html');
+            try {
+              if (fs.existsSync(aboutPath)) {
+                // Load the local about.html so your manual edits are used
+                aboutWin.loadFile(aboutPath).catch(() => {
+                  // fallback to generated HTML if loading file fails for some reason
+                  const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(aboutHtml);
+                  aboutWin.loadURL(dataUrl).catch(()=>{});
+                });
+              } else {
+                const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(aboutHtml);
+                aboutWin.loadURL(dataUrl).catch(()=>{});
+              }
+            } catch (e) {
+              // If fs checks throw for any reason, try the data URL as a fallback
+              const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(aboutHtml);
+              aboutWin.loadURL(dataUrl).catch(()=>{});
+            }
           } catch (e) { /* ignore errors opening about */ }
         }
       },
@@ -382,7 +406,7 @@ ipcMain.handle('window:printToPDF', async (event, options = {}) => {
 
 ipcMain.handle('window:printHtmlToPdfPreview', async (event, { title = 'Print', headHtml = '', bodyHtml = '' } = {}) => {
   try {
-    const offscreen = new BrowserWindow({ show: false, webPreferences: { offscreen: false, contextIsolation: true, nodeIntegration: false } });
+  const offscreen = new BrowserWindow({ show: false, icon: runtimeIcon, webPreferences: { offscreen: false, contextIsolation: true, nodeIntegration: false } });
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtmlForFile(title)}</title>${headHtml}</head><body>${bodyHtml}</body></html>`;
     const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
     await offscreen.loadURL(dataUrl);
@@ -392,13 +416,62 @@ ipcMain.handle('window:printHtmlToPdfPreview', async (event, { title = 'Print', 
     const tmpName = `session-wizard-pdf-${crypto.randomBytes(6).toString('hex')}.pdf`;
     const tmpPath = path.join(tmpDir, tmpName);
     await fs.promises.writeFile(tmpPath, pdfBuffer);
-    const preview = new BrowserWindow({ width: 1000, height: 800, webPreferences: { contextIsolation: true, nodeIntegration: false } });
+  const preview = new BrowserWindow({ width: 1000, height: 800, icon: runtimeIcon, webPreferences: { contextIsolation: true, nodeIntegration: false } });
     await preview.loadURL(`file://${tmpPath}`);
     preview.on('closed', () => { try { fs.unlinkSync(tmpPath); } catch (e) {} });
     try { offscreen.close(); } catch (e) {}
     return { success: true };
   } catch (err) { return { success: false, error: err.message }; }
 });
+
+// Temporary snapshot storage (silent, background save/load to OS temp dir)
+const SNAPSHOT_PREFIX = 'session-wizard-tmp-snap-';
+function snapshotPathForKey(key) {
+  const safe = (key || '').replace(/[^a-zA-Z0-9-_\.]/g, '_');
+  const name = `${SNAPSHOT_PREFIX}${safe}.json`;
+  return path.join(os.tmpdir(), name);
+}
+
+ipcMain.handle('snapshot:tempSave', async (event, key, data) => {
+  try {
+    const p = snapshotPathForKey(key);
+    await fs.promises.writeFile(p, typeof data === 'string' ? data : JSON.stringify(data), { encoding: 'utf8' });
+    return { success: true, path: p };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('snapshot:tempLoad', async (event, key) => {
+  try {
+    const p = snapshotPathForKey(key);
+    const exists = fs.existsSync(p);
+    if (!exists) return { success: false, missing: true };
+    const txt = await fs.promises.readFile(p, { encoding: 'utf8' });
+    try { return { success: true, data: JSON.parse(txt) }; } catch (e) { return { success: true, data: txt }; }
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('snapshot:tempClearAll', async () => {
+  try {
+    const tmp = os.tmpdir();
+    const files = await fs.promises.readdir(tmp);
+    const matches = files.filter(f => f && f.indexOf(SNAPSHOT_PREFIX) === 0);
+    await Promise.all(matches.map(f => fs.promises.unlink(path.join(tmp, f)).catch(()=>{})));
+    return { success: true, removed: matches.length };
+  } catch (err) { return { success: false, error: err.message }; }
+});
+
+// Try to clear temp snapshots when app is quitting
+try {
+  const clearTempOnExit = async () => {
+    try { const tmp = os.tmpdir(); const files = await fs.promises.readdir(tmp); const matches = files.filter(f => f && f.indexOf(SNAPSHOT_PREFIX) === 0); for (const f of matches) { try { await fs.promises.unlink(path.join(tmp, f)); } catch(e){} } } catch(e){}
+  };
+  app.on('before-quit', clearTempOnExit);
+  app.on('window-all-closed', clearTempOnExit);
+} catch (e) {}
 
 // More robust preview that inlines stylesheets and fonts
 ipcMain.handle('window:printHtmlToPdfPreviewFiles', async (event, { title = 'Print', headHtml = '', bodyHtml = '', stylesheetHrefs = [] } = {}) => {
@@ -447,7 +520,7 @@ ipcMain.handle('window:printHtmlToPdfPreviewFiles', async (event, { title = 'Pri
     }
 
     // final html render
-    const offscreen = new BrowserWindow({ show: false, webPreferences: { offscreen: false, contextIsolation: true, nodeIntegration: false } });
+  const offscreen = new BrowserWindow({ show: false, icon: runtimeIcon, webPreferences: { offscreen: false, contextIsolation: true, nodeIntegration: false } });
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtmlForFile(title)}</title>${combinedHead}</head><body>${bodyHtml}</body></html>`;
     const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
     await offscreen.loadURL(dataUrl);
@@ -457,7 +530,7 @@ ipcMain.handle('window:printHtmlToPdfPreviewFiles', async (event, { title = 'Pri
     const tmpName = `session-wizard-pdf-${crypto.randomBytes(6).toString('hex')}.pdf`;
     const tmpPath = path.join(tmpDir, tmpName);
     await fs.promises.writeFile(tmpPath, pdfBuffer);
-    const preview = new BrowserWindow({ width: 1000, height: 800, webPreferences: { contextIsolation: true, nodeIntegration: false } });
+  const preview = new BrowserWindow({ width: 1000, height: 800, icon: runtimeIcon, webPreferences: { contextIsolation: true, nodeIntegration: false } });
     await preview.loadURL(`file://${tmpPath}`);
     preview.on('closed', () => { try { fs.unlinkSync(tmpPath); } catch (e) {} });
     try { offscreen.close(); } catch (e) {}

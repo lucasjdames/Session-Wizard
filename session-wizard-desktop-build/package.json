@@ -1,6 +1,7 @@
 {
   "name": "session-wizard-desktop-build",
-  "version": "0.1.0",
+  "productName": "Session Wizard",
+  "version": "1.0",
   "description": "Electron wrapper for Session Wizard web app",
   "main": "main.js",
   "scripts": {

@@ -13,15 +13,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <!-- Prefetch main shell assets to speed up back navigation -->
-    <link rel="prefetch" href="/index.html" as="document">
-    <link rel="prefetch" href="/assets/css/main.css" as="style">
-    <link rel="prefetch" href="/assets/js/main.js" as="script">
-    <link rel="preload" href="/assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Prefetch main shell assets to speed up back navigation (use relative paths for file:// contexts) -->
+    <link rel="prefetch" href="../../index.html" as="document">
+    <link rel="prefetch" href="../../assets/css/main.css" as="style">
+    <link rel="prefetch" href="../../assets/js/main.js" as="script">
+    <link rel="preload" href="../../assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="goal-builder.css">
     <script src="../../assets/js/theme.js"></script>
     <script defer src="../../assets/js/shared/dom-utils.js"></script>
+    <script defer src="../../assets/js/shared/temp-autosave.js"></script>
     <script defer src="../../assets/js/prefetch-back.js"></script>
     <script defer src="goal-builder.js"></script>
 </head>
@@ -39,14 +40,19 @@
             <h1>Goal Builder</h1>
             <p class="tool-description">Create SMART goals and build goal attainment scales.</p>
             <div class="meta-row gb-meta-row">
-                <label for="patientName" class="meta-label">Patient:</label>
-                <input type="text" id="patientName" class="meta-inputbox" placeholder="Enter patient name..." aria-label="Patient name" />
+                <label for="patientName" class="meta-label">Client:</label>
+                <input type="text" id="patientName" class="meta-inputbox" placeholder="Enter client name..." aria-label="Patient name" />
                 <label for="goalDate" class="meta-label">Date:</label>
                 <input type="date" id="goalDate" class="meta-inputbox" aria-label="Date" />
             </div>
+                <div class="page-meta-actions">
+                </div>
         </div>
 
         <!-- Three stacked cards on the page background: Aim, SMART Builder, GAS Builder -->
+            <div class="page-meta-actions aim-header-actions">
+                <button id="clearAllBtn" class="clear-template-btn">Clear All</button>
+            </div>
         <div class="card aim-card">
             <div class="aim-row">
                 <label for="aim" class="form-label">Aim</label>
@@ -130,8 +136,8 @@
 
         <!-- Page-level actions on the dark background, bottom-right -->
         <div class="page-actions">
-            <button id="copyClipboardBtn" class="primary-btn">Copy to Clipboard</button>
-            <button id="printPageBtn" class="secondary-btn">Printable Page</button>
+            <button id="copyClipboardBtn" class="secondary-btn">Copy to Clipboard</button>
+            <button id="printPageBtn" class="primary-btn">Printable Page</button>
         </div>
     </div>
 </body>

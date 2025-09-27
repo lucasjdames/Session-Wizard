@@ -13,17 +13,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <!-- Prefetch main shell assets to speed up back navigation -->
-    <link rel="prefetch" href="/index.html" as="document">
-    <link rel="prefetch" href="/assets/css/main.css" as="style">
-    <link rel="prefetch" href="/assets/js/main.js" as="script">
-    <link rel="preload" href="/assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Prefetch main shell assets to speed up back navigation (use relative paths for file:// contexts) -->
+    <link rel="prefetch" href="../../index.html" as="document">
+    <link rel="prefetch" href="../../assets/css/main.css" as="style">
+    <link rel="prefetch" href="../../assets/js/main.js" as="script">
+    <link rel="preload" href="../../assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../../assets/css/main.css">
     <link rel="stylesheet" href="homework-tracker.css">
     <script src="../../assets/js/theme.js"></script>
         <script defer src="../../assets/js/prefetch-back.js"></script>
-    <script defer src="../../assets/js/shared/dom-utils.js"></script>
-    <script defer src="homework-tracker.js"></script>
+        <script defer src="../../assets/js/shared/dom-utils.js"></script>
+        <script defer src="../../assets/js/shared/temp-autosave.js"></script>
+        <script defer src="homework-tracker.js"></script>
 </head>
 <body>
     <header class="app-header no-print">
@@ -73,8 +74,6 @@
             <div class="side-panel">
                 <div class="panel-section">
                     <h3>Components</h3>
-                    <p class="section-description">Click or drag components below to build your log:</p>
-                    
                     <div class="component-library">
                         <div class="draggable-component" draggable="true" data-component="custom-header">
                             <span class="component-icon">🗂️</span>
@@ -125,29 +124,29 @@
                                 <small>Numerical rating scale</small>
                             </div>
                         </div>
-                        <div class="draggable-component" draggable="true" data-component="notes-section">
+                        <div class="draggable-component" draggable="true" data-component="reflection-section">
                             <span class="component-icon">🗒️</span>
                             <div class="component-info">
-                                <strong>Notes Section</strong>
-                                <small>Free text area for comments</small>
+                                <strong>Reflection Section</strong>
+                                <small>Weekly notes / self-rating scale.</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="panel-section">
-                    <h3>Actions</h3>
-                    <button id="clearTemplate" class="secondary-btn full-width">Clear All</button>
-                    <button id="previewMode" class="primary-btn full-width">Preview Mode</button>
-                    <button id="printBtn" class="primary-btn full-width">Print Log</button>
-                </div>
+                <!-- Actions moved to top-right of the template area and fixed page actions to match Session Data Taker -->
             </div>
 
             <!-- Template Building Area -->
             <div class="template-area">
                 <div class="template-header">
-                    <h2>Build Your Home Program Log</h2>
-                    <p>Click or drag components from the left panel to create your custom log template.</p>
+                    <div class="template-header-text">
+                        <h2>Build Your Home Program Log</h2>
+                        <p>Click or drag components from the left panel to create your custom log template.</p>
+                    </div>
+                    <div class="template-header-actions">
+                        <button id="clearTemplate" class="clear-template-btn">Clear Log Template</button>
+                    </div>
                 </div>
                 
                 <div id="templateDropzone" class="template-dropzone">
@@ -160,13 +159,10 @@
         </div>
     </div>
 
+        <!-- page-actions moved to end of body to ensure fixed positioning isn't clipped by parents -->
+
     <!-- Print Preview Area -->
     <div id="printArea" class="print-area">
-        <div class="preview-controls no-print">
-            <button id="backToEdit" class="secondary-btn">← Back to Edit</button>
-            <button id="printFromPreview" class="primary-btn">Print Log</button>
-        </div>
-        
         <div class="print-header">
             <h1 id="printLogTitle">Home Program Log</h1>
             <div class="print-info">
@@ -191,13 +187,13 @@
 
     <!-- Component Configuration Modal -->
     <div id="configModal" class="modal no-print">
-        <div class="modal-content">
+            <div class="modal-content">
             <div class="modal-header">
                 <h3 id="configModalTitle">Configure Component</h3>
                 <button id="closeConfigModal" class="close-btn">&times;</button>
             </div>
             <div id="configModalBody" class="modal-body">
-                <!-- Dynamic configuration form will be inserted here -->
+                <!-- Configuration form will be injected here -->
             </div>
             <div class="modal-footer">
                 <button id="cancelConfig" class="secondary-btn">Cancel</button>
@@ -211,5 +207,9 @@
     <footer class="app-footer no-print">
         <small>&copy; <span id="year"></span> Session Wizard. Modular SLP toolkit (alpha).</small>
     </footer>
+    <div class="page-actions">
+        <button id="previewMode" class="secondary-btn">Preview Mode</button>
+        <button id="printBtn" class="primary-btn">Print Log</button>
+    </div>
 </body>
 </html>

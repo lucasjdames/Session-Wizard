@@ -163,7 +163,6 @@
     padding: 6px;
     color: var(--color-text-muted);
 }
-
 .modal-body {
     padding: 12px 18px;
     overflow: auto;
@@ -399,6 +398,20 @@
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     margin-bottom: var(--spacing-lg);
+
+}
+
+/* Clear Template Button (top-right in template header) */
+/* Visuals centralized in assets/css/main.css; tool CSS should only manage placement. */
+
+/* Page-level action buttons (fixed bottom-right) */
+.page-actions {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: flex;
+    gap: 0.6rem;
+    z-index: 60;
 }
 
 .log-info-panel .panel-section {
@@ -568,7 +581,11 @@
 }
 
 .template-header {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-sm); /* tightened to sit closer to the dropzone like Therapy Data Taker */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
 }
 
 .template-header h2 {
@@ -580,6 +597,13 @@
     color: var(--color-text-muted);
     margin: 0;
 }
+
+.template-header-actions {
+    display: flex;
+    align-items: center;
+}
+/* ensure actions sit at the far right of the header */
+.template-header-actions { margin-left: auto; }
 
 .template-dropzone {
     min-height: 500px;
@@ -1408,7 +1432,7 @@
     font-family: monospace;
 }
 
-.exercise-table .notes-cell {
+.exercise-table .reflection-cell {
     min-width: 70px;
     text-align: left;
     background: #fefefe;
@@ -1475,8 +1499,8 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* Notes Section */
-.notes-section {
+/* Reflection Section */
+.reflection-section {
     margin: 25px 0;
     border: 2px solid #d1d5db;
     border-radius: 8px;
@@ -1484,7 +1508,7 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.notes-header {
+.reflection-header {
     background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
     padding: 12px 16px;
     font-weight: 600;
@@ -1493,12 +1517,153 @@
     border-radius: 6px 6px 0 0;
 }
 
-.notes-content {
+.reflection-content {
     padding: 16px;
     min-height: 100px;
     line-height: 2;
     color: #374151;
 }
+
+/* VAS (Visual Analog Scale) styles */
+.vas-container {
+    margin: 12px 0 18px 0;
+    text-align: center;
+}
+.vas-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #111827;
+}
+.vas-description {
+    font-size: 0.95rem;
+    color: #374151;
+    margin-bottom: 10px;
+}
+.vas-line-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px 0;
+}
+.vas-line {
+    width: 65%; /* about 2/3 of page width in print */
+    height: 2px;
+    background: #111827;
+    position: relative;
+}
+.vas-labels {
+    width: 65%;
+    margin: 6px auto 0 auto;
+    position: relative;
+    height: 1.2em;
+}
+.vas-left, .vas-right {
+    position: absolute;
+    top: 0;
+    font-size: 0.9rem;
+    color: #374151;
+    max-width: 48%;
+}
+.vas-left { left: 0; transform: translateX(-65%); text-align: center; padding-left: 2px; }
+.vas-right { right: 0; transform: translateX(65%); text-align: center; padding-right: 2px; }
+
+/* In print, keep the labels centered at the endpoints (no extra outward shift) */
+@media print {
+    .vas-left { transform: translateX(-50%); }
+    .vas-right { transform: translateX(50%); }
+}
+
+/* Printing: ensure VAS occupies reasonable width on A4 portrait */
+@media print {
+    .vas-line { width: 66%; }
+    .vas-labels { width: 66%; }
+}
+
+/* Numbered VAS ticks */
+.vas-line-wrap.numbered { position: relative; width: 100%; display: block; }
+.vas-line-wrap.numbered .vas-line { margin: 0 auto; width: 100%; max-width: 100%; }
+.vas-line-wrap.numbered .vas-tick { position: absolute; top: -10px; transform: translateX(-50%); text-align: center; }
+.vas-line-container { display:flex; justify-content:center; }
+.vas-line-container .vas-line-wrap { width: 5in; max-width: 100%; }
+.vas-line-container .vas-line { width: 5in; max-width: 100%; }
+.vas-line-container .vas-labels { width: 5in; max-width: 100%; margin: 6px auto 0; }
+
+/* When printing, prefer exact physical width for the VAS line so min/max map to edges on a printed A4 at 100% */
+@media print {
+    .vas-line-container .vas-line-wrap { width: 5in !important; }
+    /* Ensure ticks are positioned absolutely relative to the 5in container */
+    .vas-line-wrap.numbered { position: relative; width: 5in !important; }
+    .vas-line-wrap.numbered .vas-line { width: 5in !important; }
+}
+.vas-tick-mark { display: block; width: 2px; height: 10px; background: #111827; margin: 0 auto 3px; }
+.vas-tick-label { display: block; font-size: 0.75rem; color: #374151; }
+
+/* Writing guide lines for reflection textbox */
+.reflection-textbox { width: 100%; padding: 6px 12px 6px 12px; box-sizing: border-box; }
+.reflection-textbox.lines-4 { background-image: linear-gradient(#e5e7eb 2px, transparent 2px); background-size: 100% 25%; min-height: 140px; background-position: 0 0.95em; }
+.reflection-description { margin: 6px 0 6px 0; color: #374151; font-size: 0.95rem; }
+
+/* Pill-style checkbox toggles used in config forms */
+.pill-toggle-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* Match schedule-option pill styling for consistency */
+.pill-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+/* Keep the native checkbox accessible but visually hidden */
+.pill-toggle input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+
+.pill-toggle::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    flex: 0 0 auto;
+    margin-right: 6px;
+    text-align: center;
+    line-height: 16px;
+    font-size: 12px;
+}
+
+/* Checked state */
+.pill-toggle:has(input[type="checkbox"]:checked) {
+    background: rgba(79,140,255,0.08);
+    border-color: var(--color-accent);
+    color: var(--color-text);
+}
+
+.pill-toggle:has(input[type="checkbox"]:checked)::before {
+    content: '\2713';
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+}
+
+.pill-toggle span { font-size: 0.95rem; color: var(--color-text); }
+
 
 @media print {
     .no-print {

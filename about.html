@@ -5,18 +5,42 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>About Session Wizard</title>
   <style>
-  /* Force light mode only for About panel */
-  :root{color-scheme: light}
-  body{font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:20px; color:#222; background: #f7f7f8}
-  .card{max-width:760px;margin:0 auto;padding:20px;border-radius:12px;background:#ffffff;box-shadow:0 6px 22px rgba(0,0,0,0.08)}
-  .header{display:flex;gap:16px;align-items:center}
-  .logo{width:72px;height:72px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
-  .logo img{width:100%;height:100%;object-fit:contain}
-  h1{margin:0;font-size:20px}
-  .meta{color:#666;margin-top:6px;font-size:13px}
-  p{line-height:1.45;color:#333;margin-top:14px}
-  .footer{margin-top:18px;border-top:1px solid rgba(0,0,0,0.06);padding-top:12px;color:#555;font-size:13px;display:flex;justify-content:space-between;align-items:center}
-  a{color:#0060df}
+    /* Theme variables with light defaults; prefers-color-scheme will adjust automatically */
+    :root{
+      --bg: #f7f7f8;
+      --card-bg: #ffffff;
+      --text: #222;
+      --muted: #666;
+      --accent: #0060df;
+      --border: rgba(0,0,0,0.06);
+      --shadow: 0 6px 22px rgba(0,0,0,0.08);
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0d0d0f;
+        --card-bg: #0f1113;
+        --text: #ddd;
+        --muted: #aaa;
+        --accent: #7fb1ff;
+        --border: rgba(255,255,255,0.04);
+        --shadow: 0 6px 22px rgba(0,0,0,0.6);
+        color-scheme: dark;
+      }
+    }
+    html,body{height:100%;}
+    body{font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; margin:20px; background:var(--bg); color:var(--text)}
+    .card{max-width:760px;margin:0 auto;padding:20px;border-radius:12px;background:var(--card-bg);box-shadow:var(--shadow)}
+    .header{display:flex;gap:16px;align-items:center}
+    .logo{width:72px;height:72px;border-radius:12px;background:var(--card-bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .logo img{width:100%;height:100%;object-fit:contain}
+    h1{margin:0;font-size:20px}
+    .meta{color:var(--muted);margin-top:6px;font-size:13px}
+    .section{margin-top:14px;line-height:1.45;color:var(--text)}
+    .section h2{font-size:15px;margin:8px 0}
+    ul{margin:8px 0 0 18px}
+    .footer{margin-top:18px;border-top:1px solid var(--border);padding-top:12px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+    a{color:var(--accent)}
   </style>
 </head>
 <body>
@@ -25,15 +49,59 @@
       <div class="logo"><img src="assets/img/icon-512.png" alt="icon"></div>
       <div>
         <h1>Session Wizard</h1>
-        <div class="meta">Version 0.1.0</div>
+        <div class="meta">Version 1.0</div>
       </div>
     </div>
-    <p>
-      The Session Wizard is a toolkit designed to help clinicians with setting therapy goals, taking data in and outside of sessions, and tracking clients' progress. The tools provided are built to be cross-applicable for different clinical settings and interventions, but some components are intended for specific interventions from the world of speech-language pathology and cognitive rehabilitation.
-    </p>
-  <p>For full documentation and source code, visit <a href="https://github.com/lucasjdames/Session-Wizard" target="_blank" rel="noreferrer noopener">GitHub — Session Wizard</a>.</p>
+
+    <div class="section">
+      <p>
+      Session Wizard is a clinical toolkit for planning, tracking, and monitoring clients' progress in speech-language pathology and cognitive rehabilitation. It aims to facilitate goalsetting and data collection inside and outside of the therapy room. It was created by Lucas James, SLP-Reg. Please note that the project was developed with the assistance of large language models for coding and image generation. Session Wizard will always be free to use and open source.
+      </p>
+      <p>The current tools available are:</p>
+    </div>
+
+    <div class="section">
+      <h2>Tools</h2>
+      <ul>
+        <li><strong>Goal Builder</strong> — create SMART goals and build Goal Attainment Scales (GAS). Drag-and-drop components and checklists help ensure completeness.</li>
+        <li><strong>Therapy Session Data Taker</strong> — customizable templates for real-time session tracking. Includes special components for common interventions (PACE, discourse transcription, spaced retrieval) and a flexible data table for trial-based scoring.</li>
+        <li><strong>Homework Tracker</strong> — create printable home program logs with configurable activities, frequencies, and scheduling.</li>
+      </ul>
+    </div>
+
+    <p class="section small">For full documentation and source code, visit <a href="https://github.com/lucasjdames/Session-Wizard" target="_blank" rel="noreferrer noopener">GitHub — Session Wizard</a>. Development is ongoing.</p> 
+
     <div class="footer"><div>License: MIT</div><div><a href="#" id="close">Close</a></div></div>
   </div>
-  <script>document.getElementById('close').addEventListener('click',()=>{ window.close(); });</script>
+
+  <script>
+    // Close button behaviour
+    document.getElementById('close').addEventListener('click', function(e){ e.preventDefault(); window.close(); });
+
+    // Theme handling: allow local override via localStorage ('session-wizard-theme' = 'light'|'dark')
+    (function(){
+      try {
+        var key = 'session-wizard-theme';
+        var stored = (localStorage && localStorage.getItem) ? localStorage.getItem(key) : null;
+        if (stored === 'light') {
+          document.documentElement.style.colorScheme = 'light';
+          document.documentElement.style.setProperty('--bg', '#f7f7f8');
+          document.documentElement.style.setProperty('--card-bg', '#ffffff');
+          document.documentElement.style.setProperty('--text', '#222');
+          document.documentElement.style.setProperty('--muted', '#666');
+          document.documentElement.style.setProperty('--accent', '#0060df');
+          document.documentElement.style.setProperty('--border', 'rgba(0,0,0,0.06)');
+        } else if (stored === 'dark') {
+          document.documentElement.style.colorScheme = 'dark';
+          document.documentElement.style.setProperty('--bg', '#0d0d0f');
+          document.documentElement.style.setProperty('--card-bg', '#0f1113');
+          document.documentElement.style.setProperty('--text', '#ddd');
+          document.documentElement.style.setProperty('--muted', '#aaa');
+          document.documentElement.style.setProperty('--accent', '#7fb1ff');
+          document.documentElement.style.setProperty('--border', 'rgba(255,255,255,0.04)');
+        }
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
 </body>
 </html>
