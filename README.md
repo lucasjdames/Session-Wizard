@@ -46,3 +46,17 @@ Tips
 - All save files are local. If you need to share information, prefer Export to PDF or Copy to Clipboard.
 - Save/Load isn't just for saving client data; try using it to make whole new custom templates. Configure a template to suit your needs, setting up Custom Data Tables, component titles, etc; then save and label it according to its use case so you can easily load it back up later for a new client or session.
 
+## Downloads / Releases
+
+Binary installers for the desktop app are published on GitHub Releases. To download the latest installer for your platform visit:
+
+- https://github.com/lucasjdames/Session-Wizard/releases/latest
+
+If you'd like to build locally, the Electron desktop wrapper is in `session-wizard-desktop-build/`. The CI will produce installers for supported platforms when a release tag (for example `v1.0.0`) is pushed.
+
+Windows: run the `.exe` installer from Releases.
+
+macOS: open the `.dmg` and drag the app into Applications (mac builds require a macOS runner).
+
+If you plan to distribute broadly, consider signing your installers (Windows code signing / Apple notarization) to avoid SmartScreen or Gatekeeper warnings.
+
