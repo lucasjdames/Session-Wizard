@@ -61,5 +61,13 @@
       "perMachine": false,
       "allowToChangeInstallationDirectory": true
     }
+  ,
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "lucasjdames",
+      "repo": "Session-Wizard"
+    }
+  ]
   }
 }
