@@ -9,11 +9,6 @@ Session Wizard is a modular toolkit to help Speech-Language Pathologists (SLPs) 
 - Homework Tracker — printable, customizable home program logs
 - Progress Analyzer — experimental/hidden in the dashboard; the code remains in `tools/progress-monitor/` for development and QA
 
-### Technical highlights
-
-- Desktop-first packaging via Electron (see `session-wizard-desktop-build/`) — runs offline as a standalone desktop app
-- Responsive, accessible UI with dark/light theme support
-
 ## Project layout (important files)
 
 ```
