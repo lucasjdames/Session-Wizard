@@ -24,6 +24,37 @@ function escapeHtmlForFile(str){
 }
 function locationHrefForMain() { try { return `file://${path.join(__dirname, '..', 'index.html')}`; } catch (e) { return 'file://'; } }
 
+function getIndexedFilePath() {
+  try {
+    // When packaged, prefer process.resourcesPath (this is where electron-builder places resources)
+    if (app.isPackaged) {
+      const candidates = [
+        path.join(process.resourcesPath || '', 'app', 'index.html'),
+        path.join(process.resourcesPath || '', 'app.asar', 'index.html'),
+        path.join(process.resourcesPath || '', 'index.html')
+      ];
+      for (const c of candidates) {
+        try { if (fs.existsSync(c)) return c; } catch (e) {}
+      }
+    }
+
+    // Development layout (one level up from this file)
+    const devCandidate = path.join(__dirname, '..', 'index.html');
+    try { if (fs.existsSync(devCandidate)) return devCandidate; } catch (e) {}
+
+    // As a last resort, try app.getAppPath() which may point inside asar or app folder
+    try {
+      const appPathCandidate = path.join(app.getAppPath() || '', 'index.html');
+      if (fs.existsSync(appPathCandidate)) return appPathCandidate;
+    } catch (e) {}
+
+    // Fallback: return the devCandidate (may cause loadURL fallback)
+    return devCandidate;
+  } catch (e) {
+    return path.join(__dirname, '..', 'index.html');
+  }
+}
+
 async function fetchTextFromUrl(url) {
   return new Promise((resolve) => {
     try {
@@ -123,8 +154,46 @@ function createWindow() {
       nodeIntegration: false
     }
   });
-  const indexPath = path.join(__dirname, '..', 'index.html');
-  win.loadFile(indexPath).catch(() => win.loadURL(locationHrefForMain()));
+  const indexPath = getIndexedFilePath();
+  // Small startup logger for packaged-app debugging
+  function appendStartupLog(msg) {
+    try {
+      const logDir = app.getPath && app.getPath('userData') ? app.getPath('userData') : os.tmpdir();
+      const logPath = path.join(logDir, 'session-wizard-startup.log');
+      const ts = new Date().toISOString();
+      fs.appendFileSync(logPath, `${ts} - ${String(msg)}\n`);
+    } catch (e) { /* ignore logging errors */ }
+  }
+
+  appendStartupLog('Attempting to load index from: ' + indexPath);
+
+  // Try to load the resolved path first. If it fails, attempt explicit resources fallbacks
+  win.loadFile(indexPath).then(() => {
+    appendStartupLog('loadFile succeeded: ' + indexPath);
+  }).catch(async (err) => {
+    appendStartupLog('loadFile failed for ' + indexPath + ' -> ' + String(err));
+    // Try explicit resources locations that sometimes are used by electron-builder
+    const candidates = [];
+    try { candidates.push(path.join(process.resourcesPath || '', 'app.asar', 'index.html')); } catch (e) {}
+    try { candidates.push(path.join(process.resourcesPath || '', 'app', 'index.html')); } catch (e) {}
+    try { candidates.push(path.join(process.resourcesPath || '', 'index.html')); } catch (e) {}
+    let loaded = false;
+    for (const c of candidates) {
+      try {
+        appendStartupLog('Trying fallback: ' + c);
+        await win.loadURL('file://' + c);
+        appendStartupLog('Fallback load succeeded: ' + c);
+        loaded = true;
+        break;
+      } catch (e) {
+        appendStartupLog('Fallback failed: ' + c + ' -> ' + String(e));
+      }
+    }
+    if (!loaded) {
+      appendStartupLog('All fallbacks failed, using locationHrefForMain()');
+      try { await win.loadURL(locationHrefForMain()); appendStartupLog('loadURL(locationHrefForMain) succeeded'); } catch (e) { appendStartupLog('Final fallback failed: ' + String(e)); }
+    }
+  });
 
   // Ensure the webContents regain focus when the window is shown, restored, or focused.
   // This helps avoid a state on some platforms where inputs become uneditable until

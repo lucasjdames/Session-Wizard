@@ -1,11 +1,9 @@
 appId: com.lucasjames.sessionwizard
 productName: Session Wizard
+directories:
+  app: ..
 files:
-  - "../index.html"
-  - "../assets/**/*"
-  - "../tools/**/*"
-  - "main.js"
-  - "preload.js"
+  - "**/*"
 win:
   target:
     - nsis
