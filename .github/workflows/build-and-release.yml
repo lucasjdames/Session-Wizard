@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,15 +41,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artifacts
+      - name: Upload artifacts to Release (PowerShell)
+        shell: pwsh
         env:
           UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Uploading artifacts from session-wizard-desktop-build/dist"
-          ls -la session-wizard-desktop-build/dist || true
-          for f in session-wizard-desktop-build/dist/*; do
-            filename=$(basename "$f")
-            echo "Uploading $filename ..."
-            curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/octet-stream" --data-binary @"$f" "${UPLOAD_URL}?name=${filename}"
-          done
+          Write-Host "Uploading artifacts from session-wizard-desktop-build/dist"
+          if (-not (Test-Path "session-wizard-desktop-build/dist")) { Write-Host 'No dist folder found'; exit 0 }
+          Get-ChildItem -Path session-wizard-desktop-build/dist -File | ForEach-Object {
+            $file = $_.FullName
+            $name = $_.Name
+            Write-Host "Uploading $name ..."
+            $uri = "$($env:UPLOAD_URL)?name=$name"
+            Invoke-RestMethod -Uri $uri -Method Post -Headers @{ Authorization = "token $env:GITHUB_TOKEN" } -InFile $file -ContentType 'application/octet-stream'
+          }
