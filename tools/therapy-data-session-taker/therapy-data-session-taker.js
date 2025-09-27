@@ -874,7 +874,7 @@ class SessionTimer {
     openPanel() {
         this.isOpen = true;
         this.element.style.transform = 'translateX(0)';
-        this.tabIcon.style.transform = 'rotate(180deg)';
+        // Do not rotate the tab icon; keep emoji orientation stable
         // Notify listeners that the timer opened
         try { document.dispatchEvent(new CustomEvent('TDS:timer-toggle', { detail: { open: true, height: this.element.getBoundingClientRect().height } })); } catch (e) { /* ignore */ }
     }
@@ -882,7 +882,7 @@ class SessionTimer {
     closePanel() {
         this.isOpen = false;
         this.element.style.transform = 'translateX(200px)';
-        this.tabIcon.style.transform = 'rotate(0deg)';
+        // Keep emoji orientation unchanged when closing
         // Notify listeners that the timer closed
         try { document.dispatchEvent(new CustomEvent('TDS:timer-toggle', { detail: { open: false, height: this.element.getBoundingClientRect().height } })); } catch (e) { /* ignore */ }
     }

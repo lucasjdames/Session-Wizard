@@ -17,13 +17,15 @@ class HomeworkTracker {
     }
 
     initializeDefaultValues() {
-        // Set today's date as the default start date
-        const today = new Date();
-        const dateString = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-        document.getElementById('startDate').value = dateString;
-        
-        // Set default number of weeks
-        document.getElementById('numWeeks').value = 1;
+    // Set today's date as the default start date (guarded)
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    const startDateEl = document.getElementById('startDate');
+    if (startDateEl) startDateEl.value = dateString;
+
+    // Set default number of weeks (guarded)
+    const numWeeksEl = document.getElementById('numWeeks');
+    if (numWeeksEl) numWeeksEl.value = 1;
     }
 
     validateWeeksInput(e) {
@@ -73,19 +75,34 @@ class HomeworkTracker {
         }
 
         // Button events
-        document.getElementById('clearTemplate').addEventListener('click', this.clearTemplate.bind(this));
-        document.getElementById('previewMode').addEventListener('click', this.togglePreviewMode.bind(this));
-        document.getElementById('printBtn').addEventListener('click', this.printLog.bind(this));
-        
-        // Preview mode navigation buttons
-        document.getElementById('backToEdit').addEventListener('click', this.togglePreviewMode.bind(this));
-        document.getElementById('printFromPreview').addEventListener('click', this.printLog.bind(this));
+    const clearTemplateBtn = document.getElementById('clearTemplate');
+    if (clearTemplateBtn) clearTemplateBtn.addEventListener('click', this.clearTemplate.bind(this));
 
-        // Modal events
-        document.getElementById('closeConfigModal').addEventListener('click', this.closeConfigModal.bind(this));
-        document.getElementById('cancelConfig').addEventListener('click', this.closeConfigModal.bind(this));
-        document.getElementById('saveConfig').addEventListener('click', this.saveComponentConfig.bind(this));
-        document.getElementById('modalOverlay').addEventListener('click', this.closeConfigModal.bind(this));
+    const previewModeBtn = document.getElementById('previewMode');
+    if (previewModeBtn) previewModeBtn.addEventListener('click', this.togglePreviewMode.bind(this));
+
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) printBtn.addEventListener('click', this.printLog.bind(this));
+
+    // Preview mode navigation buttons (may not exist in all templates)
+    const backToEditBtn = document.getElementById('backToEdit');
+    if (backToEditBtn) backToEditBtn.addEventListener('click', this.togglePreviewMode.bind(this));
+
+    const printFromPreviewBtn = document.getElementById('printFromPreview');
+    if (printFromPreviewBtn) printFromPreviewBtn.addEventListener('click', this.printLog.bind(this));
+
+    // Modal events (guarded in case template omits elements)
+    const closeConfigBtn = document.getElementById('closeConfigModal');
+    if (closeConfigBtn) closeConfigBtn.addEventListener('click', this.closeConfigModal.bind(this));
+
+    const cancelConfigBtn = document.getElementById('cancelConfig');
+    if (cancelConfigBtn) cancelConfigBtn.addEventListener('click', this.closeConfigModal.bind(this));
+
+    const saveConfigBtn = document.getElementById('saveConfig');
+    if (saveConfigBtn) saveConfigBtn.addEventListener('click', this.saveComponentConfig.bind(this));
+
+    const modalOverlayEl = document.getElementById('modalOverlay');
+    if (modalOverlayEl) modalOverlayEl.addEventListener('click', this.closeConfigModal.bind(this));
 
         // Form input events
         const formInputs = document.querySelectorAll('#clientName, #clinicianName, #logTitle, #startDate, #numWeeks');
@@ -95,8 +112,10 @@ class HomeworkTracker {
 
         // Add validation for numWeeks input
         const numWeeksInput = document.getElementById('numWeeks');
-        numWeeksInput.addEventListener('input', this.validateWeeksInput.bind(this));
-        numWeeksInput.addEventListener('blur', this.validateWeeksInput.bind(this));
+        if (numWeeksInput) {
+            numWeeksInput.addEventListener('input', this.validateWeeksInput.bind(this));
+            numWeeksInput.addEventListener('blur', this.validateWeeksInput.bind(this));
+        }
     }
 
     handleDragStart(e) {
@@ -567,7 +586,7 @@ class HomeworkTracker {
                     title: 'Visual Analog Scale',
                     description: '',
                     leftLabel: 'No problem',
-                    rightLabel: 'Severe problem'
+                    rightLabel: 'Significant problem'
                 }
             },
             'custom-header': {
