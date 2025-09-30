@@ -98,3 +98,10 @@ If issues arise, you can revert this consolidation with minimal surface area cha
 
 ---
 Historical Electron distribution artifacts remain quarantined under `_archived_cleanout/` and are out of scope for current functional maintenance.
+
+
+## [1.0.1] - 2025-09-30
+### Changed
+- Aesthetic fixes across tools: small UI tweaks to spacing, typography, and form layouts to improve visual consistency.
+- Standardized CSS across tools: consolidated shared rules and normalized component styles to reduce visual drift between tools.
+
