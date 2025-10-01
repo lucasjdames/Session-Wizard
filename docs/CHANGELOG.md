@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format loosely follows Keep a Changelog and uses semantic, human-readable descriptions.
 
+## [1.1.0] - 2025-09-30
+### Added
+- Speech Deck integration in the Therapy Data Session Taker: printable reports, live scoring modes (Table/Flash-Card), and clipboard export.
+### Changed
+- Compact printable Speech Deck summary (reduced vertical gaps and collapsed redundant blank elements).
+- Live UI, clipboard, and printable outputs now display Rated / Total counts so you can spot unrated trials.
+- 'NR' (No Response) is counted as part of the Off-Target/NR bucket when summarizing accuracy.
+### Fixed
+- Sanitization and layout tweaks to avoid large vertical spacing in Speech Deck printable output.
+
 ## [1.0] - 2025-09-25
 ### Added
 - Desktop-first packaging and updated build configs for Electron in `session-wizard-desktop-build/`.
