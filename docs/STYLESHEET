@@ -1,0 +1,774 @@
+/* ==========================================================================
+   Comprehensive Stylesheet
+   ========================================================================== */
+
+/*
+ * This stylesheet is a combination of all the CSS files from the project.
+ * It is organized to provide a clear and maintainable structure for developers and LLM coding agents.
+ *
+ * Structure:
+ * 1. Font Declarations
+ * 2. Root Variables (Colors, Spacing, etc.)
+ * 3. Global Styles (Body, Box-sizing, etc.)
+ * 4. Main Application Layout (Header, Footer, Dashboard, etc.)
+ * 5. Shared Utility Classes (Buttons, Form Inputs, etc.)
+ * 6. Tool-Specific Styles
+ * - Goal Builder
+ * - Homework Tracker
+ * - Progress Monitor
+ * - Therapy Data Session Taker
+ * 7. Inline Fixes and Overrides
+ * 8. Print Styles
+ */
+
+/* ==========================================================================
+   1. Font Declarations
+   ========================================================================== */
+
+/* Local Inter font-face declarations */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/inter/Inter-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/inter/Inter-Medium.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/inter/Inter-SemiBold.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/inter/Inter-Bold.woff2') format('woff2');
+  font-display: swap;
+}
+
+
+/* ==========================================================================
+   2. Root Variables
+   ========================================================================== */
+
+:root {
+  /* App header sizing variables to keep header consistent across pages */
+  --app-header-height: 64px;
+  --header-toggle-size: 40px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* Radii and Shadows */
+  --radius-sm: 6px; --radius-md: 12px; --radius-lg: 18px;
+  --ease: cubic-bezier(.16,.8,.24,1);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 18px -2px rgba(0,0,0,.12);
+  --shadow-lg: 0 8px 32px -4px rgba(0,0,0,.15);
+
+  /* Light Theme Colors */
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-surface-alt: #eef2f7;
+  --color-border: #d8dee6;
+  --color-text: #1f2630;
+  --color-text-soft: #4f5b6b;
+  --color-accent: #4f8cff;
+  --color-accent-alt: #38b2ac;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --grad-accent: linear-gradient(90deg,#4f8cff,#38b2ac);
+  --focus: #ffbf47;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+}
+
+/* Dark Theme Colors */
+[data-theme='dark'] {
+  --color-bg:#0f151c; --color-surface:#1b232d; --color-surface-alt:#24303b;
+  --color-border:#2e3945; --color-text:#ecf2f7; --color-text-soft:#9fb0c1;
+  --color-accent:#5b9dff; --color-accent-alt:#3ac3bc;
+  --color-success: #10b981; --color-warning: #f59e0b; --color-error: #ef4444;
+  --shadow-sm:0 2px 6px -1px rgba(0,0,0,.55);
+  --shadow-md:0 6px 28px -4px rgba(0,0,0,.6);
+  --shadow-lg: 0 12px 40px -6px rgba(0,0,0,.7);
+}
+
+
+/* ==========================================================================
+   3. Global Styles
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin:0;
+  font-family:var(--font-sans);
+  background:var(--color-bg);
+  color:var(--color-text);
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion:reduce) {
+  * {
+    transition:none !important;
+    animation:none !important;
+  }
+}
+
+
+/* ==========================================================================
+   4. Main Application Layout
+   ========================================================================== */
+
+/* App Header */
+.app-header {
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  height: var(--app-header-height);
+  padding: 0 1.4rem;
+  background:rgba(255,255,255,.7);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--color-border);
+  flex-wrap: nowrap;
+}
+
+[data-theme='dark'] .app-header {
+  background:rgba(27,35,45,.75);
+}
+
+.app-header .branding {
+  flex: 0 0 auto;
+  display:flex;
+  gap:.7rem;
+  align-items:center;
+}
+
+.app-header .header-actions {
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  margin-left:auto;
+}
+
+.logo-circle {
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  background: transparent;
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:600;
+  letter-spacing:.5px;
+  font-size:.85rem;
+  box-shadow:var(--shadow-sm);
+}
+
+.logo-circle img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.app-title {
+  margin:0;
+  font-size:1.25rem;
+  font-weight:600;
+  letter-spacing:.5px;
+}
+
+/* Dashboard */
+.dashboard {
+  width:min(1200px,100%);
+  margin:0 auto;
+  padding:2rem 1.5rem 3.5rem;
+  display:flex;
+  flex-direction:column;
+  gap:2.2rem;
+  flex:1;
+}
+
+.subtitle {
+  margin:0 0 .3rem;
+  font-size:1.45rem;
+  font-weight:600;
+}
+
+.tagline {
+  margin:0;
+  color:var(--color-text-soft);
+  font-size:.95rem;
+}
+
+/* Tool Grid */
+.tool-grid {
+  display:grid;
+  gap:1rem;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+}
+
+.tool-card {
+  border:1px solid var(--color-border);
+  background:var(--color-surface);
+  border-radius:var(--radius-lg);
+  padding:1.25rem 1rem 1.25rem;
+  text-align:left;
+  display:flex;
+  flex-direction:column;
+  gap:.75rem;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition: border-color .3s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease);
+}
+
+.tool-card::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 25% 15%,rgba(79,140,255,.18),transparent 60%);
+  opacity:0;
+  transition:opacity .5s var(--ease);
+}
+
+.tool-card:hover {
+  border-color: var(--color-accent);
+  box-shadow:var(--shadow-md);
+  transform:translateY(-3px);
+}
+
+.tool-card:hover::before {
+  opacity:1;
+}
+
+.tool-card:active {
+  transform:translateY(0);
+}
+
+.tool-card:focus-visible {
+  outline:2px solid var(--focus);
+  outline-offset:2px;
+}
+
+.tool-title {
+  font-weight:600;
+  font-size:1.05rem;
+  letter-spacing:.4px;
+  background:var(--grad-accent);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.tool-desc {
+  font-size:.9rem;
+  color:var(--color-text-soft);
+  line-height:1.35;
+}
+
+/* App Footer */
+.app-footer {
+  padding:1rem 1.4rem;
+  text-align:center;
+  font-size:.7rem;
+  color:var(--color-text-soft);
+}
+
+/* Responsive header sizing */
+@media (max-width:520px) {
+  :root {
+    --app-header-height: 56px;
+    --header-toggle-size: 36px;
+  }
+  .app-header {
+    padding: 0 .9rem;
+  }
+  #themeToggle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width:720px) {
+  .tool-grid {
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  }
+  .tool-card {
+    padding:1rem .95rem 1.05rem;
+    gap:.55rem;
+  }
+  .tool-title {
+    font-size:.95rem;
+  }
+  .tool-desc {
+    font-size:.78rem;
+  }
+}
+
+/* ==========================================================================
+   5. Shared Utility Classes
+   ========================================================================== */
+
+/* Buttons */
+.ghost-btn {
+  background:none;
+  border:1px solid var(--color-border);
+  color:var(--color-text-soft);
+  padding:.55rem .8rem;
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  font:inherit;
+  transition:.25s background var(--ease), .25s color var(--ease), .25s border-color var(--ease);
+}
+
+.ghost-btn:hover {
+  background:var(--color-surface-alt);
+  color:var(--color-text);
+}
+
+.ghost-btn:focus-visible {
+  outline:2px solid var(--focus);
+  outline-offset:2px;
+}
+
+.primary-btn {
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s var(--ease);
+}
+
+.primary-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 85%, black);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+.secondary-btn {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s var(--ease);
+}
+
+.secondary-btn:hover {
+  background: var(--color-surface-alt);
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.back-btn {
+  position: absolute;
+  top: var(--spacing-lg);
+  left: var(--spacing-lg);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.65em 1.2em;
+  border: none;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s var(--ease);
+  z-index: 10;
+  display: inline-block;
+}
+
+.back-btn:hover, .back-btn:focus {
+  background: color-mix(in srgb, var(--color-accent) 85%, black);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.back-btn-inline-reset {
+  position: static;
+  margin: 0;
+}
+
+.app-header .branding .back-btn,
+.app-header .branding a.back-btn {
+  position: static;
+  margin: 0 0.75rem 0 0;
+  height: calc(var(--header-toggle-size) - 2px);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 .9rem;
+  font-size: 0.95rem;
+}
+
+.ui-action-btn,
+.primary-btn,
+.secondary-btn,
+.clear-template-btn {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.clear-template-btn {
+  background: var(--color-error);
+  color: #fff;
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s var(--ease);
+}
+
+.clear-template-btn:hover,
+.clear-template-btn:focus {
+  background: color-mix(in srgb, var(--color-error) 85%, black);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* Form Inputs */
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 0.75em 0.9em;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: all 0.2s var(--ease);
+  resize: vertical;
+}
+
+.form-input:focus, .form-textarea:focus {
+  border-color: var(--color-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+/* Explainer/Attributions Box */
+.explainer-box, .attributions-box {
+  max-width: 680px;
+  margin: var(--spacing-2xl) auto var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-2xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.explainer-box::before, .attributions-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--grad-accent);
+}
+
+.explainer-box h3, .attributions-box h3 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--grad-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.3px;
+}
+
+.explainer-content, .attributions-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Other shared styles */
+
+.dropdown-header {
+  font-weight: 600;
+  font-size: 1.1em;
+  color: var(--color-accent);
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 1em 0 0.5em 0;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition: color 0.2s var(--ease);
+}
+
+[data-theme='dark'] .dropdown-header {
+  color: var(--color-accent);
+}
+
+
+/* ==========================================================================
+   6. Tool-Specific Styles
+   ========================================================================== */
+
+/*
+ * --------------------------------------------------------------------------
+ * Goal Builder
+ * --------------------------------------------------------------------------
+ */
+
+.gb-page-header {
+    background: var(--app-header-bg, transparent);
+    padding: 0 0 0 var(--spacing-lg);
+    margin-bottom: calc(var(--spacing-md) * -1);
+}
+
+.gb-meta-row {
+    display:flex; gap: var(--spacing-md); align-items:center;
+    padding: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
+    color: var(--color-text);
+}
+
+.sgb-block {
+    background: var(--grad-accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.7em 1.2em;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    cursor: grab;
+    user-select: none;
+    border: 2px solid transparent;
+    transition: all 0.25s var(--ease);
+    margin-bottom: var(--spacing-sm);
+}
+
+.sgb-drop-area {
+    min-height: 80px;
+    background: var(--color-surface-alt);
+    border: 2px dashed var(--color-accent);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg) var(--spacing-md);
+    display: flex;
+    gap: 0.7em;
+    flex-wrap: wrap;
+    align-items: center;
+    transition: all 0.25s var(--ease);
+    margin-bottom: var(--spacing-sm);
+    position: relative;
+}
+
+.gas-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: var(--spacing-xl) 0;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    font-size: 0.9rem;
+    transition: box-shadow 0.3s var(--ease);
+}
+
+/*
+ * --------------------------------------------------------------------------
+ * Homework Tracker
+ * --------------------------------------------------------------------------
+ */
+
+.app-header.homework-reset {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    height: var(--app-header-height) !important;
+    min-height: var(--app-header-height) !important;
+    padding: 0 1.4rem !important;
+}
+
+.log-info-panel {
+    background: var(--color-surface-alt);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-lg);
+}
+
+.template-dropzone {
+    min-height: 500px;
+    background: var(--color-surface-alt);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/*
+ * --------------------------------------------------------------------------
+ * Progress Monitor
+ * --------------------------------------------------------------------------
+ */
+
+.pm-page-header {
+    background: var(--app-header-bg, transparent);
+    padding: 0 0 0 var(--spacing-lg);
+    margin-bottom: calc(var(--spacing-md) * -1);
+}
+
+.pm-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    font-size: 0.85rem;
+}
+
+/*
+ * --------------------------------------------------------------------------
+ * Therapy Data Session Taker
+ * --------------------------------------------------------------------------
+ */
+
+[data-theme='dark'] .bolus-table,
+[data-theme='dark'] .bolus-table th,
+[data-theme='dark'] .bolus-table td {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+
+.tds-pullout {
+    position: fixed;
+    right: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease, top 0.25s ease;
+    transform: translateX(200px); /* closed by default */
+}
+
+.srt-mark {
+    cursor: pointer;
+    font-size: 18px;
+    margin: 0 4px;
+    color: #bfc8d6;
+    transition: color 0.2s, background 0.2s;
+    border-radius: 50%;
+    padding: 2px 6px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+/* ==========================================================================
+   7. Inline Fixes and Overrides
+   ========================================================================== */
+
+.logo-circle img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+}
+
+.tool-card .tool-icon {
+  width: 102px;
+  height: 102px;
+  object-fit: contain;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.citations {
+  display: none;
+}
+
+
+/* ==========================================================================
+   8. Print Styles
+   ========================================================================== */
+
+@media print {
+    .back-btn, .button-row, .no-print {
+        display: none !important;
+    }
+
+    .tool-container, .print-area {
+        box-shadow: none;
+        margin: 0;
+        padding: var(--spacing-md);
+        display: block !important;
+    }
+
+    .sgb-blocks-row, .main-container {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .exercise-table, .week-section {
+        page-break-inside: avoid;
+    }
+
+    .section-header, .week-header {
+        page-break-after: avoid;
+    }
+}

@@ -29,7 +29,7 @@
 	<style>
 		body { margin: 0; font-family: var(--font-sans); }
 		.main-container { 
-			padding: 10px; 
+			
 			max-width: calc(100vw - 200px);
 			margin: 0 100px;
 			min-width: 1200px;
@@ -86,13 +86,8 @@
 			box-shadow: var(--shadow-sm);
 			border-color: var(--color-accent) !important;
 		}
-		.template-area { 
-			flex: 1; 
-			padding: var(--spacing-lg); 
-			background: var(--color-bg); 
-			border-radius: var(--radius-lg);
-			min-width: 0; 
-		}
+		/* .template-area inherits canonical styles from assets/css/main.css */
+		.template-area { --template-area-inherited:1; }
 		.template-dropzone { 
 			min-height: 500px; 
 			background: var(--color-surface-alt) !important; 
@@ -356,7 +351,7 @@
 		.button-row { display: none; }
 	</style>
 </head>
-<body>
+<body class="tdst-reset">
 	<header class="app-header">
 		<div class="branding">
 			<a href="../../index.html" class="back-btn back-btn-inline-reset">← Session Wizard</a>
@@ -396,6 +391,7 @@
 					<div class="draggable-item" draggable="true" data-type="Theme/Subject Matter">Theme/Subject Matter</div>
 					<div class="draggable-item" draggable="true" data-type="Word List">Word List</div>
 					<div class="draggable-item" draggable="true" data-type="Sentence List">Sentence List</div>
+					<div class="draggable-item" draggable="true" data-type="Speech Deck">Speech Deck</div>
 					<div class="draggable-item" draggable="true" data-type="Discourse Transcript">Discourse Transcript</div>
 					<div class="draggable-item" draggable="true" data-type="Session">Session</div>
 					<div class="draggable-item" draggable="true" data-type="Notes">Notes</div>
@@ -414,7 +410,7 @@
 						<p>Click or drag components from the left panel to create your custom session template.</p>
 					</div>
 					<div class="template-header-actions">
-						<button id="clearTemplateBtn" class="clear-template-btn">Clear Session Template</button>
+						<button id="clearTemplateBtn" class="clear-template-btn btn btn-danger">Clear Session Template</button>
 					</div>
 				</div>
 				<div class="template-dropzone" id="templateDropzone">
@@ -430,5 +426,9 @@
 			<button id="printPageBtn" class="primary-btn">Printable Page</button>
 		</div>
 	</div>
+	
+	<footer class="app-footer no-print"></footer>
+	<script src="../../assets/js/app-meta.js"></script>
+	<script src="../../assets/js/footer.js"></script>
 </body>
 </html>

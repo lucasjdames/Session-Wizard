@@ -212,6 +212,33 @@ function createWindow() {
   win.on('show', refocus);
   win.on('restore', refocus);
   win.on('focus', refocus);
+
+  // Open external links in the user's default browser instead of inside the app window.
+  try {
+    const { shell } = require('electron');
+    // Links with target="_blank" or window.open should be handled here
+    win.webContents.setWindowOpenHandler(({ url }) => {
+      try {
+        if (/^https?:\/\//i.test(url)) {
+          shell.openExternal(url);
+          return { action: 'deny' };
+        }
+      } catch (e) {}
+      return { action: 'deny' };
+    });
+
+    // Prevent navigations inside the main window to external sites; open them externally instead
+    win.webContents.on('will-navigate', (event, url) => {
+      try {
+        if (/^https?:\/\//i.test(url)) {
+          event.preventDefault();
+          shell.openExternal(url).catch(()=>{});
+        }
+      } catch (e) {}
+    });
+  } catch (e) {
+    // If shell is not available for any reason, ignore and allow defaults
+  }
   return win;
 }
 

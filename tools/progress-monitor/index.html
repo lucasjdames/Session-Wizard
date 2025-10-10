@@ -40,8 +40,8 @@
         <h1>Progress Monitor</h1>
 		<p class="tool-description">Compare progress from session to session.</p>
         <div class="meta-row pm-meta-row">
-            <label for="patientName" class="meta-label">Patient:</label>
-            <input type="text" id="patientName" class="meta-inputbox" placeholder="Enter patient name..." />
+            <label for="patientName" class="meta-label">Client:</label>
+            <input type="text" id="patientName" class="meta-inputbox client-input" placeholder="Enter client name..." />
             <label for="goalDate" class="meta-label">Date:</label>
             <input type="date" id="goalDate" class="meta-inputbox" />
         </div>
@@ -82,7 +82,7 @@
                             <label class="sr-only" for="pmDate4">Date column 4</label>
                             <input id="pmDate4" type="date" class="pm-date-input" value="" />
                         </th>
-                        <th><button id="addDateBtn" class="pm-add-date-btn" title="Add date column">+</button></th>
+                        <th><button id="addDateBtn" class="pm-add-date-btn btn btn-success" title="Add date column">+</button></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,7 +93,7 @@
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><button class="pm-add-row-btn" data-section="task" title="Add row">+</button></td>
+                        <td><button class="pm-add-row-btn btn btn-success" data-section="task" title="Add row">+</button></td>
                     </tr>
                     <tr class="pm-editable-subheader" data-section="prompts"><td colspan="100%"><label class="sr-only" for="pmSubheaderPrompts">Prompts/Cues/Supports</label><input id="pmSubheaderPrompts" type="text" class="pm-subheader-input" value="Prompts/Cues/Supports" /></td></tr>
                     <tr class="pm-row" data-section="prompts">
@@ -102,7 +102,7 @@
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><button class="pm-add-row-btn" data-section="prompts" title="Add row">+</button></td>
+                        <td><button class="pm-add-row-btn btn btn-success" data-section="prompts" title="Add row">+</button></td>
                     </tr>
                     <tr class="pm-editable-subheader" data-section="other"><td colspan="100%"><label class="sr-only" for="pmSubheaderOther">Other/Comments</label><input id="pmSubheaderOther" type="text" class="pm-subheader-input" value="Other/Comments" /></td></tr>
                     <tr class="pm-row" data-section="other">
@@ -111,7 +111,7 @@
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
                         <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><button class="pm-add-row-btn" data-section="other" title="Add row">+</button></td>
+                        <td><button class="pm-add-row-btn btn btn-success" data-section="other" title="Add row">+</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -126,5 +126,8 @@
         </div>
     </div>
     </div>
+    <footer class="app-footer no-print"></footer>
+    <script src="../../assets/js/app-meta.js"></script>
+    <script src="../../assets/js/footer.js"></script>
 </body>
 </html>

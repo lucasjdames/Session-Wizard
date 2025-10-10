@@ -45,6 +45,151 @@
   height: 4px;
   background: var(--grad-accent);
 }
+  /* Centralized data table styles (source-of-truth for PACE/SRT/Custom tables) */
+  .data-table,
+  .data-table th,
+  .data-table td {
+    border-collapse: collapse;
+    border: 1px solid var(--color-border);
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+  }
+  .data-table th {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 700;
+  }
+  .data-table td {
+    padding: 10px 12px;
+    vertical-align: top;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .data-table tbody tr:nth-child(even) td {
+    background: color-mix(in srgb, var(--color-surface) 96%, var(--color-border) 4%);
+  }
+
+  /* Container visuals for data-table (applies to tables using .data-table) */
+  .data-table {
+    width: 100%;
+    background: var(--color-surface);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    margin-top: 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+  /* Ensure form controls inside data tables use the app font + neutral text color
+     (fixes Stimulus and Cues/Credits boxes using incorrect font or color). */
+  .data-table input,
+  .data-table textarea,
+  .data-table .tdst-textarea,
+  .data-table .pace-comments,
+  .data-table .tdst-input {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--color-text);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    padding: 0.45rem 0.55rem;
+    border-radius: 6px;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* Make headers neutral grey by default so Custom Data Table headers don't appear blue */
+  .data-table th {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+  }
+
+  /* Button variants: ensure success/primary small action buttons have readable text on light backgrounds.
+     SRT buttons were showing white text on light backgrounds; prefer semantic .btn / .btn-success colors here. */
+  .btn { font-family: var(--font-sans); }
+  .btn-success,
+  .btn.btn-success,
+  .srt-add-row-btn.btn-success,
+  .srt-add-col-btn.btn-success {
+    background: var(--color-success);
+    color: #fff; /* success on accent uses white text */
+  }
+  /* For small circular add buttons inside tdst tables, prefer dark text when background is light */
+  .srt-add-row-btn,
+  .srt-add-col-btn,
+  .pace-add-row-btn,
+  .pace-add-col-btn {
+    display:inline-flex; align-items:center; justify-content:center; border-radius:50%; padding:0.25rem 0.45rem; font-size:0.9rem; border:1px solid var(--color-border); background: var(--color-surface-alt); color: var(--color-text);
+  }
+  .srt-add-row-btn.btn-success,
+  .srt-add-col-btn.btn-success {
+    background: var(--color-accent-alt); color: #000; /* when using alternate accent in light mode, ensure readable text */
+  }
+  /* Force custom data table headers to a neutral (non-transparent) surface so blue/gradient
+     backgrounds underneath can't show through. This targets migrated and non-migrated tables. */
+  .custom-data-table th,
+  .custom-data-table.data-table th {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    background-image: none;
+    background-clip: padding-box;
+  }
+
+  /* SRT add buttons should visually match PACE add buttons (light surface, dark text).
+     Keep the smaller sizing used for table actions but match the look so tool visuals are consistent. */
+  .srt-add-row-btn,
+  .srt-add-col-btn {
+    background: linear-gradient(90deg, #e3e7ed 0%, #f8fafc 100%);
+    color: #333333;
+    border: 1px solid #bfc8d6;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, border 0.2s;
+  }
+  .srt-add-row-btn:hover,
+  .srt-add-col-btn:hover {
+    background: #d1e7dd;
+    border-color: #333333;
+  }
+  /* When .btn-success is present don't switch to green for these specialized buttons */
+  .srt-add-row-btn.btn-success,
+  .srt-add-col-btn.btn-success {
+    background: linear-gradient(90deg, #e3e7ed 0%, #f8fafc 100%);
+    color: #333333;
+    border: 1px solid #bfc8d6;
+  }
+
+  /* Single source-of-truth rule: make all add-row / add-col buttons across tools use the exact same style.
+     Adding a grouped selector here ensures PACE/SRT/PM/other add buttons match. Use strong properties
+     (background/color/border) to increase chance of winning over tool-level rules; avoid widespread !important
+     except where necessary in tool CSS overrides. */
+  .pace-add-row-btn, .pace-add-col-btn,
+  .srt-add-row-btn, .srt-add-col-btn,
+  .pm-add-row-btn, .pm-add-date-btn, .pm-add-col-btn,
+  .practice-add-row-btn, .custom-add-row-btn, .add-row-btn {
+    background: linear-gradient(90deg, #e3e7ed 0%, #f8fafc 100%);
+    color: #333333;
+    border: 1px solid #bfc8d6;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, border 0.2s;
+  }
+  .pace-add-row-btn:hover, .pace-add-col-btn:hover,
+  .srt-add-row-btn:hover, .srt-add-col-btn:hover,
+  .pm-add-row-btn:hover, .pm-add-date-btn:hover, .pm-add-col-btn:hover,
+  .practice-add-row-btn:hover, .custom-add-row-btn:hover, .add-row-btn:hover {
+    background: #d1e7dd;
+    border-color: #333333;
+  }
 .attributions-box h3 {
   margin: 0 0 var(--spacing-lg) 0;
   font-size: 1.4rem;
@@ -113,7 +258,24 @@
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
+  --spacing-2xl: 2.5rem;
+}
+
+/* Canonical template-area: single source-of-truth for tool content surfaces */
+.template-area {
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Dark theme canonical surface for template-area */
+[data-theme='dark'] .template-area {
+  background: #0F151C; /* consistent dark surface used across tools */
+  color: var(--color-text);
+  border-color: rgba(255,255,255,0.04);
 }
 [data-theme='dark'] {
   --color-bg:#0f151c; --color-surface:#1b232d; --color-surface-alt:#24303b;
@@ -164,6 +326,15 @@ body {
   object-fit: contain;
   border-radius: 50%;
   background: transparent;
+}
+
+/* Inline-fixes merged: logo sizing and tool-card layout used by older pages */
+.logo-circle img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
 }
 .app-title { margin:0; font-size:1.25rem; font-weight:600; letter-spacing:.5px; }
 .ghost-btn {
@@ -273,6 +444,8 @@ body {
 .back-btn:hover, .back-btn:focus {
   /* fallback for older browsers */
   background: var(--color-accent);
+  /* rgba fallback for older browsers */
+  background: rgba(23, 120, 242, 0.9);
   background: color-mix(in srgb, var(--color-accent) 85%, black);
   box-shadow: var(--shadow-md);
   text-decoration: none;
@@ -301,7 +474,7 @@ body {
 
 /* Ensure theme toggle button is visually consistent across tools */
 #themeToggle { width: var(--header-toggle-size); height: var(--header-toggle-size); display:inline-flex; align-items:center; justify-content:center; padding:0 .4rem; font-size:1.05rem; border-radius: calc(var(--radius-sm) - 2px); }
-#themeToggle:hover { background: var(--color-surface-alt); background: color-mix(in srgb, var(--color-surface-alt) 85%, var(--color-surface)); }
+#themeToggle:hover { background: var(--color-surface-alt); background: rgba(245,245,247,0.95); background: color-mix(in srgb, var(--color-surface-alt) 85%, var(--color-surface)); }
 
 /* Responsive header sizing for narrow viewports */
 @media (max-width:520px) {
@@ -321,6 +494,12 @@ body {
   font-family: var(--font-sans);
   position: relative;
 }
+
+/* Backwards compatibility: many tools still use .main-container and .card */
+.main-container { max-width: 1000px; margin: var(--spacing-lg) auto var(--spacing-xl); padding: 20px !important; background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); font-family: var(--font-sans); position: relative; }
+
+/* Generic card base that tools may use; .tool-card is more specific for dashboard cards */
+.card { background: var(--color-surface); border-radius: var(--radius-md); padding: 1rem 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
 
 /* Meta row for patient/date fields */
 .meta-row {
@@ -351,54 +530,105 @@ body {
   box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
 }
 
-/* Primary button styling */
-.primary-btn {
-  background: var(--color-accent);
-  color: #fff;
-  font-family: var(--font-sans);
-  border: none;
+/* Standardized client/date input helpers (use these classes in tool HTML) */
+.client-input {
+  /* visual alias to .meta-inputbox for semantic clarity */
+  padding: 0.6em 0.8em;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.25s var(--ease);
-}
-.primary-btn:hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, black);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-.primary-btn:active {
-  transform: translateY(0);
-}
-
-/* Secondary button styling */
-.secondary-btn {
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.date-input {
+  display: inline-block;
+  padding: 0.45em 0.6em;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.25s var(--ease);
-}
-.secondary-btn:hover {
-  background: var(--color-surface-alt);
-  border-color: var(--color-accent);
-  transform: translateY(-1px);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
 }
 
-/* Shared action button base to ensure consistent font/padding/shape across tools */
-.ui-action-btn,
-.primary-btn,
-.secondary-btn,
-.clear-template-btn {
+/* Unified button system
+   - Use .btn as the base, then modifiers: .btn-primary, .btn-secondary, .btn-danger, .btn-success
+   - Keep legacy class names (.primary-btn, .secondary-btn, .clear-template-btn, .ui-action-btn)
+     as aliases so tools continue to work while we migrate markup.
+*/
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--font-sans);
-  font-weight: 500; /* medium weight used across session taker */
-  font-size: 14px; /* matches Therapy Session Data Taker */
-  padding: 8px 16px;
-  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.22s var(--ease);
+  line-height: 1;
+  text-decoration: none;
 }
+
+/* Ensure add-row/col buttons that also have .btn inherit the canonical .btn font-weight
+  Some tool code creates small circular or inline add buttons without the .btn class; when
+  the .btn class is present we want consistent bold text. */
+.add-row-btn.btn, .add-col-btn.btn, .pace-add-row-btn.btn, .srt-add-row-btn.btn, .pm-add-row-btn.btn { font-weight: 600; }
+
+/* Print-friendly compact table styles */
+@media print {
+  body { color: #000; background: #fff; }
+  .data-table {
+    box-shadow: none !important;
+    border: 1px solid #bbb !important;
+    margin-top: 0.25rem !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    font-size: 11px !important;
+  }
+  .data-table th, .data-table td {
+    padding: 6px 8px !important;
+    vertical-align: middle !important;
+  }
+  .data-table tbody tr:nth-child(even) td { background: transparent !important; }
+  /* Reduce spacing for page-level containers when printing tables */
+  .attributions-box, .info-cards-row, .page-actions, .tdst-container { box-shadow: none !important; }
+  /* Hide UI-only elements */
+  button, .btn, .ui-action-btn { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* Size modifiers */
+.btn-sm { padding: 6px 10px; font-size: 0.82rem; border-radius: calc(var(--radius-sm) - 2px); }
+.btn-lg { padding: 12px 20px; font-size: 1rem; }
+.btn-icon-only { padding: 6px; width: 36px; height: 36px; justify-content:center; }
+
+/* Semantic variants */
+.btn-primary,
+.primary-btn { background: var(--color-accent); color: #fff; }
+.btn-primary:hover,
+.primary-btn:hover { background: rgba(10, 90, 210, 0.92); background: color-mix(in srgb, var(--color-accent) 85%, black); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.btn-primary:active,
+.primary-btn:active { transform: translateY(0); }
+
+.btn-secondary,
+.secondary-btn { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+.btn-secondary:hover,
+.secondary-btn:hover { background: var(--color-surface-alt); border-color: var(--color-accent); transform: translateY(-1px); }
+
+.btn-danger,
+.clear-template-btn { background: var(--color-error); color: #fff; border: none; }
+.btn-danger:hover,
+.clear-template-btn:hover { background: rgba(180, 20, 30, 0.9); background: color-mix(in srgb, var(--color-error) 85%, black); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+.btn-success { background: var(--color-success); color: #fff; }
+.btn-success:hover { background: rgba(46, 201, 113, 0.9); background: color-mix(in srgb, var(--color-success) 85%, black); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+/* Legacy alias for other action-like buttons */
+.ui-action-btn { /* keep compatibility */ display:inline-flex; align-items:center; gap:.5rem; }
 
 /* Canonical Clear Template Button visuals (centralized) */
 .clear-template-btn {
@@ -416,14 +646,8 @@ body {
   outline: none;
 }
 
-/* Canonical page-actions button styles: ensure buttons in the fixed page actions
-   area are visually identical across tools (prevents per-tool overrides from
-   introducing transparency, filters or different hover behavior). This
-   selector is intentionally specific and placed in the shared stylesheet so
-   it wins over tool-scoped styles. */
-.page-actions .primary-btn,
-.page-actions .secondary-btn {
-  /* match primary/secondary sizing and weight used elsewhere */
+/* Page actions area: prefer explicit .btn variants; keep light specificity but avoid !important */
+.page-actions .btn, .page-actions .primary-btn, .page-actions .secondary-btn {
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.9rem;
@@ -432,37 +656,24 @@ body {
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: all 0.22s var(--ease);
-  /* neutralize filters/backdrop effects that may be applied by tool CSS */
-  -webkit-filter: none !important;
-  filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  /* ensure fully opaque backgrounds */
-  background-clip: padding-box !important;
-  opacity: 1 !important;
+  /* neutralize unexpected filters/backdrop effects if present */
+  -webkit-filter: none;
+  filter: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background-clip: padding-box;
+  opacity: 1;
 }
 
-.page-actions .primary-btn {
-  background: var(--color-accent) !important;
-  color: #fff !important;
-  border: none !important;
+.page-actions .btn-primary, .page-actions .primary-btn, .page-actions .btn-primary.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
 }
-.page-actions .primary-btn:hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, black) !important;
-  box-shadow: var(--shadow-md) !important;
-  transform: translateY(-1px) !important;
-}
+.page-actions .btn-primary:hover, .page-actions .primary-btn:hover { background: color-mix(in srgb, var(--color-accent) 85%, black); box-shadow: var(--shadow-md); transform: translateY(-1px); }
 
-.page-actions .secondary-btn {
-  background: var(--color-surface) !important;
-  color: var(--color-text) !important;
-  border: 1px solid var(--color-border) !important;
-}
-.page-actions .secondary-btn:hover {
-  background: var(--color-surface-alt) !important;
-  border-color: var(--color-accent) !important;
-  transform: translateY(-1px) !important;
-}
+.page-actions .btn-secondary, .page-actions .secondary-btn { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+.page-actions .btn-secondary:hover, .page-actions .secondary-btn:hover { background: var(--color-surface-alt); border-color: var(--color-accent); transform: translateY(-1px); }
 
 /* Form input styling */
 .form-input, .form-textarea {
@@ -483,6 +694,46 @@ body {
   box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
 }
 
+/* Legacy input aliases for backward compatibility with tools that still use
+   older class names. These mirror the shared .form-input/.form-textarea styles. */
+.header-input,
+.goal-input,
+.pm-subheader-input,
+.pm-table-input,
+.pm-date-input,
+.tdst-input,
+.tdst-textarea,
+.pm-other-input,
+.pm-subheader-input {
+  width: 100%;
+  padding: 0.75em 0.9em;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: all 0.2s var(--ease);
+  box-sizing: border-box;
+  resize: vertical;
+}
+.header-input:focus,
+.goal-input:focus,
+.pm-subheader-input:focus,
+.pm-table-input:focus,
+.pm-date-input:focus,
+.tdst-input:focus,
+.tdst-textarea:focus {
+  border-color: var(--color-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+/* Small modifiers used by tools */
+.form-input--date, .pm-date-input { max-width: 100px; font-size: 0.8rem; padding: 0.3em 0.5em; }
+.form-input--table, .pm-table-input { min-width: 80px; font-size: 0.8rem; padding: 0.4em 0.5em; }
+.pm-label-input { font-weight: 600; min-width: 150px; max-width: 250px; }
+
 /* Button row styling */
 .button-row {
   display: flex;
@@ -497,17 +748,20 @@ body {
 
 /* Dark mode overrides for therapy data session taker hardcoded colors */
 [data-theme='dark'] .srt-mark {
-  color: var(--color-text-soft) !important;
+  color: var(--color-text-soft);
 }
 
 [data-theme='dark'] .srt-mark.correct {
-  color: var(--color-success) !important;
-  background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  color: var(--color-success);
+  /* fallback for systems without color-mix support */
+  background: rgba(84, 255, 159, 0.12);
+  background: color-mix(in srgb, var(--color-success) 15%, transparent);
 }
 
 [data-theme='dark'] .srt-mark.incorrect {
-  color: var(--color-error) !important;
-  background: color-mix(in srgb, var(--color-error) 15%, transparent) !important;
+  color: var(--color-error);
+  background: rgba(255, 118, 118, 0.12);
+  background: color-mix(in srgb, var(--color-error) 15%, transparent);
 }
 
 /* === EXPLAINER SECTION STYLING === */
@@ -573,6 +827,20 @@ body {
   font-style: italic;
   color: var(--color-accent);
   font-weight: 500;
+}
+
+/* Ensure links inside explainer/attributions boxes use the accent and look correct in dark mode */
+.explainer-box a, .attributions-box a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.explainer-box a:hover, .attributions-box a:hover {
+  color: var(--color-accent-alt);
+  text-decoration: underline;
+}
+
+[data-theme='dark'] .explainer-box a, [data-theme='dark'] .attributions-box a {
+  color: var(--color-accent);
 }
 
 .bibliography-intro {
@@ -641,3 +909,9 @@ body {
     line-height: 1.4;
   }
 }
+/* Inline-fixes: alternate tool-card layout used by some pages */
+.tool-grid.alt-layout { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.tool-card.row-layout { display:flex; flex-direction:row; align-items:center; padding:14px; border-radius:8px; }
+.tool-card .tool-icon { width: 102px; height: 102px; object-fit: contain; margin-right: 16px; flex-shrink: 0; }
+.tool-card .tool-title { display:block; font-weight:700; margin-bottom:6px; font-size:1.125rem; color:var(--color-accent); letter-spacing:0.2px; }
+.tool-card .tool-desc { color: var(--color-text-soft); font-size:0.95rem; }

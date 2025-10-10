@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#pmDateRow th.pm-date-col').forEach(th => {
         if (!th.querySelector('.pm-del-date-btn')) {
             const delBtn = document.createElement('button');
-            delBtn.className = 'pm-del-date-btn';
+            delBtn.className = 'pm-del-date-btn btn btn-danger';
             delBtn.title = 'Delete this date column';
             delBtn.innerHTML = '&times;';
             delBtn.style.marginLeft = '0.3em';
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const actionTd = row.lastElementChild;
         if (actionTd && actionTd.querySelector('.pm-add-row-btn') && !actionTd.querySelector('.pm-del-row-btn')) {
             const delBtn = document.createElement('button');
-            delBtn.className = 'pm-del-row-btn';
+            delBtn.className = 'pm-del-row-btn btn btn-danger';
             delBtn.title = 'Delete row';
             delBtn.innerHTML = '&times;';
             delBtn.style.marginLeft = '0.5em';
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 newTh.appendChild(dateInput);
 
                 const delBtn = document.createElement('button');
-                delBtn.className = 'pm-del-date-btn';
+                delBtn.className = 'pm-del-date-btn btn btn-danger';
                 delBtn.title = 'Delete this date column';
                 delBtn.innerHTML = '&times;';
                 delBtn.style.marginLeft = '0.3em';
@@ -168,14 +168,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const actionTd = document.createElement('td');
                 const addBtn = document.createElement('button');
-                addBtn.className = 'pm-add-row-btn';
+                addBtn.className = 'pm-add-row-btn btn btn-success';
                 addBtn.setAttribute('data-section', section);
                 addBtn.title = 'Add row';
                 addBtn.textContent = '+';
                 actionTd.appendChild(addBtn);
 
                 const delBtn = document.createElement('button');
-                delBtn.className = 'pm-del-row-btn';
+                delBtn.className = 'pm-del-row-btn btn btn-danger';
                 delBtn.title = 'Delete row';
                 delBtn.innerHTML = '&times;';
                 delBtn.style.marginLeft = '0.5em';
@@ -217,7 +217,7 @@ function getClipboardText() {
     }
     let output = '';
     output += '==== Progress Monitor Summary ====' + '\n';
-    if (patient) output += `Patient: ${patient}\n`;
+    if (patient) output += `Client: ${patient}\n`;
     if (date) output += `Date: ${date}\n`;
     if (target) output += `Target: ${target}\n`;
     if (trainingPhase) output += `Training Phase: ${trainingPhase}\n`;
@@ -271,7 +271,7 @@ function getPrintableHtml() {
 
     // Meta Info
     html += `<div style="margin-bottom: 1.5em; padding: 1em; background: #f7fafd; border-radius: 8px; font-size: 0.9em;">`;
-    if (patient) html += `<p style="margin: 0.5em 0;"><strong>Patient:</strong> ${patient}</p>`;
+    if (patient) html += `<p style="margin: 0.5em 0;"><strong>Client:</strong> ${patient}</p>`;
     if (date) html += `<p style="margin: 0.5em 0;"><strong>Date Created:</strong> ${date}</p>`;
     if (target) html += `<p style="margin: 0.5em 0;"><strong>Target:</strong> ${target}</p>`;
     if (trainingPhase) html += `<p style="margin: 0.5em 0;"><strong>Training Phase:</strong> ${trainingPhase}</p>`;
@@ -345,7 +345,7 @@ function exportTableToCSV(filename) {
 
     // Meta Data
     csv.push(['Meta', 'Key', 'Value']);
-    csv.push(['Meta', 'Patient', document.getElementById('patientName')?.value || '']);
+    csv.push(['Meta', 'Client', document.getElementById('patientName')?.value || '']);
     csv.push(['Meta', 'Date Created', document.getElementById('goalDate')?.value || '']);
     csv.push(['Meta', 'Target', document.getElementById('target')?.value || '']);
     csv.push(['Meta', 'Training Phase', document.getElementById('trainingPhase')?.value || '']);
@@ -463,7 +463,7 @@ function importCSVToTable(file) {
             newTh.appendChild(dateInput);
 
             const delBtn = document.createElement('button');
-            delBtn.className = 'pm-del-date-btn';
+            delBtn.className = 'pm-del-date-btn btn btn-danger';
             delBtn.title = 'Delete this date column';
             delBtn.innerHTML = '&times;';
             delBtn.style.marginLeft = '0.3em';
@@ -510,14 +510,14 @@ function importCSVToTable(file) {
 
             const actionTd = document.createElement('td');
             const addBtn = document.createElement('button');
-            addBtn.className = 'pm-add-row-btn';
+            addBtn.className = 'pm-add-row-btn btn btn-success';
             addBtn.setAttribute('data-section', sectionId);
             addBtn.title = 'Add row';
             addBtn.textContent = '+';
             actionTd.appendChild(addBtn);
 
             const delBtn = document.createElement('button');
-            delBtn.className = 'pm-del-row-btn';
+            delBtn.className = 'pm-del-row-btn btn btn-danger';
             delBtn.title = 'Delete row';
             delBtn.innerHTML = '&times;';
             delBtn.style.marginLeft = '0.5em';

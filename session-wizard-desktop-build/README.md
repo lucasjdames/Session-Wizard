@@ -4,16 +4,11 @@ Session Wizard is a modular toolkit to help Speech-Language Pathologists (SLPs) 
 
 ## What’s included
 
-- Goal Builder — SMART goal composer with Goal Attainment Scale (GAS) support
+- Goal Builder — SMART goal and Goal Attainment Scale (GAS) templates
 - Therapy Session Data Taker — customizable real-time data collection templates
 - Homework Tracker — printable, customizable home program logs
 
-### Technical highlights
-
-- Desktop-first packaging via Electron (see `session-wizard-desktop-build/`) — runs offline as a standalone desktop app
-- Responsive, accessible UI with dark/light theme support
-
-## Academic foundation & works cited
+Works cited
 
 This toolkit is grounded in evidence-based practices from cognitive rehabilitation research, especially *Transforming Cognitive Rehabilitation: Effective Instructional Methods* (Sohlberg, Hamilton, & Turkstra, 2023).
 
@@ -27,19 +22,19 @@ Nicholas, L. E., & Brookshire, R. H. (1993). A System for Quantifying the Inform
 
 ## Tutorial — quick guide
 
-This short tutorial explains the common workflows and features clinicians will use in Session Wizard.
+This short tutorial explains the common workflows and features clinicians can use in Session Wizard.
 
 Features
-- Copy to Clipboard: produces a compact, easy-to-read text summary of the current page contents. Raw data is generally not included. Use this to paste concise clinical notes or brief progress updates into electronic health records, progress reports, or messaging systems.
-- Export to PDF: creates a print-ready PDF that preserves layout, formatting, and raw data. Use this for documentation to include in charts, to hand to clients, or to attach to emails.
+- Copy to Clipboard: produces a compact text summary of the current page contents. Raw data (e.g., from tables) is generally not included. This is best for pasting session summary data into electronic health records /other inputs with low formatting compatibility.
+- Export to PDF: creates a print-ready PDF that preserves layout, formatting, and raw data. Use this for documentation to attach to charts, hand to clients, etc.
 - File → Save / Load: Session Wizard preserves your work when navigating between tools during a single session. When you close the Session Wizard app, all data will be lost unless you choose to save each Session Wizard tool page individually to a local file. Files are stored locally on your device. You can use save to pause and resume a session for later use. Export (PDF/Copy) is preferred to share readable content with others. 
 - Theme toggle: click the upper right-hand corner (sun/moon emojis) to toggle between light and dark themes.
 - Full screen mode: Press F11 to toggle full-screen.
 
 Primary tools
-- Goal Builder: assemble SMART goals using drag-and-drop components. The interface guides you through measurable, time-bound, and functional goal components and helps you construct Goal Attainment Scales (GAS) to quantify outcome expectations. Use the included checklists to improve goal quality and reproducibility.
-- Therapy Session Data Taker: build or select a template for in-session data collection. Templates support a wide range of component types (text, numeric, checkboxes) and special components for common interventions (PACE, structured discourse, spaced retrieval). The custom data table lets you record trial-by-trial performance and export the resulting data for analysis or records. You can click on the Quick Tool tabs (right side of the the window) to open the Stopwatch/Timer and Clicker Counter tools.
-- Homework Tracker: design printable home-program logs by dragging exercises onto the canvas, setting labels, descriptions, and frequency. The Log Details allows you to customise identifying information and the number of weeks to print. The Exercise Group component bundles related activities into a compact layout for easy printing and client handouts. The Reflection section offers text-box or visual analog scale fields for self-reflection/rating and comments on a weekly, rather than daily, schedule.
+- Goal Builder: assemble goals using drag-and-drop components. The interface guides you through smart goal components and helps you construct Goal Attainment Scales (GAS) to quantify outcome expectations. Use the included checklists to ensure your goals meet best practices for these frameworks.
+- Therapy Session Data Taker: build or select a template for in-session data collection. Templates include some special components tuned for certain interventions (PACE, structured discourse, spaced retrieval). The Custom Data Table is the most versatile, allowing you to record  trial-by-trial performance and export the resulting data for analysis or records. You can click on the Quick Tool tabs (right side of the the window) to open the Stopwatch/Timer and Clicker Counter tools.
+- Homework Tracker: design printable home-program logs by dragging exercises onto the canvas and specifying details. The Log Details allows you to customise identifying information and the number of weeks to print. The Exercise Group component bundles related activities into a compact print layout to hand to clients. The Reflection section offers text-box or Visual Analog Scale fields for self-reflection/rating and comments on a weekly, rather than daily, schedule.
 
 Tips
 - 

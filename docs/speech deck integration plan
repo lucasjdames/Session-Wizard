@@ -1,0 +1,109 @@
+Task: Integrate SpeechDeck as a Full-Featured Component in Session Data Taker
+Objective
+Revise the integration plan to adapt the standalone SpeechDeck Functional Cards v5.html as a complete practice and data collection component within the therapy-data-session-taker tool. The new "Speech Deck" component will launch a modal window that contains the full functionality of SpeechDeck, including both Table and Flashcard practice modes, scoring, and data tracking. When the practice session is complete, the modal will close, and a summary of the collected data will be displayed within the component.
+
+Step 1: Migrate Core Assets
+File to Modify: tools/therapy-data-session-taker/therapy-data-session-taker.js
+
+Action: Locate the stimuliData constant in SpeechDeck Functional Cards v5.html. Copy this entire JavaScript object.
+
+Placement: Paste the stimuliData object at the very top of therapy-data-session-taker.js, before any other code.
+
+Step 2: Create the SpeechDeckComponent Class
+File to Modify: tools/therapy-data-session-taker/therapy-data-session-taker.js
+
+Action: Define a new component class named SpeechDeckComponent that extends BaseComponent. Place it with the other component classes.
+
+Implementation:
+
+The constructor should initialize this.data.sessionResults as an empty object {}.
+
+The createContent method will create the component's main view. It should contain:
+
+A "Start Practice Session" button (<button>) with a class like primary-btn. Its onclick event must trigger this.openPracticeModal().
+
+A results display area (<div>). Assign it to this.resultsDisplay. This div will initially be empty but will be populated with a summary of the practice data after a session.
+
+Step 3: Implement the Main Practice Modal
+File to Modify: tools/therapy-data-session-taker/therapy-data-session-taker.js
+
+Action: Add the openPracticeModal() method to the SpeechDeckComponent class.
+
+Implementation: This method will create and manage the modal.
+
+Create a main overlay <div> (stimulus-modal-overlay).
+
+Inside it, create a content <div> (stimulus-modal-content).
+
+Add a close button to the content <div>. The close button's onclick handler should call this.updateResultsDisplay() before removing the modal overlay from the DOM.
+
+Append the overlay to document.body.
+
+Call this.renderPartSelector(modalContent) to show the initial category selection screen inside the modal.
+
+File to Modify: tools/therapy-data-session-taker/therapy-data-session-taker.css
+
+Action: Add CSS for the modal overlay, content area, and close button, similar to the previous plan. Ensure the modal content area is large enough for practice (e.g., width: 90vw; height: 90vh;).
+
+Step 4: Port All SpeechDeck UI and Logic into the Component Class
+File to Modify: tools/therapy-data-session-taker/therapy-data-session-taker.js
+
+Action: Copy the following functions from the <script> tag of SpeechDeck Functional Cards v5.html and add them as methods to the SpeechDeckComponent class:
+
+renderPartSelector
+
+renderSubPartSelector
+
+renderTable
+
+renderFlashCardMode
+
+renderScoreButtons
+
+Modifications:
+
+Data Source: All functions should read from the global stimuliData object and read/write to the component's instance variable, this.data.sessionResults.
+
+Rendering Target: Each rendering function (renderPartSelector, renderSubPartSelector, renderTable, renderFlashCardMode) must be modified to accept a container argument and render its HTML content into that container, not into a hardcoded element ID like main-content.
+
+Flashcard Mode: Modify renderFlashCardMode. Instead of creating its own full-screen overlay (flashcard-overlay), it should clear the provided container (the modal's content div) and render the flashcard UI directly inside it. This keeps the practice session contained within the main modal.
+
+Event Handling: Ensure all event listeners created within these methods (e.g., for scoring buttons, navigation) are correctly bound and refer to this (the component instance). The clearTableListeners logic from the original SpeechDeck should be removed, as event listeners will be scoped to the modal.
+
+Step 5: Implement Data Persistence and Display
+File to Modify: tools/therapy-data-session-taker/therapy-data-session-taker.js
+
+Action: Create the updateResultsDisplay() method within the SpeechDeckComponent class.
+
+Implementation:
+
+This method is called when the practice modal is closed.
+
+It should clear the content of this.resultsDisplay.
+
+It will then iterate through this.data.sessionResults. For each category practiced, it should calculate summary statistics (e.g., Total Trials, % Accuracy).
+
+Generate and append HTML to this.resultsDisplay to show this summary in a clean, readable format. For example:
+
+<h4>Practice Results:</h4>
+<p><strong>Greetings & Social Phrases:</strong> 8/10 trials correct (80%)</p>
+<!-- etc. -->
+
+Step 6: Finalize Component Registration
+File to Modify: tools/therapy-data-session-taker/therapy-data-session-taker.js
+
+Action: Register the new, full-featured component.
+
+In the SessionBuilder class's registerComponents method, add:
+
+this.registerComponent('speech-deck', SpeechDeckComponent);
+
+In the DragHandler class's getComponentType method, add a new entry to the typeMap:
+
+'Speech Deck Practice': 'speech-deck',
+
+File to Modify: tools/therapy-data-session-taker/index.html
+
+Action: Add the component to the draggable list in the side panel:
+
+<div class="draggable-item" draggable="true" data-type="Speech Deck Practice">Speech Deck Practice</div>

@@ -1,7 +1,7 @@
 {
   "name": "session-wizard-desktop-build",
   "productName": "Session Wizard",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Electron wrapper for Session Wizard web app",
   "main": "main.js",
   "scripts": {
@@ -24,6 +24,7 @@
     },
     "icon": "..\\assets\\img\\icon-512.png",
     "extraMetadata": {
+      "version": "1.1.1",
       "main": "session-wizard-desktop-build/main.js"
     },
     "asar": true,
@@ -61,13 +62,5 @@
       "perMachine": false,
       "allowToChangeInstallationDirectory": true
     }
-  ,
-  "publish": [
-    {
-      "provider": "github",
-      "owner": "lucasjdames",
-      "repo": "Session-Wizard"
-    }
-  ]
   }
 }

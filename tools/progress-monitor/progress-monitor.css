@@ -133,65 +133,28 @@ h1, h2, h3, .pm-summary-label, .pm-subheader {
     color: var(--color-text);
 }
 
-.pm-date-input {
-    width: 100%;
-    max-width: 100px;
-    padding: 0.3em 0.5em;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    color: var(--color-text);
-    font-family: var(--font-sans);
-    font-size: 0.8rem;
-}
+.form-input--date { max-width: 100px; font-size: 0.8rem; padding: 0.3em 0.5em; }
 
-.pm-date-input:focus {
-    border-color: var(--color-accent);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.1);
-}
+.form-input:focus { border-color: var(--color-accent); outline: none; box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.1); }
 
+
+/* Use unified .btn classes; keep circular size for these small controls */
 .pm-add-date-btn {
-    background: #2ecc40; /* Green background */
-    color: #fff;
-    border: none;
-    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 28px;
     height: 28px;
+    border-radius: 50%;
+    padding: 0;
     font-size: 1.2rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.25s var(--ease);
-    display: inline-block;
-    margin: 0 auto;
 }
-
-.pm-add-date-btn:hover {
-    background: #28a745; /* Darker green on hover */
-    transform: scale(1.1);
-}
+.pm-add-date-btn.btn-success, .pm-add-date-btn.btn { background: var(--color-success); color: #fff; }
+.pm-add-date-btn.btn-success:hover { background: color-mix(in srgb, var(--color-success) 85%, black); transform: scale(1.1); }
 
 
-.pm-table-input {
-    width: 100%;
-    min-width: 80px;
-    padding: 0.4em 0.5em;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background: var(--color-surface);
-    color: var(--color-text);
-    font-family: var(--font-sans);
-    font-size: 0.8rem;
-    resize: none;
-    overflow: hidden;
-}
-
-.pm-table-input:focus {
-    border-color: var(--color-accent);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.1);
-}
+.form-input--table { min-width: 80px; font-size: 0.8rem; padding: 0.4em 0.5em; }
+.form-input--table:focus { border-color: var(--color-accent); outline: none; box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.1); }
 
 .pm-label-input {
     font-weight: 600;
@@ -199,48 +162,16 @@ h1, h2, h3, .pm-summary-label, .pm-subheader {
     max-width: 250px !important;
 }
 
-.pm-add-row-btn {
-    background: #2ecc40; /* Green background */
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.25s var(--ease);
-    display: inline-block;
-    margin: 0 auto;
-}
 
-.pm-add-row-btn:hover {
-    background: #28a745; /* Darker green on hover */
-    transform: scale(1.1);
-}
+.pm-add-row-btn { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; padding:0; }
+.pm-add-row-btn.btn-success, .pm-add-row-btn.btn { background: var(--color-success); color:#fff; }
+.pm-add-row-btn.btn-success:hover { background: color-mix(in srgb, var(--color-success) 85%, black); transform: scale(1.1); }
 
 /* Delete button styles */
-.pm-del-date-btn, .pm-del-row-btn {
-    background: #dc3545; /* Red background */
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.25s var(--ease);
-    display: inline-block;
-    margin: 0 auto;
-}
 
-.pm-del-date-btn:hover, .pm-del-row-btn:hover {
-    background: #c82333; /* Darker red on hover */
-    transform: scale(1.1);
-}
+.pm-del-date-btn, .pm-del-row-btn { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; padding:0; }
+.pm-del-date-btn.btn-danger, .pm-del-row-btn.btn-danger, .pm-del-date-btn.btn, .pm-del-row-btn.btn { background: var(--color-error); color:#fff; }
+.pm-del-date-btn.btn-danger:hover, .pm-del-row-btn.btn-danger:hover { background: color-mix(in srgb, var(--color-error) 85%, black); transform: scale(1.1); }
 
 /* Print styles */
 @media print {
@@ -298,12 +229,9 @@ h1, h2, h3, .pm-summary-label, .pm-subheader {
 }
 
 /* ensure inputs look like they're on the page background */
-.pm-meta-row .pm-date-input, .pm-meta-row .pm-subheader-input {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.06);
-}
+.pm-meta-row .form-input--date, .pm-meta-row .form-input { background: transparent; border: 1px solid rgba(255,255,255,0.06); }
 
 /* Utility helpers */
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.main-container { max-width: 1200px; margin: 0 auto; padding: var(--spacing-lg); }
+.main-container { max-width: 1200px; margin: 0 auto; }
 .hidden { display: none !important; }

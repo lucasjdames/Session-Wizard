@@ -26,6 +26,25 @@ document.addEventListener('DOMContentLoaded', function() {
             draggedBlock = block;
             e.dataTransfer.effectAllowed = 'move';
         });
+        // allow clicking a block to append it to the drop area (matches other tools)
+        block.addEventListener('click', function(e) {
+            // if the block is already present in the drop area, do nothing
+            try {
+                if (!dropArea) return;
+                if (dropArea.querySelector(`[data-block='${block.dataset.block}']`)) return;
+                const placeholder = dropArea.querySelector('.sgb-drop-placeholder');
+                if (placeholder) placeholder.remove();
+                const blockDiv = document.createElement('div');
+                blockDiv.className = 'sgb-drop-block';
+                blockDiv.dataset.block = block.dataset.block;
+                blockDiv.setAttribute('draggable', 'true');
+                blockDiv.innerHTML = `<span class='sgb-drop-label'>${block.dataset.block}:</span> <input type='text' class='sgb-drop-input' placeholder='Enter details...'> <button class='sgb-drop-remove' title='Remove'>&times;</button>`;
+                dropArea.appendChild(blockDiv);
+                updateGoalSentence();
+            } catch (err) {
+                console.error('Error appending sgb-block on click', err);
+            }
+        });
     });
 
     dropArea.addEventListener('dragstart', function(e) {
@@ -90,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('sgb-drop-remove')) {
             e.target.parentElement.remove();
             if (dropArea.children.length === 0) {
-                dropArea.innerHTML = '<span class="sgb-drop-placeholder">Drag blocks here in order, then fill in details.</span>';
+                dropArea.innerHTML = '<span class="sgb-drop-placeholder">Click or drag blocks here in the order you need and fill in the details.</span>';
             }
             updateGoalSentence();
         }
@@ -226,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Clear aim
                 try { const aimEl = document.getElementById('aim'); if (aimEl) { aimEl.value = ''; } } catch (e) {}
                 // Clear SMART builder blocks
-                try { const dropArea = document.getElementById('sgb-drop-area'); if (dropArea) { dropArea.innerHTML = '<span class="sgb-drop-placeholder">Drag blocks here in order, then fill in details.</span>'; } const goalSentence = document.getElementById('sgb-goal-sentence'); if (goalSentence) goalSentence.textContent = ''; } catch (e) {}
+                try { const dropArea = document.getElementById('sgb-drop-area'); if (dropArea) { dropArea.innerHTML = '<span class="sgb-drop-placeholder">Click or drag blocks here in the order you need and fill in the details.</span>'; } const goalSentence = document.getElementById('sgb-goal-sentence'); if (goalSentence) goalSentence.textContent = ''; } catch (e) {}
                 // Reset GAS to five-level default
                 try { const sel = document.getElementById('levelSelector'); if (sel) { sel.value = 'five'; buildTable('five'); } } catch (e) {}
                 // Clear checklists
@@ -355,7 +374,7 @@ function toggleSection(id, headerEl) {
         if (!dropArea) return;
         dropArea.innerHTML = '';
         if (!blocks || blocks.length === 0) {
-            dropArea.innerHTML = '<span class="sgb-drop-placeholder">Drag blocks here in order, then fill in details.</span>';
+            dropArea.innerHTML = '<span class="sgb-drop-placeholder">Click or drag blocks here in the order you need and fill in the details.</span>';
             return;
         }
         blocks.forEach(b => {
@@ -618,7 +637,7 @@ function getPrintableHtml() {
     // Header for the printable export should be 'Goal Builder'
     html += `<h1 style='color:#1976d2;margin-bottom:0.3em;'>Goal Builder</h1>`;
     // Patient / Date / Aim come next
-    html += `<div style='margin-bottom:0.5em;'><strong>Patient:</strong> ${patient}</div>`;
+    html += `<div style='margin-bottom:0.5em;'><strong>Client:</strong> ${patient}</div>`;
     html += `<div style='margin-bottom:0.5em;'><strong>Date:</strong> ${date}</div>`;
     if (aim) {
         html += `<div style='margin-bottom:1em;'><strong>Aim:</strong> ${aim}</div>`;

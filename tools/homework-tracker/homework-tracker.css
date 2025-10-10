@@ -16,37 +16,37 @@
 /* Force a strict, homework-page-only header layout to avoid legacy overrides
    that were causing the toggle to wrap to a second line. These rules are
    intentionally specific and loaded last for this page. */
-.app-header.homework-reset,
-.app-header {
-    display: flex !important;
-    align-items: center !important;
-    flex-wrap: nowrap !important;
-    height: var(--app-header-height) !important;
-    min-height: var(--app-header-height) !important;
-    padding: 0 1.4rem !important;
+.app-header.homework-reset {
+    /* Scoped reset for Homework Tracker header layout; higher specificity replaces use of !important */
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    height: var(--app-header-height);
+    min-height: var(--app-header-height);
+    padding: 0 1.4rem;
 }
 
 /* Force branding and back button to be inline/static (override absolute defaults) */
-.app-header > .branding { flex: 0 1 auto !important; max-width: calc(100% - var(--header-toggle-size) - 3rem) !important; overflow: hidden; padding-right: calc(var(--header-toggle-size) + 1rem) !important; }
-.app-header > .branding .back-btn,
-.app-header > .branding a.back-btn.back-btn-inline-reset {
-    position: static !important;
-    top: auto !important;
-    left: auto !important;
-    margin: 0 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+.app-header.homework-reset > .branding { flex: 0 1 auto; max-width: calc(100% - var(--header-toggle-size) - 3rem); overflow: hidden; padding-right: calc(var(--header-toggle-size) + 1rem); }
+.app-header.homework-reset > .branding .back-btn,
+.app-header.homework-reset > .branding a.back-btn.back-btn-inline-reset {
+    position: static;
+    top: auto;
+    left: auto;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Keep header-actions in-flow and aligned to right using flex */
-.app-header > .header-actions {
-    position: static !important;
-    margin-left: auto !important;
-    right: auto !important;
-    top: auto !important;
-    transform: none !important;
-    z-index: 60 !important;
+.app-header.homework-reset > .header-actions {
+    position: static;
+    margin-left: auto;
+    right: auto;
+    top: auto;
+    transform: none;
+    z-index: 60;
 }
 
 .app-header .branding {
@@ -380,7 +380,6 @@
 
 /* Main Layout */
 .main-container {
-    padding: 20px;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -571,14 +570,8 @@
     font-size: 0.8rem;
 }
 
-/* Template Area */
-.template-area {
-    flex: 1;
-    background: var(--color-bg);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    min-width: 0;
-}
+/* Template Area: inherit canonical styles from assets/css/main.css */
+.template-area { flex: 1; --template-area-inherited:1; }
 
 .template-header {
     margin-bottom: var(--spacing-sm); /* tightened to sit closer to the dropzone like Therapy Data Taker */

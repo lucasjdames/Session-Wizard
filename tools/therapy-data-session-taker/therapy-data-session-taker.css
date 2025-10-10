@@ -36,20 +36,22 @@
 /* Dark mode: enhanced section headers */
 [data-theme='dark'] .swallow-section-header {
 
-/* Centralized pullout tab styles for Session Timer & Counter */
-.tds-pullout {
+/* Centralized pullout tab styles for Session Timer & Counter (scoped under .tdst-reset) */
+.tdst-reset .tds-pullout {
     position: fixed;
     right: 0;
-    z-index: 1000;
+    /* Ensure Quick Tools sit above modal overlays (modal uses z-index:9999) */
+    z-index: 10001;
     transition: transform 0.3s ease, top 0.25s ease;
     transform: translateX(200px); /* closed by default */
 }
 
-.tds-pullout.open {
+.tdst-reset .tds-pullout.open {
     transform: translateX(0);
+    z-index: 10001;
 }
 
-.tds-pullout-tab {
+.tdst-reset .tds-pullout-tab {
     position: absolute;
     left: -56px; /* make stick-out match wider emoji tab */
     /* allow JS to set vertical placement via element.style.top */
@@ -64,18 +66,19 @@
     flex-direction: column;
     gap: 2px;
     box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    z-index: 10002; /* tab should be above the panel */
     transition: all 0.2s ease;
     -webkit-user-select: none;
     user-select: none;
 }
 
-.tds-pullout-tab .tds-tab-text {
+.tdst-reset .tds-pullout-tab .tds-tab-text {
     /* hide the vertical text labels — we'll use emoji-only tabs */
     display: none;
 }
 
 /* Emoji icon styling for the tab */
-.tds-pullout-tab .tds-tab-icon {
+.tdst-reset .tds-pullout-tab .tds-tab-icon {
     font-size: 22px; /* larger emoji */
     line-height: 1;
     color: white;
@@ -83,19 +86,26 @@
     transform-origin: center;
 }
 
-.tds-pullout-panel {
+.tdst-reset .tds-pullout-panel {
     width: 200px;
+    /* Ensure panel is fully opaque on first paint to avoid transient transparency issues */
     background: var(--color-surface, white);
+    background-color: var(--color-surface, white);
+    opacity: 1 !important;
+    will-change: transform, opacity, background-color;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     border: 1px solid var(--color-border, #e3e7ed);
     border-radius: 8px 0 0 8px;
     box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+    z-index: 10001;
     padding: 12px 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.tds-pullout-tab:hover {
+.tdst-reset .tds-pullout-tab:hover {
     transform: translateX(-2px);
     box-shadow: -4px 0 12px rgba(0,0,0,0.2);
 }
@@ -103,63 +113,61 @@
     border-bottom-color: var(--color-border);
 }
 
-/* Defensive, high-specificity enforcement for pullout layout.
-   This ensures the Timer/Counter remain fixed, constrained, and behave
-   correctly even if other rules are missing or overridden (eg. stale SW).
-*/
-html body .tds-pullout, body > .tds-pullout {
+/* Scoped enforcement for pullout layout: use .tdst-reset to avoid global !important rules */
+.tdst-reset .tds-pullout, .tdst-reset body > .tds-pullout {
     /* Re-assert fixed positioning and right anchoring; allow JS inline styles to control top/transform */
-    position: fixed !important;
-    right: 0 !important;
-    z-index: 1000 !important;
+    position: fixed;
+    right: 0;
+    z-index: 10002;
     /* Do NOT force top/transform here; the JS sets inline styles for precise placement and toggling */
-    transition: transform 0.3s ease, top 0.25s ease !important;
-    box-sizing: border-box !important;
-    max-width: 240px !important;
+    transition: transform 0.3s ease, top 0.25s ease;
+    box-sizing: border-box;
+    max-width: 240px;
 }
 
-html body .tds-pullout.open, body > .tds-pullout.open {
+.tdst-reset .tds-pullout.open, .tdst-reset body > .tds-pullout.open {
     /* Allow JS to set transform when toggling; keep a mild fallback */
     transform: translateX(0);
 }
 
 /* Panel content must be a narrow column */
-html body .tds-pullout-panel, body > .tds-pullout .tds-pullout-panel {
-    width: 200px !important;
-    min-width: 160px !important;
-    max-width: 240px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-    padding: 12px 16px !important;
-    border-radius: 8px 0 0 8px !important;
+.tdst-reset .tds-pullout-panel, .tdst-reset body > .tds-pullout .tds-pullout-panel {
+    width: 200px;
+    min-width: 160px;
+    max-width: 240px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px 0 0 8px;
 }
 
 /* Tab stick-out appearance */
-html body .tds-pullout-tab, body > .tds-pullout .tds-pullout-tab {
-    position: absolute !important;
-    left: -56px !important;
-    width: 56px !important;
-    height: 88px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-    cursor: pointer !important;
-    border-radius: 8px 0 0 8px !important;
+.tdst-reset .tds-pullout-tab, .tdst-reset body > .tds-pullout .tds-pullout-tab {
+    position: absolute;
+    left: -56px;
+    width: 56px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    cursor: pointer;
+    border-radius: 8px 0 0 8px;
 }
 
 /* Ensure tab text orientation stays vertical and readable */
-html body .tds-pullout-tab .tds-tab-text {
+.tdst-reset .tds-pullout-tab .tds-tab-text {
     /* hidden — emoji-only tabs */
-    display: none !important;
+    display: none;
 }
 
 /* Keep panels above other UI elements */
-html body .tds-pullout, html body .tds-pullout * {
-    z-index: 1000 !important;
+.tdst-reset .tds-pullout, .tdst-reset body > .tds-pullout, .tdst-reset .tds-pullout * {
+    /* Ensure pullout and all its children stay above the stimulus modal overlay. */
+    z-index: 10002;
 }
 
 /* Dark mode: enhanced analysis container */
@@ -172,6 +180,44 @@ html body .tds-pullout, html body .tds-pullout * {
 [data-theme='dark'] .swallow-analysis-container::before {
     background: linear-gradient(90deg, #2a2a2a, #404040);
 }
+
+/* Unified table appearance for Session Data Taker tools
+   - Applies to common table types used in the tool without altering functional classes (SRT checkmarks, PACE controls)
+   - Scoped to .tdst-container to avoid global style leakage
+*/
+.tdst-container table,
+.tdst-container table th,
+.tdst-container table td {
+    border-collapse: collapse;
+    border: 1px solid var(--tdst-border, var(--color-border));
+    font-size: 0.95rem;
+}
+.tdst-container table th {
+    background: var(--tdst-surface-alt, var(--color-surface-alt));
+    color: var(--tdst-text, var(--color-text));
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+}
+.tdst-container table td {
+    padding: 8px 10px;
+    vertical-align: top;
+    background: var(--tdst-surface, var(--color-surface));
+    color: var(--tdst-text, var(--color-text));
+}
+.tdst-container table tbody tr:nth-child(even) td {
+    background: color-mix(in srgb, var(--tdst-surface, var(--color-surface)) 96%, var(--tdst-muted, var(--color-border)) 4%);
+}
+/* Style for small action buttons inside tables (add/delete) */
+
+/* (main-container uses global padding from assets/css/main.css) */
+.tdst-container table .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Preserve SRT table specific visuals; heavier changes must be done inside .srt-table if needed */
+/* SRT specifics preserved by not applying overrides to srt-table checkmark cells. */
 
 /* Dark mode: enhanced trials container */
 [data-theme='dark'] .trials-container {
@@ -197,10 +243,7 @@ html body .tds-pullout, html body .tds-pullout * {
     background: var(--color-surface-alt);
     color: var(--color-text);
 }
-[data-theme='dark'] .template-area {
-    background: var(--color-bg);
-    color: var(--color-text);
-}
+[data-theme='dark'] .template-area { /* inherits canonical template-area from assets/css/main.css */ --template-area-inherited:1; }
 [data-theme='dark'] .template-dropzone {
     background: var(--color-surface-alt);
     color: var(--color-text);
@@ -331,6 +374,109 @@ html body .tds-pullout, html body .tds-pullout * {
     color: var(--color-text);
     border-color: var(--color-border);
 }
+
+/* Alias PACE/SRT/Custom table classes to the centralized .data-table visuals
+   so all tool tables share a single source-of-truth for headers, colors, and spacing. */
+.pace-table, .srt-table, .custom-data-table, .gas-table { box-sizing: border-box; }
+/* Prefer centralized .data-table visuals; tools may add .data-table to their markup or we
+   apply visual parity here so tables without the class still match the source-of-truth. */
+.data-table,
+.pace-table.data-table, .srt-table.data-table, .custom-data-table.data-table, .gas-table.data-table,
+.pace-table, .srt-table, .custom-data-table, .gas-table {
+    border-collapse: collapse;
+}
+.data-table th, .data-table td,
+.pace-table:not(.data-table) th, .srt-table:not(.data-table) th, .custom-data-table:not(.data-table) th, .gas-table:not(.data-table) th,
+.pace-table:not(.data-table) td, .srt-table:not(.data-table) td, .custom-data-table:not(.data-table) td, .gas-table:not(.data-table) td {
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+/* Stimulus modal styles (SpeechDeck integration) */
+.stimulus-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 24px;
+}
+.stimulus-modal-content {
+    background: var(--color-surface, #fff);
+    color: var(--color-text, #111);
+    padding: 18px;
+    border-radius: 8px;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.modal-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    /* Match visual style of component-controls .delete-btn */
+    background-color: var(--color-error);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: background 0.12s ease;
+}
+
+.modal-close-btn:hover { background: color-mix(in srgb, var(--color-error) 85%, black); }
+.stimulus-parts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+.part-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-surface-alt); cursor: pointer; text-align: left; }
+.stimulus-subparts-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.subpart-btn { padding: 10px 12px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; }
+.stimulus-items-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.stimulus-item-label { display: block; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; }
+.stimulus-group-title { font-weight: 600; margin-top: 8px; }
+.add-stimuli-btn { margin-top: 12px; }
+/* If a table has been migrated to .data-table, ensure its headers use neutral surface-alt and text colors.
+   This prevents older per-tool rules from tinting headers with the accent color. */
+.data-table th,
+.custom-data-table.data-table th,
+.pace-table.data-table th,
+.srt-table.data-table th,
+.gas-table.data-table th {
+    background: var(--color-surface-alt);
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+}
+/* Ensure custom-data-table headers are not rendered transparent by more specific TDST rules */
+.custom-data-table th, .custom-data-table.data-table th {
+    background: var(--color-surface-alt) !important;
+    color: var(--color-text) !important;
+    background-image: none !important;
+}
+/* Force SRT add buttons to use the global accent (blue) with white text so they're consistent
+    with other tool Add controls. Use high specificity and !important to win over local gradients. */
+.tdst-container .srt-add-row-btn,
+.tdst-container .srt-add-col-btn,
+.tdst-container .srt-add-row-btn.btn,
+.tdst-container .srt-add-col-btn.btn {
+    background: linear-gradient(90deg, #e3e7ed 0%, #f8fafc 100%) !important;
+    color: #333333 !important;
+    border: 1px solid #bfc8d6 !important;
+    border-radius: 4px !important;
+    padding: 4px 16px !important;
+    font-weight: 500 !important;
+}
+.tdst-container .srt-add-row-btn:hover,
+.tdst-container .srt-add-col-btn:hover {
+    background: #d1e7dd !important;
+    border-color: #333333 !important;
+}
 [data-theme='dark'] .pace-table th,
 [data-theme='dark'] .srt-table th {
     background: var(--color-surface-alt);
@@ -340,6 +486,14 @@ html body .tds-pullout, html body .tds-pullout * {
 [data-theme='dark'] .pace-table td,
 [data-theme='dark'] .srt-table td {
     background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+
+/* Ensure centralized .data-table picks up dark-mode visuals too */
+[data-theme='dark'] .data-table th,
+[data-theme='dark'] .data-table td {
+    background: var(--color-surface-alt);
     color: var(--color-text);
     border-color: var(--color-border);
 }
@@ -518,16 +672,8 @@ html body .tds-pullout, html body .tds-pullout * {
 /* Clear template button visuals are centralized in assets/css/main.css */
 
 /* (removed duplicate broken block) */
-.srt-correct.active {
-    color: #2ecc40;
-    background: #eafbe7;
-    font-weight: bold;
-}
-.srt-incorrect.active {
-    color: #ff4d4d;
-    background: #ffeaea;
-    font-weight: bold;
-}
+.srt-correct.active { color: var(--color-success); background: color-mix(in srgb, var(--color-success) 10%, var(--color-surface)); font-weight: bold; }
+.srt-incorrect.active { color: var(--color-error); background: color-mix(in srgb, var(--color-error) 10%, var(--color-surface)); font-weight: bold; }
 
 /* Component controls styles */
 .component-controls {
@@ -543,7 +689,7 @@ html body .tds-pullout, html body .tds-pullout * {
 
 .component-controls .duplicate-btn {
     order: 1; /* Ensure duplicate is on the left */
-    background: #2ecc40; /* Green background */
+    background: var(--color-success);
     color: white;
     border: none;
     border-radius: 50%;
@@ -562,7 +708,7 @@ html body .tds-pullout, html body .tds-pullout * {
     order: 2;
     margin-right: 8px; /* Space between delete and edge */
     margin-bottom: auto; /* Align delete button to the top */
-    background-color: red; /* Red background */
+    background-color: var(--color-error);
     color: white;
     border: none;
     border-radius: 50%;
@@ -577,9 +723,7 @@ html body .tds-pullout, html body .tds-pullout * {
     transition: background 0.2s;
 
 }
-.component-controls .duplicate-btn:hover {
-    background: #28a745; /* Darker green on hover */
-}
+.component-controls .duplicate-btn:hover { background: color-mix(in srgb, var(--color-success) 85%, black); }
 
 /* SRT Session Data table styles */
 .srt-table {
@@ -594,7 +738,7 @@ html body .tds-pullout, html body .tds-pullout * {
     overflow: hidden;
     border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
 }
-.srt-table th {
+.srt-table:not(.data-table) th {
     background: var(--tdst-surface-alt, var(--color-surface-alt, #e3e7ed));
     font-weight: 600;
     padding: 6px 10px;
@@ -602,48 +746,26 @@ html body .tds-pullout, html body .tds-pullout * {
     border-right: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
     text-align: left;
 }
-.srt-table th:last-child {
+.srt-table:not(.data-table) th:last-child {
     border-right: none;
 }
-.srt-table td {
+.srt-table:not(.data-table) td {
     padding: 6px 10px;
     border-bottom: 1px solid var(--tdst-border, var(--color-border, #e3e7ed));
     border-right: 1px solid var(--tdst-border, var(--color-border, #e3e7ed));
     text-align: center;
 }
-.srt-table td:last-child {
+.srt-table:not(.data-table) td:last-child {
     border-right: none;
 }
 .srt-add-row-btn, .srt-add-col-btn {
-    background: linear-gradient(90deg, var(--tdst-surface-alt, var(--color-surface-alt, #e3e7ed)) 0%, var(--tdst-surface, var(--color-surface, #f8fafc)) 100%);
-    color: var(--tdst-text, var(--color-text, #333333));
-    border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 4px 16px;
-    cursor: pointer;
-    transition: background 0.2s, border 0.2s;
+    display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:6px 10px; border-radius:6px; font-size:14px;
+    border:1px solid var(--tdst-border, var(--color-border)); background: linear-gradient(90deg, var(--tdst-surface-alt, var(--color-surface-alt)) 0%, var(--tdst-surface, var(--color-surface)) 100%);
 }
-.srt-add-row-btn:hover, .srt-add-col-btn:hover {
-    background: color-mix(in srgb, var(--tdst-accent-alt, var(--color-accent-alt, #d1e7dd)) 60%, var(--tdst-surface, var(--color-surface, #f8fafc)) 40%);
-    border-color: var(--tdst-border-hover, var(--color-border, #333333));
-}
-.srt-row-delete {
-    background: var(--tdst-error, var(--color-error, #ff4d4d));
-    color: var(--tdst-error-text, #fff);
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 14px;
-    cursor: button;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    transition: background 0.2s;
-}
-.srt-row-delete:hover {
-    background: color-mix(in srgb, var(--tdst-error, var(--color-error, #ff4d4d)) 85%, black);
-}
+.srt-add-row-btn:hover, .srt-add-col-btn:hover { background: color-mix(in srgb, var(--tdst-accent-alt, var(--color-accent-alt)) 60%, var(--tdst-surface, var(--color-surface)) 40%); border-color: var(--tdst-border-hover, var(--color-border)); }
+.srt-row-delete { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; }
+.srt-row-delete.btn-danger, .srt-row-delete.btn { background: var(--tdst-error, var(--color-error)); color: var(--tdst-error-text, #fff); box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background 0.2s; }
+.srt-row-delete.btn-danger:hover { background: color-mix(in srgb, var(--tdst-error, var(--color-error)) 85%, black); }
 
 /* SRT Session Data table mark styles */
 .srt-mark {
@@ -675,21 +797,20 @@ html body .tds-pullout, html body .tds-pullout * {
     font-weight: bold;
 }
 
-/* Component input styles */
-.tdst-input {
-    border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+/* Component input styles - use shared form classes with local fallbacks */
+.form-input {
+    border: 1px solid var(--tdst-border, var(--color-border));
     border-radius: 6px;
     padding: 8px 12px;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
+    box-sizing: border-box;
 }
-.tdst-input:focus {
-    border-color: var(--tdst-focus, var(--color-text, #333333));
-    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.1);
-}
-.tdst-textarea {
-    border: 1px solid var(--tdst-border, var(--color-border, #bfc8d6));
+.form-input:focus { border-color: var(--tdst-focus, var(--color-text)); box-shadow: 0 0 0 2px rgba(0,86,179,0.1); }
+
+.form-textarea {
+    border: 1px solid var(--tdst-border, var(--color-border));
     border-radius: 6px;
     padding: 8px 12px;
     font-size: 14px;
@@ -703,10 +824,7 @@ html body .tds-pullout, html body .tds-pullout * {
     overflow-y: auto;
     box-sizing: border-box;
 }
-.tdst-textarea:focus {
-    border-color: var(--tdst-focus, var(--color-text, #333333));
-    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.1);
-}
+.form-textarea:focus { border-color: var(--tdst-focus, var(--color-text)); box-shadow: 0 0 0 2px rgba(0,86,179,0.1); }
 
 /* Swallow Data Component Styles */
 .swallow-data-container {
@@ -915,8 +1033,9 @@ html body .tds-pullout, html body .tds-pullout * {
     margin: 8px 0;
 }
 .trial-success {
-    background: rgba(34,197,94,0.08);
-    color: var(--color-success, #16a34a);
+    background: color-mix(in srgb, var(--color-success) 8%, var(--color-surface));
+    color: var(--color-success);
+    /* rgba fallback for older browsers */
     border: 1px solid rgba(34,197,94,0.12);
     padding: 4px 8px;
     border-radius: 6px;
@@ -924,10 +1043,10 @@ html body .tds-pullout, html body .tds-pullout * {
     font-size: 0.85rem;
     letter-spacing: 0.2px;
 }
-
 .trial-fail {
-    background: rgba(239,68,68,0.06);
-    color: var(--color-error, #dc2626);
+    background: color-mix(in srgb, var(--color-error) 6%, var(--color-surface));
+    color: var(--color-error);
+    /* rgba fallback for older browsers */
     border: 1px solid rgba(239,68,68,0.12);
     padding: 4px 8px;
     border-radius: 6px;
@@ -1023,7 +1142,8 @@ html body .tds-pullout, html body .tds-pullout * {
 .pace-row-delete:hover {
     background: #d90429;
 }
-.pace-table {
+.pace-table:not(.data-table) {
+    /* legacy visual styles only applied when a table hasn't been migrated to .data-table */
     border-collapse: separate;
     border-spacing: 0;
     width: 100%;
@@ -1035,7 +1155,7 @@ html body .tds-pullout, html body .tds-pullout * {
     overflow: hidden;
     border: 1px solid #bfc8d6;
 }
-.pace-table th {
+.pace-table:not(.data-table) th {
     background: #e3e7ed;
     font-weight: 600;
     padding: 6px 10px;
@@ -1043,16 +1163,16 @@ html body .tds-pullout, html body .tds-pullout * {
     border-right: 1px solid #bfc8d6;
     text-align: left;
 }
-.pace-table th:last-child {
+.pace-table:not(.data-table) th:last-child {
     border-right: none;
 }
-.pace-table td {
+.pace-table:not(.data-table) td {
     padding: 6px 10px;
     border-bottom: 1px solid #e3e7ed;
     border-right: 1px solid #e3e7ed;
     vertical-align: top; /* helps multi-line cells start at top */
 }
-.pace-table td:last-child {
+.pace-table:not(.data-table) td:last-child {
     border-right: none;
 }
 .pace-offer-receive {
@@ -1260,11 +1380,7 @@ html body .tds-pullout, html body .tds-pullout * {
         box-shadow: var(--shadow-lg);
     }
 
-    .template-area {
-        background: var(--color-bg);
-        padding: var(--spacing-lg);
-        border-radius: var(--radius-lg);
-    }
+    .template-area { /* inherits canonical template-area from assets/css/main.css */ --template-area-inherited:1; }
 
     .template-dropzone {
         min-height: 500px;
@@ -1517,9 +1633,9 @@ label {
         background: #fff;
     }
     
-    /* Main container optimization */
+    /* Main container optimization for print - keep consistent padding */
     .main-container {
-        padding: 0 !important;
+        padding: 20px !important;
     }
     
     .main-layout {
@@ -1527,10 +1643,8 @@ label {
     min-height: 0 !important;
     }
     
-    .template-area {
-        padding: 0 !important;
-        background: #fff !important;
-    }
+    /* print/live template-area overrides removed so canonical styles apply */
+    .template-area { --template-area-inherited:1; }
     
     /* Header styling */
     h1 {
@@ -1772,4 +1886,5 @@ label {
         color: var(--tdst-text, var(--color-text, #222));
         font-weight:500;
     }
+    
 

@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeechDeck: Functional Cards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root {
+            --bg: #f8fafc; /* light background */
+            --panel-bg: #ffffff;
+            --text: #0f172a; /* slate-900 */
+            --muted: #64748b; /* slate-500 */
+            --accent: #0ea5e9; /* sky-500 */
+            --badge-bg: rgba(255,255,255,0.08);
+            --close-bg: rgba(255,255,255,0.06);
+        }
+        .theme-dark {
+            /* Prefer host theme tokens when available for consistency */
+            --bg: var(--color-bg, #0b1220); /* deep slate fallback */
+            --panel-bg: var(--color-surface, #0f1724);
+            --text: var(--color-text, #e6eef8);
+            --muted: var(--color-text-muted, #9aa9bb);
+            --accent: var(--color-accent, #38bdf8); /* host accent fallback */
+            --badge-bg: rgba(255,255,255,0.04);
+            --close-bg: rgba(255,255,255,0.06);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        /* Dark-mode overrides for common components to match main app */
+        .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4 { color: var(--text); }
+        .theme-dark .bg-white { background-color: var(--panel-bg) !important; }
+        /* Make subcategory and part cards a softer dark-gray in dark mode (not fully black) */
+        .theme-dark .part-btn,
+        .theme-dark .bg-white.p-6,
+        .theme-dark .bg-white.p-6.rounded-lg,
+        .theme-dark .bg-white.p-6.rounded-xl {
+            background-color: #1f2937 !important; /* slate-800 */
+            border: 1px solid rgba(255,255,255,0.04);
+            color: var(--text);
+        }
+        .theme-dark .bg-slate-50 { background-color: rgba(255,255,255,0.02) !important; }
+        .theme-dark .text-slate-700 { color: var(--text) !important; }
+        .theme-dark table { background-color: transparent; color: var(--text); }
+        .theme-dark .stimulus-table thead th {
+            background-color: rgba(255,255,255,0.03);
+            color: var(--text);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .theme-dark .stimulus-table tbody tr:nth-child(odd) td { background: rgba(255,255,255,0.01); }
+        .theme-dark .stimulus-table tbody tr td { border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .theme-dark .p-4, .theme-dark .p-6 { background-color: var(--panel-bg); }
+        .theme-dark input, .theme-dark textarea, .theme-dark select {
+            background-color: rgba(255,255,255,0.02);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+        }
+        .theme-dark input::placeholder, .theme-dark textarea::placeholder { color: rgba(255,255,255,0.36); }
+        .theme-dark .rounded-lg { background-color: var(--panel-bg); border: 1px solid rgba(255,255,255,0.04); }
+        .theme-dark .trial-count { background: var(--badge-bg); color: var(--text); padding: 0.25rem 0.6rem; border-radius: 6px; }
+
+    /* Use host color tokens for better contrast and visual hierarchy (fallbacks for older browsers) */
+    /* Trial badge: subtle accent stripe to match app accents */
+    .theme-dark .trial-count { background: rgba(56,189,248,0.08); color: white; font-weight: 600; border-left: 4px solid var(--accent); padding-left: 0.75rem; }
+    /* Ensure darker slate utilities also map to high-contrast text in dark theme */
+    .theme-dark .text-slate-800, .theme-dark .text-slate-900 {
+        color: var(--text) !important;
+    }
+
+    /* Make lower-contrast border utilities (e.g., border-slate-300 used for carrier input underline)
+       visible in dark mode */
+    .theme-dark .border-slate-300 {
+        --tw-border-opacity: 1;
+        border-color: rgba(255,255,255,0.06) !important;
+    }
+    .theme-dark .score-btn.selected { background-color: rgba(56,189,248,0.18); border-color: var(--accent); color: white; }
+    .theme-dark .section-title { color: var(--accent); font-weight: 600; }
+    /* Ensure utility blue headings match host accent in dark mode */
+    .theme-dark .text-blue-700 { color: var(--accent) !important; }
+    .theme-dark #exit-flashcard { border-color: var(--color-border, rgba(255,255,255,0.06)); }
+
+        /* Button system for dark mode to match main app */
+        .theme-dark .btn, .theme-dark .button, .theme-dark button {
+            background-color: transparent;
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
+            transition: background-color 160ms ease, transform 120ms ease;
+        }
+        .theme-dark .btn:hover, .theme-dark button:hover { background-color: rgba(255,255,255,0.03); transform: translateY(-1px); }
+        .theme-dark .btn-primary, .theme-dark .button-primary {
+            background-color: var(--accent);
+            color: white;
+            border: 1px solid rgba(0,0,0,0.12);
+            box-shadow: 0 10px 30px rgba(14,165,233,0.12);
+        }
+        .theme-dark .btn-secondary {
+            background-color: rgba(255,255,255,0.02);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        /* Ensure common panel utilities like rounded-2xl and large shadows use panel-bg */
+        .theme-dark .rounded-2xl { background-color: var(--panel-bg) !important; border: 1px solid rgba(255,255,255,0.04) !important; }
+        .theme-dark .shadow-2xl, .theme-dark .shadow-md { box-shadow: none !important; }
+
+        /* Enhanced structure for dark mode: clearer borders and separators */
+        .theme-dark .panel, .theme-dark .card, .theme-dark .rounded-lg, .theme-dark header, .theme-dark footer {
+            /* Fallback solid background for wide browser support */
+            background-color: rgba(15,18,36,0.96) !important;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+            border-radius: 12px;
+        }
+        .theme-dark .panel + .panel, .theme-dark .card + .card {
+            margin-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+        /* Slightly stronger table header background and borders */
+        .theme-dark .stimulus-table thead th {
+            background-color: rgba(255,255,255,0.04) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+            color: var(--text) !important;
+        }
+        .theme-dark .stimulus-table tbody td {
+            border-bottom: 1px solid rgba(255,255,255,0.03) !important;
+        }
+        /* Emphasize section headings and separators */
+        .theme-dark .section-title {
+            color: var(--text);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        /* Buttons: add subtle border and hover lift in dark mode for clarity */
+        .theme-dark .btn, .theme-dark button {
+            border: 1px solid rgba(255,255,255,0.06);
+            background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+        }
+        /* Primary button hover (match footer print/save button) */
+        .btn-primary:hover, .theme-dark .btn-primary:hover {
+            background-color: #0369a1; /* bg-blue-700 */
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(3,105,161,0.12);
+            color: #ffffff;
+        }
+        .theme-dark .btn-primary { box-shadow: 0 1px 0 rgba(0,0,0,0.6) inset; }
+
+        /* Replace light utility backgrounds with dark equivalents */
+        .theme-dark .bg-slate-100 { background-color: rgba(255,255,255,0.03) !important; }
+        .theme-dark .bg-white { background-color: var(--panel-bg) !important; }
+
+        /* Score-button container (bg-slate-100 p-2 rounded-full) should not be bright */
+        .theme-dark .bg-slate-100.p-2.rounded-full {
+            background-color: rgba(255,255,255,0.02) !important;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        /* Score buttons themselves */
+        .theme-dark .score-btn {
+            background-color: transparent;
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--text);
+        }
+        .theme-dark .score-btn:hover { background-color: rgba(255,255,255,0.035); }
+        /* Selected score button uses accent color */
+        .theme-dark .score-btn.selected { background-color: rgba(56,189,248,0.20); border-color: var(--accent); color: white; }
+
+        /* Stimuli text in table mode should be high-contrast */
+        .theme-dark .stimulus-table tbody tr td, .theme-dark .stimulus-table tbody tr td p {
+            color: var(--text) !important;
+        }
+        .theme-dark .stimulus-table tbody tr td .muted, .theme-dark .stimulus-table tbody tr td .text-slate-500 {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        .stimulus-table th, .stimulus-table td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+        }
+        .score-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .score-btn.selected {
+            background-color: rgba(14,165,233,0.12);
+            border-color: var(--accent);
+        }
+        /* Trial counter animation removed: badge will update text-only */
+        #flashcard-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(2,6,23,0.85); /* dark overlay */
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        /* Fullscreen adjustments for flashcard mode */
+        #flashcard-overlay.fullscreen {
+            background-color: rgba(2,6,23,1);
+            padding: 0;
+        }
+        #flashcard-overlay .flashcard-inner {
+            transition: all 180ms ease;
+        }
+        /* Use a small inset so the flashcard doesn't butt directly against device edges */
+        #flashcard-overlay.fullscreen .flashcard-inner {
+            width: calc(100vw - 2rem) !important;
+            height: calc(100vh - 2rem) !important;
+            max-width: none !important;
+            max-height: none !important;
+            border-radius: 12px !important;
+            padding: calc(1.5rem + env(safe-area-inset-top, 0px)) calc(1.5rem + env(safe-area-inset-right, 0px)) calc(1.5rem + env(safe-area-inset-bottom, 0px)) calc(1.5rem + env(safe-area-inset-left, 0px)) !important;
+            box-sizing: border-box;
+        }
+        /* Scale up key text sizes for readability at distance when fullscreen */
+        #flashcard-overlay.fullscreen .text-4xl { font-size: 3.25rem !important; }
+        #flashcard-overlay.fullscreen .md\:text-5xl { font-size: 4rem !important; }
+        #flashcard-overlay.fullscreen .md\:text-6xl { font-size: 5.25rem !important; }
+        #flashcard-overlay.fullscreen .text-3xl { font-size: 2.5rem !important; }
+        /* Also increase reading passage body text so paragraphs are readable at distance */
+        #flashcard-overlay.fullscreen p.text-lg,
+        #flashcard-overlay.fullscreen .flashcard-inner p.text-lg {
+            font-size: 2.3rem !important; 
+            line-height: 2.1 !important;
+        }
+
+        /* Close button (more visible) */
+        #exit-flashcard {
+            background: var(--close-bg);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 20px;
+            line-height: 1;
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 2px 8px rgba(2,6,23,0.4);
+        }
+        #exit-flashcard:hover { transform: translateY(-1px); }
+        /* Print-specific styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            table, figure {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="max-w-6xl mx-auto p-4 md:p-8">
+        <header class="bg-white p-6 rounded-xl shadow-sm mb-8">
+            <div class="relative flex justify-between items-start">
+                <h1 class="text-2xl font-bold text-slate-800 mb-4">Speech Deck: Motor Speech Practice Stimuli</h1>
+                <div class="relative">
+                    <button id="how-to-use-btn" class="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                        How to Use
+                    </button>
+                    <div id="how-to-use-popover" class="hidden absolute top-full right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-slate-200 z-50">
+                        <div class="bg-white rounded-lg max-h-[70vh] overflow-y-auto p-6">
+                            <h2 class="text-lg font-bold text-slate-800 mb-3">How to Use</h2>
+                            <div class="text-sm text-slate-600 space-y-3">
+                                <p><strong>Modes:</strong> <em>Table</em> for row-based scoring and comments; <em>Flash-Card</em> for focused, one-item practice (type a completion then score).</p>
+                                <p><strong>Scoring:</strong> Use + (Accurate), +/- (Partial), and - (Off-Target/NR) buttons.</p>
+                                <p><strong>Custom Decks:</strong> Paste a list (one per line) and click <em>Create Custom Deck</em>, or add single items in Table View. Custom decks persist when you close the pop-up.</p>
+                                <p><strong>Save:</strong> Always click Save Results before closing the popup to preserve your session data.</p>
+                                <p class="text-xs text-slate-500">Shortcuts: ← / → (navigate), Esc (close).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Session metadata (patient, DOB, session date, SLP) is provided by the host Data Taker tool; inputs removed here. -->
+        </header>
+
+        <main id="main-content">
+            <!-- Navigation and content will be injected here -->
+        </main>
+
+        <footer class="mt-8 text-center">
+            <button id="printButton" class="btn-primary bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-all shadow-md flex items-center gap-2 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v3a2 2 0 002 2h6a2 2 0 002-2v-3h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" /></svg>
+                Generate & Print Report
+            </button>
+        </footer>
+    </div>
+
+    <div id="print-area" class="p-4">
+        <!-- The printable report will be generated here -->
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+        const stimuliData = {
+          "Part 1: Short Functional Phrases": {
+            "Greetings & Social Phrases": [
+              { level: "1-2 Words", items: ["Hello", "Hi there", "Hey", "Good morning", "Good afternoon", "Good evening", "How are you?", "I'm fine", "I'm okay", "Not bad", "Thank you", "Thanks", "You're welcome", "No problem", "My pleasure", "Excuse me", "Pardon me", "See you", "So long", "Goodbye", "Take care"] },
+              { level: "3-4 Words", items: ["How are you doing?", "How's it going?", "I'm doing well.", "Pretty good, thanks.", "Can't complain.", "Thanks so much.", "I appreciate it.", "It's nice to see you.", "Good to see you.", "Have a good day.", "You too.", "See you later.", "See you soon.", "Talk to you soon.", "Take care now."] },
+              { level: "5-8 Words", items: ["It is very nice to finally meet you.", "How has your week been so far?", "I haven't seen you in a long time.", "Thanks for coming to see me today.", "I hope you have a great afternoon.", "Let's try to catch up again soon.", "It was really nice talking with you."] },
+              { level: "Longer Phrases", items: ["It's been a while, how have you been?", "I'm very pleased to meet you in person.", "It was really nice meeting you today.", "Thank you for your help, I really appreciate it.", "I hope you have a wonderful and relaxing weekend.", "What have you been up to lately?"] }
+            ],
+            "Personal & Biographical Information": [
+              { level: "1-3 Words", items: ["My name is...", "I'm...", "I live in...", "I am from...", "I am [age] years old.", "Yes, I am.", "No, I'm not.", "I'm married.", "I'm single.", "I'm retired."] },
+              { level: "4-5 Words", items: ["My full name is...", "You can call me...", "I live on [street name].", "My birthday is in [month].", "I have [number] children.", "I have [number] grandchildren.", "I used to work as a...", "I'm retired now.", "I'm originally from..."] },
+              { level: "5-8 Words", items: ["My phone number is [phone number].", "I was born in the year [year].", "I have lived here for many years.", "My oldest child's name is [name].", "I worked at [company] for [number] years.", "My favourite hobby is [hobby]."] },
+              { level: "Longer Phrases", items: ["My address is [number], [street name], [city].", "I was born in [city, province/country].", "I grew up in a small town called...", "Before I retired, I was a [profession].", "My children's names are [names].", "My spouse's name is [name]."] }
+            ],
+            "Requests": [
+                { level: "1-2 Words", items: ["Help, please.", "Water, please.", "The remote.", "The phone.", "My glasses.", "Come here.", "One moment.", "Just a minute.", "Stop that.", "Over here.", "A little more.", "That's enough."] },
+                { level: "3-4 Words", items: ["Can you help me?", "I need a napkin.", "Please pass the salt.", "Could you open this?", "I'd like some tea.", "I need some help.", "Turn the TV on.", "Turn the lights off.", "Can you repeat that?", "Please speak slowly.", "Could you check this?", "I need the nurse."] },
+                { level: "5-8 Words", items: ["Could you please pass me my book?", "I would like another cup of coffee.", "Can you please turn the volume up?", "Would you mind closing the door, please?", "I need some help with my shoes.", "Can you please get that for me?", "Please write that down on the board."] },
+                { level: "Longer Phrases", items: ["Could you please help me get dressed?", "I would like a glass of water, please.", "Can you please write that down for me?", "Would you mind turning the volume down?", "Could you grab my glasses from the table?", "I'm having trouble with this, can you assist?"] }
+            ],
+            "Expressing Feelings & Opinions": [
+                { level: "1-2 Words", items: ["I'm happy.", "I'm sad.", "I'm tired.", "I'm sore.", "I'm thirsty.", "I'm hungry.", "I'm cold.", "I'm hot.", "I agree.", "I disagree.", "That's good.", "That's bad.", "I like it.", "I don't like it.", "Of course.", "No way."] },
+                { level: "3-4 Words", items: ["I feel much better.", "I have a headache.", "I'm feeling frustrated.", "I'm a little confused.", "That's a good idea.", "I'm not sure about that.", "I think you're right.", "This is delicious.", "I'm in a lot of pain.", "I feel very weak.", "That makes me happy."] },
+                { level: "5-8 Words", items: ["I'm feeling a lot stronger today.", "I think that's a wonderful idea.", "I don't agree with that at all.", "This is the best I've felt all week.", "My pain is a little better now.", "I'm not very happy about this situation.", "That sounds like a lot of fun."] },
+                { level: "Longer Phrases", items: ["To be honest, I'm a little bit worried.", "I'm very excited about the visit today.", "I don't think that's the best way to do it.", "In my opinion, we should wait and see.", "I'm so proud of how much progress I've made.", "I'm disappointed that the event was cancelled."] }
+            ],
+            "Home & Daily Living": [
+                { level: "1-2 Words", items: ["I'm home.", "What's new?", "Time to eat.", "I'm tired.", "Good night.", "Where is it?", "It's lost.", "Clean up.", "Do the dishes."] },
+                { level: "3-4 Words", items: ["Where are my keys?", "What's for supper?", "The floor is wet.", "I need to rest.", "Turn off the stove.", "Lock the front door.", "Let's watch a movie.", "I'll be in the garden.", "I need to do laundry."] },
+                { level: "5-8 Words", items: ["Did you remember to take the garbage out?", "I can't find the remote control anywhere.", "What time do we need to leave?", "The dog needs to go for a walk.", "Can you help me with these groceries?", "I'm going to take a nap now.", "Let's sit on the porch for a while."] },
+                { level: "Longer Phrases", items: ["Could you please water the plants in the living room?", "I think I left my reading glasses on the nightstand.", "We need to make a grocery list for this week.", "Don't forget that your appointment is tomorrow morning.", "I'm going to read my book for a little while."] }
+            ],
+            "Questions": [
+                { level: "1-2 Words", items: ["What's that?", "What's new?", "Who is it?", "Where is it?", "When is it?", "Why not?", "How come?", "Are you sure?", "Is it time?", "Really?", "For me?"] },
+                { level: "3-4 Words", items: ["What time is it?", "What's for dinner?", "Where is the washroom?", "What is your name?", "How much is this?", "Can you spell that?", "Are you coming with us?", "Is this the right way?", "What day is it today?", "Can I ask something?", "What does that mean?", "Is that a fact?"] },
+                { level: "5-8 Words", items: ["What is on the schedule for today?", "Could you tell me where the cafeteria is?", "Do you know when the doctor will be here?", "What is the weather forecast for tomorrow?", "Can you explain that to me again?", "How long will the appointment take?", "Where did I put my wallet?"] },
+                { level: "Longer Phrases", items: ["What is the name of that new medication I'm taking?", "Could you please tell me how to get to the main lobby?", "Do you happen to know if the gift shop is open now?", "How much does that particular item cost with tax?", "Can you explain the difference between these two options?"] }
+            ],
+            "Transactional & Community Phrases": [
+                { level: "1-3 Words", items: ["Just looking.", "I'll take it.", "Debit, please.", "Cash or credit?", "A coffee, please.", "A small double-double.", "Do you have...?", "I need a stamp.", "Fill it up, please. (Gas)", "One ticket, please.", "I'd like this.", "That's all."] },
+                { level: "4-5 Words", items: ["I'm here for an appointment.", "How much is that all together?", "Do you have this in a different size?", "I'd like to make a return.", "Can I get a receipt, please?", "A table for two, please.", "I'd like to make a withdrawal.", "I need to fill a prescription.", "Does this bus go downtown?", "Where is the fitting room?"] },
+                { level: "5-8 Words", items: ["I have an appointment at three o'clock.", "Could I please have a bag for this?", "I'm looking for the cereal aisle.", "Do you take credit cards here?", "I'd like to book a haircut, please.", "This is the wrong size for me.", "Can you tell me where the library is?"] },
+                { level: "Longer Phrases", items: ["I have an appointment with Dr. [Name] at 2.", "I'm looking for the bread aisle, can you point me in the right direction?", "Could you tell me if you have any more of these in the back?", "I'd like to book a follow-up appointment for next week, please.", "I need to mail this package to an address in Ontario.", "I'd like to deposit this cheque into my savings account."] }
+            ]
+          },
+          "Part 2: Carrier Phrases": {
+            "All Carrier Phrases": [
+                { level: "Carrier Phrases", items: ["I want the...", "I see a...", "I hear a...", "I feel...", "I smell...", "I need to...", "I have to...", "I like to...", "I love to...", "I plan to...", "I hope to...", "I don't want...", "I don't like...", "I don't understand...", "I can't find the...", "I can't remember the...", "I can't believe that...", "Can I have the... ?", "Can you pass the... ?", "Can we go to... ?", "Could you get me... ?", "Could you help me with... ?", "Where is the... ?", "When is the... ?", "Why is the... ?", "Who is the... ?", "How do you... ?", "How much is... ?", "How long does... ?", "How many... ?", "I'm looking for the...", "I'm thinking about...", "I'm worried about...", "I'm happy about...", "I'm excited about...", "I'm feeling...", "It looks like...", "It sounds like...", "It feels like...", "I have to go to the...", "Don't forget to...", "Did you remember to... ?", "The best part was...", "The worst part was...", "The funniest thing was...", "My favourite kind of... is...", "My least favourite... is...", "I'm not sure if...", "I was wondering if...", "The problem is that...", "The reason for this is...", "The next step is to...", "Before we do that, we should...", "After we finish, let's..."] }
+            ]
+          },
+          "Part 3: Paragraph-Length Reading Passages": {
+            "Reading Passages": [
+              { "title": "How Sleep Works", "content": "Sleep is more than just resting. It is a very important time for your brain and body. When you sleep, your brain works hard to sort and store memories from the day. This helps you learn and remember things. Your body also uses this time to repair muscles, grow tissue, and strengthen your immune system. Adults usually need seven to nine hours of sleep each night to feel their best. Not getting enough sleep can make it hard to focus and can affect your mood. A good night's sleep is one of the best things you can do for your health." },
+              { "title": "The Importance of Coral Reefs", "content": "Coral reefs are often called the \"rainforests of the sea.\" They are large underwater structures made of the skeletons of tiny animals called corals. Reefs are found in warm, clear ocean waters. They are home to thousands of different kinds of fish, plants, and animals. This makes them one of the most diverse ecosystems on Earth. Coral reefs also protect coastlines from large waves and storms. Sadly, many reefs are in danger because of pollution and climate change. Scientists are working hard to protect these beautiful and important underwater worlds." },
+              { "title": "The Story of the Guide Dog", "content": "For over a century, guide dogs have helped people who are blind or visually impaired to live more independently. The idea became popular after World War I, to help soldiers who had lost their sight. These special dogs, usually Labradors or Golden Retrievers, go through intense training. They learn to navigate around obstacles, stop at curbs, and ignore distractions. The bond between a guide dog and its owner is very strong. The dog provides not just safety, but also companionship and confidence. It is a partnership built on trust and communication." },
+              { "title": "The Story of Terry Fox", "content": "Terry Fox is one of Canada's greatest heroes. After losing his leg to cancer, he decided to run across the country to raise money for cancer research. He called his journey the Marathon of Hope. He started in St. John's, Newfoundland, in 1980. He ran almost a full marathon every single day for 143 days. He ran through six provinces. Sadly, his cancer returned, and he had to stop his run near Thunder Bay, Ontario. Terry Fox did not survive, but his legacy lives on. Every year, Canadians participate in the Terry Fox Run to continue his dream of finding a cure for cancer." },
+              { "title": "The Northern Lights", "content": "The Northern Lights, or Aurora Borealis, are a beautiful natural light show in the sky. They are often seen in Canada's northern regions, like the Yukon and Northwest Territories. The lights are caused by particles from the sun hitting the Earth's atmosphere. When these particles collide with gases, they create beautiful colours like green, pink, and purple. The lights dance and move across the night sky. Many Indigenous cultures have stories and legends about the lights. For them, the lights have a deep spiritual meaning. Seeing the Northern Lights is an unforgettable experience." },
+              { "title": "The Bluenose", "content": "The Bluenose was a fishing and racing schooner from Nova Scotia. It was launched in Lunenburg in 1921. The ship was designed to be a fast fishing vessel, but it became a racing legend. For 17 years, the Bluenose was the undefeated champion of the International Fisherman's Race. It became a symbol of Nova Scotia's shipbuilding and sailing skills. The Bluenose was so famous that it was put on the Canadian dime in 1937, where it still appears today. The original ship is gone, but a replica called the Bluenose II now sails as Nova Scotia's sailing ambassador." },
+              { "title": "The Invention of Basketball", "content": "Many people don't know that a Canadian invented the sport of basketball. His name was James Naismith. He was born in Ontario in 1861. He became a physical education teacher at a school in Massachusetts. In the winter of 1891, he was asked to create a new indoor game that was less rough than football. He came up with 13 basic rules, using peach baskets as hoops. The game was an instant success. Basketball quickly spread across the world, and today it is one of the most popular sports on the planet, all thanks to a creative Canadian teacher." },
+              { "title": "How Bees Make Honey", "content": "Honey starts as a sweet liquid called nectar, which bees collect from flowers. They use their long tongues to take up nectar and store it in a special stomach called a 'honey stomach.' Back at the hive, the bees pass the nectar to other worker bees. They chew the nectar for about half an hour, which adds special enzymes to it. Then, they spread the mixture into the honeycomb cells and fan it with their wings to help the water evaporate. This makes the nectar thick and turns it into the sweet honey we love to eat." },
+              { "title": "The Halifax Explosion", "content": "On December 6, 1917, a terrible accident happened in Halifax, Nova Scotia. A French ship carrying explosives collided with another ship in the harbour. The crash caused a huge explosion, the largest man-made blast before the atomic bomb. It destroyed a large part of the city. People from all over, especially from Boston, sent help right away. Every year, Halifax sends a special Christmas tree to Boston to say thank you for their kindness. This event changed Halifax forever and is an important part of Canadian history." },
+              { "title": "How to Pack a Suitcase Like a Pro", "content": "Packing a suitcase well can save you space and keep your clothes neat. Many travel experts say that rolling your clothes is better than folding them. Rolled clothes take up less room and get fewer wrinkles. For bigger items like jackets, it's best to fold them flat at the bottom. Put your shoes in bags along the sides of the suitcase to keep your clothes clean. Any small items or things you need to grab quickly should go on top. This simple method can make packing for your next trip much easier." },
+              { "title": "The Courage of Viola Desmond", "content": "Viola Desmond was a brave businesswoman from Halifax, Nova Scotia. In 1946, she went to a movie theatre in New Glasgow. Because she wanted to see better, she sat in the main floor section, which the theatre had reserved only for white visitors. She was told to move, but she refused. For this act of courage, she was arrested. Her story was not well known for many years, but it was an important moment in the fight for civil rights in Canada. Today, Viola Desmond is celebrated as a hero. Her face is on the Canadian ten-dollar bill to honour her stand against injustice." },
+              { "title": "The Mysterious Giant Squid", "content": "Deep in the ocean lives a mysterious creature called the giant squid. It is one of the largest animals in the world, growing up to 13 meters long. That's as long as a school bus! Giant squids have the largest eyes of any animal on Earth, as big as dinner plates. These huge eyes help them see in the dark, deep water. For a long time, no one had ever seen a live giant squid. Finally, in 2004, scientists took the first pictures of a giant squid in its natural home, solving a long-held mystery of the deep sea." },
+              { "title": "The Rideau Canal", "content": "The Rideau Canal is a famous waterway in Ontario, Canada, that connects the cities of Ottawa and Kingston. It was built almost 200 years ago for military reasons, to have a safe supply route. Today, the canal is used for fun. In the summer, people enjoy boating on it. In the winter, a part of the canal in Ottawa becomes the world's largest skating rink. The Rideau Canal is a UNESCO World Heritage Site, recognized for its history and beauty." },
+              { "title": "The Mystery of Yawning", "content": "Everyone yawns, but scientists are still not exactly sure why we do it. For a long time, people thought yawning was a sign that our body needed more oxygen. But studies have shown this is not true. A newer idea is that yawning helps to cool down our brains. When we are tired, our brain temperature can rise slightly. A big yawn brings a deep breath of cool air into our bodies, which can help bring the brain's temperature back to normal. And why is yawning contagious? Seeing someone else yawn might be a way our bodies show empathy." },
+              { "title": "The Klondike Gold Rush", "content": "In 1896, gold was discovered in a creek in the Yukon region of northwestern Canada. This news started one of the biggest gold rushes in history. Over 100,000 people tried to travel to the Klondike to find their fortune. The journey was very long and difficult. Many had to climb steep, icy mountains and travel down dangerous rivers. Most people who went to the Klondike did not get rich, but the gold rush changed the region forever. It led to the creation of the Yukon Territory and the growth of cities like Dawson City." },
+              { "title": "The Lifecycle of a Butterfly", "content": "A butterfly goes through four amazing stages in its life. This process is called metamorphosis. It begins when a butterfly lays its eggs on a leaf. From the egg hatches a larva, which we call a caterpillar. The caterpillar's main job is to eat and grow. Once it is big enough, it forms a chrysalis around itself. This is the pupa stage. Inside, the caterpillar completely changes its body. Finally, a beautiful butterfly emerges, ready to fly, drink nectar, and start the cycle all over again." },
+              { "title": "The Group of Seven", "content": "The Group of Seven were famous Canadian painters from the 1920s. They wanted to create a new style of art that was truly Canadian. They believed that Canada's wild landscape was its most important feature. They travelled by canoe and train to remote areas to sketch and paint. Their paintings are known for their bright colours and bold brush strokes. At first, some people thought their art was too different, but soon they became very popular. The Group of Seven helped Canada see the beauty of its own wilderness." },
+              { "title": "How GPS Works", "content": "GPS, which stands for Global Positioning System, helps us find our way. It works using a group of about 30 satellites that are always circling the Earth. Each satellite sends out a special signal. A GPS receiver, like the one in your phone or car, listens for these signals. When your receiver gets signals from at least four different satellites, it can figure out exactly where you are. It does this by measuring the time it takes for each signal to travel from the satellite to you. It's like a very, very smart ruler in the sky." },
+              { "title": "The Invention of the Printing Press", "content": "Before the 1400s, books were rare and very expensive because they had to be copied by hand. This all changed when a German man named Gutenberg invented the printing press around 1440. His invention used movable metal letters that could be arranged to form words and sentences. This made it possible to print many copies of a page quickly. The printing press was a huge turning point in history. It allowed ideas and knowledge to spread faster and to more people than ever before. It led to big changes in science, religion, and government." },
+              { "title": "The Canadarm", "content": "Canada is famous for its contributions to space exploration, especially the Canadarm. This was a giant robotic arm that was attached to the space shuttles. Its job was to move and grab things in the weightlessness of space. Astronauts used it to lift satellites out of the shuttle's cargo bay and to help build the International Space Station. The first Canadarm went to space in 1981 and worked for 30 years. It became a proud symbol of Canadian technology and innovation, showing that Canada was a leader in the field of robotics." },
+              { "title": "The Rosetta Stone", "content": "The Rosetta Stone is one of the most important objects in any museum. It was found by French soldiers in Egypt in 1799. The stone is special because it has the same message written in three different scripts: ancient Greek, a common Egyptian script, and Egyptian hieroglyphs. At the time, no one knew how to read hieroglyphs. Because scholars could read the Greek text, they were able to use the Rosetta Stone like a key to unlock the meaning of the hieroglyphs. This allowed us to understand the history and culture of ancient Egypt for the first time." },
+              { "title": "The Amazing Baobab Tree", "content": "In Africa and Australia, there is a strange and wonderful tree called the baobab. It is sometimes called the 'upside-down tree' because its branches look like roots sticking up into the air. Baobab trees can live for thousands of years and grow very large. Their trunks are special because they can store huge amounts of water. This helps the tree survive long periods with no rain. People and animals use the tree for many things. Its fruit is full of vitamins, its bark can be made into rope, and its hollow trunk can even provide shelter." },
+              { "title": "The Great Monarch Migration", "content": "Every autumn, millions of monarch butterflies do something amazing. They fly from Canada and the United States all the way down to Mexico for the winter. This journey can be up to 5,000 kilometers long. No single butterfly completes the entire round trip. It takes three or four generations of butterflies to travel north in the spring. But in the fall, one special 'super generation' is born. These butterflies live much longer than the others and make the entire long flight south on their own. How they find the same small area in Mexico year after year is still a scientific mystery." },
+              { "title": "How to Create a Strong Password", "content": "Keeping your online accounts safe starts with a strong password. A good password is long, with at least 12 characters. It should also be complex, with a mix of uppercase and lowercase letters, numbers, and symbols. A great way to create one is to think of a phrase that is easy for you to remember but hard for others to guess. For example, 'My first pet was a turtle!' could become 'M1pwat!'. It's also very important to use a different password for every website you use. That way, if one account has a problem, your other accounts stay safe." },
+              { "title": "The First Olympic Games", "content": "The first recorded Olympic Games took place in Greece in 776 B.C. They were held in a place called Olympia and were part of a religious festival to honour the Greek god Zeus. At first, the only event was a short footrace. Over the years, more sports were added, like wrestling and the long jump. The games were so important that wars would be stopped so that athletes and visitors could travel safely to Olympia. The ancient games were held for over a thousand years. The modern Olympic Games, which started in 1896, were inspired by this ancient tradition of peace and competition." },
+              { "title": "The Story of Maple Syrup", "content": "Maple syrup is a sweet treat that comes from maple trees. It is a big part of Canada's identity, especially in Quebec. Indigenous peoples were the first to discover how to make it. They would cut the bark of maple trees in the early spring and collect the watery sap that dripped out. They then boiled the sap over a fire for a long time. As the water boiled away, the sap became thick and sweet, turning into syrup. Early European settlers learned this process from them. Today, Canada produces most of the world's maple syrup using modern methods, but the basic idea is still the same." },
+              { "title": "How Volcanoes Work", "content": "Deep under the Earth's surface, it is so hot that rock melts into a thick liquid called magma. Sometimes, this magma pushes its way up to the surface through cracks in the Earth's crust. When it erupts, it is called a volcano. The eruption can be a slow flow of lava, which is what magma is called when it's outside the volcano. Or, it can be a big explosion of ash, gas, and rock. Over time, the cooled lava and ash build up to form a mountain or hill. Volcanoes are a powerful force of nature that can create new land." },
+              { "title": "The Discovery of Insulin", "content": "Before the 1920s, having diabetes was a death sentence. But a team of Canadian scientists made a discovery that changed everything. At the University of Toronto, Frederick Banting and Charles Best figured out how to get insulin from animals. Insulin is a hormone that controls sugar in the blood. Their discovery meant that people with diabetes could get injections of insulin to live long, healthy lives. This Canadian breakthrough has saved millions of lives around the world and is one of the most important medical discoveries ever made." },
+              { "title": "The CN Tower", "content": "The CN Tower stands tall over the city of Toronto, Ontario. When it was finished in 1976, it was the tallest freestanding structure in the world. It was built by the Canadian National Railway company, which is where the name 'CN' comes from. The tower was built to help with television and radio signals, so people could get a clearer picture and sound. Today, it is a famous landmark that attracts millions of visitors each year. People can ride a glass elevator to the top to see amazing views of the city and Lake Ontario." },
+              { "title": "Why Do Leaves Change Colour?", "content": "In the autumn, the leaves on many trees change from green to beautiful shades of yellow, orange, and red. This happens because of a chemical called chlorophyll. Chlorophyll is what makes leaves green and helps them use sunlight to make food for the tree. In the fall, when the days get shorter and colder, trees stop making food. The green chlorophyll disappears from the leaves. This lets other colours that were already in the leaves, like yellow and orange, finally show through. The red colours are made from sugars that get trapped in the leaves." },
+              { "title": "The Life of a Sea Turtle", "content": "Sea turtles are ancient reptiles that have lived in the oceans for over 100 million years. A mother sea turtle comes ashore to lay her eggs in the sand. After about two months, the baby turtles hatch and make a dangerous journey to the sea. They spend their entire lives in the water, only coming to the surface to breathe. Sea turtles can travel thousands of kilometers across the oceans to feed and to return to the same beaches where they were born to lay their own eggs. They are amazing navigators, but many kinds of sea turtles are now endangered." },
+              { "title": "The Canadian Pacific Railway", "content": "Building the Canadian Pacific Railway was one of the biggest projects in Canada's history. It was started in 1881 to connect the province of British Columbia with the rest of Canada. The government promised to build the railway to get British Columbia to join the new country. The work was very difficult and dangerous, especially through the Rocky Mountains. Thousands of workers, including many from China, helped build the railway. When it was finished in 1885, it united the country from coast to coast, allowing people and goods to travel across Canada for the first time." },
+              { "title": "The Benefits of Walking", "content": "Walking is one of the easiest and best forms of exercise. You don't need any special equipment, just a good pair of shoes. Taking a brisk walk every day is great for your heart and helps keep your bones strong. It can also help you maintain a healthy weight. Walking is good for your mind, too. It can improve your mood, reduce stress, and help you think more clearly. Even a short 15-minute walk can make a big difference in how you feel. It's a simple way to stay active and healthy throughout your life." },
+              { "title": "How Popcorn Pops", "content": "Have you ever wondered why popcorn pops? Each kernel of popcorn has a tiny drop of water stored inside a hard outer shell called a hull. When you heat the kernel, this water turns into steam. The steam creates a lot of pressure inside the kernel, pushing against the hard hull. When the pressure gets strong enough, the hull bursts open with a 'pop!' The soft, starchy inside of the kernel puffs out and quickly cools, creating the fluffy white snack we love to eat. Not all corn can pop; only special popcorn kernels have a hull that is strong enough to let this pressure build up." },
+              { "title": "How Chocolate is Made", "content": "Chocolate comes from cacao beans, which grow on trees in warm climates near the equator. The beans grow inside large pods. After the pods are picked, the beans are taken out and left to ferment, which gives them their chocolatey flavour. Then, they are dried, cleaned, and roasted. The roasted beans are ground into a thick paste called chocolate liquor. This paste can then be separated into cocoa solids and cocoa butter. By mixing these parts with sugar and milk in different amounts, you can make all the different kinds of chocolate we enjoy, like dark, milk, and white chocolate." },
+              { "title": "The Great Pyramids of Giza", "content": "The Great Pyramids of Giza in Egypt are one of the most amazing wonders of the ancient world. They were built over 4,500 years ago as tombs for powerful kings called pharaohs. The largest pyramid, the Great Pyramid, was built for Pharaoh Khufu. It is made of more than two million huge stone blocks. For thousands of years, it was the tallest man-made structure on Earth. How the ancient Egyptians built these massive pyramids without modern machines is still a mystery that scientists and historians are trying to solve." },
+              { "title": "The Importance of the Beaver", "content": "The beaver is a symbol of Canada, and for good reason. For hundreds of years, the fur trade was the most important business in early Canada. Beaver pelts were very valuable in Europe, where they were made into fashionable felt hats. This demand for beaver fur drove the exploration of the country, as traders pushed further west to find more. The beaver is also an amazing engineer. By building dams, beavers create ponds and wetlands that become homes for many other animals, like fish, frogs, and birds. This makes the beaver a very important part of the ecosystem." },
+              { "title": "The Story of Anne of Green Gables", "content": "Anne of Green Gables is one of the most famous books to come from Canada. It was written by Lucy Maud Montgomery and published in 1908. The story is about a young orphan girl named Anne Shirley who is accidentally sent to live with a brother and sister on a farm in Prince Edward Island. Anne is imaginative, talkative, and always getting into trouble. The book follows her adventures as she grows up in the beautiful setting of P.E.I. The story of Anne has been loved by readers all over the world for more than a century." },
+              { "title": "How Spiders Spin Webs", "content": "Spiders are master builders. They create beautiful, intricate webs to catch their food. They make silk inside their bodies in special glands. The silk starts as a liquid and becomes a solid thread as it is pulled out of the spider's body through openings called spinnerets. Different types of silk are used for different parts of the web. Some silk is strong for the frame, while other silk is sticky to trap insects. Many spiders can build a brand new web every single day. It is an amazing feat of natural engineering." },
+              { "title": "The Silk Road", "content": "The Silk Road was not a single road, but a network of trade routes that connected China with Europe and Africa for more than 1,500 years. It was named after the valuable silk that was traded from China. But many other goods traveled along these routes, including spices, tea, and paper. More than just goods were exchanged. The Silk Road was also a path for sharing ideas, religions, inventions, and cultures between the East and the West. It was one of the most important routes in world history, connecting different civilizations in a way that had never happened before." },
+              { "title": "The Planet Jupiter", "content": "Jupiter is the largest planet in our solar system. It is so big that all of the other planets could fit inside it. Jupiter is a gas giant, which means it is made mostly of gases like hydrogen and helium, with no solid surface to stand on. One of its most famous features is the Great Red Spot, which is a giant storm that has been raging for hundreds of years. The storm is bigger than the entire planet Earth. Jupiter also has many moons, more than 75 of them, including four large ones that were first seen by the astronomer Galileo." },
+              { "title": "How to Brew a Perfect Cup of Tea", "content": "Making a great cup of tea is simple, but a few details matter. First, start with fresh, cold water. If you are making black tea, bring the water to a full boil. For green tea, the water should be hot but not boiling, as boiling water can make it taste bitter. Use one tea bag or one teaspoon of loose tea leaves for each cup. Let the tea steep, or sit in the hot water, for the right amount of time. Black tea usually needs three to five minutes, while green tea only needs one to three minutes. Steeping for too long can also make tea taste bitter." },
+              { "title": "The Invention of the Telephone", "content": "The telephone was invented by Alexander Graham Bell in 1876. Bell was a scientist who was working on ways to help deaf people. He was trying to send speech over electrical wires. One day, while working on his device, he accidentally spilled some acid on his pants. He called out to his assistant in another room, saying, 'Mr. Watson, come here! I want to see you.' Watson heard Bell's voice clearly through the machine. This was the very first telephone call. Bell's invention completely changed the way people communicate over long distances." },
+              { "title": "The Water Cycle", "content": "The Earth has a limited amount of water, which is always moving in a process called the water cycle. It starts with evaporation, when the sun heats up water in oceans and lakes, turning it into a gas called water vapour. This vapour rises into the air. As it gets higher and colder, it turns back into liquid water drops, forming clouds. This is called condensation. When the clouds get too full of water, the water falls back to Earth as rain, snow, or hail. This is called precipitation. The water then collects in rivers and oceans, ready to start the cycle all over again." }
+            ]
+          },
+          "Part 4: Conversation Topics & Starters": {
+            "Food & Cooking": [
+                { level: "Simple Prompts", items: ["What's your favourite food?", "Do you prefer coffee or tea?", "What did you have for breakfast?", "Do you like to cook?", "Do you prefer sweet or salty snacks?", "What is your favourite fruit?"] },
+                { level: "Intermediate Prompts", items: ["What's a meal you enjoy cooking?", "Are there any foods you dislike?", "What is a traditional food from your family's culture?", "What's your favourite restaurant?", "Do you prefer eating at home or eating out? Why?", "What is a food that reminds you of your childhood?"] },
+                { level: "Complex Prompts", items: ["Describe the best meal you've ever had. Where were you and what made it so special?", "If you were to host a dinner party, what would you serve your guests?", "Walk me through the steps of a recipe you know by heart.", "How has your taste in food changed over the years?"] }
+            ],
+            "Travel & Geography": [
+                { level: "Simple Prompts", items: ["What's your favourite season?", "Do you prefer the city or the country?", "Do you like hot weather or cold weather?", "Have you ever been on a boat?", "Have you ever been to Toronto?", "Do you prefer the beach or the mountains?"] },
+                { level: "Intermediate Prompts", items: ["What is the most beautiful place you have ever visited in Canada?", "If you could travel anywhere in the world, where would you go?", "Describe your hometown.", "What do you like about living in your current city/town?", "Tell me about a trip you took as a child."] },
+                { level: "Complex Prompts", items: ["Talk about a memorable trip you took. What went well and what challenges did you face?", "What advice would you give to a tourist visiting your province for the first time?", "If you had to move to another country, which one would you choose and why?", "Describe your ideal vacation. Would it be relaxing or full of adventure?"] }
+            ],
+            "Hobbies & Interests": [
+                { level: "Simple Prompts", items: ["Do you like to read?", "What kind of music do you listen to?", "Do you watch sports?", "Do you have a pet?", "Do you like movies?", "Do you like to garden?"] },
+                { level: "Intermediate Prompts", items: ["What do you like to do on the weekend?", "Tell me about your favourite movie or TV show.", "What was the last book you read?", "Do you play any musical instruments or games?", "Are you a fan of a particular sports team?", "What is your favourite type of music?"] },
+                { level: "Complex Prompts", items: ["Explain the rules of your favourite sport or game.", "Describe a hobby you are passionate about and what you enjoy about it.", "If you had an extra hour every day, how would you spend it?", "What's a skill you would like to learn now if you had the chance?"] }
+            ],
+            "Personal History & Family": [
+                { level: "Simple Prompts", items: ["Where did you grow up?", "Do you have brothers or sisters?", "Are you married?", "Do you have children?", "Do you have grandchildren?", "What colour are your eyes?"] },
+                { level: "Intermediate Prompts", items: ["What was your first job?", "Tell me about your family.", "What is a favourite memory from your childhood?", "What were you like as a teenager?", "Where did you go to school?", "Tell me about your best friend."] },
+                { level: "Complex Prompts", items: ["What is one of the most important lessons you have learned in your life?", "Describe a person who has had a major influence on you.", "How has the world changed the most since you were a child?", "What is a family tradition that is important to you?"] }
+            ],
+            "Work & Education": [
+                { level: "Simple Prompts", items: ["Did you like school?", "What was your favourite subject?", "Did you work?", "What was your job?", "Did you have a favourite teacher?"] },
+                { level: "Intermediate Prompts", items: ["Describe a typical day at your old job.", "What was the best part of your job? What was the worst part?", "What skills did you use most often at work?", "Did you go to college or university? What did you study?", "What was your very first paying job?"] },
+                { level: "Complex Prompts", items: ["What was the most challenging project you ever worked on?", "What advice would you give to a young person starting their career today?", "How has technology changed the way people work since you started your career?", "If you could have chosen any other career, what would it have been?"] }
+            ],
+            "Hypotheticals & Opinions": [
+                { level: "Simple Prompts", items: ["What's your favourite animal?", "What's your favourite colour?", "Are you a morning person or a night person?", "Do you prefer cats or dogs?", "What is your lucky number?"] },
+                { level: "Intermediate Prompts", items: ["If you could have any superpower, what would it be?", "What is more important: being rich or being happy?", "What is the most important quality in a friend?", "What is something that always makes you laugh?", "Is it better to live in the city or the country?"] },
+                { level: "Complex Prompts", items: ["If you won the lottery, what are the first five things you would do?", "If you could give one piece of advice to your younger self, what would it be?", "What do you think has been the most important invention in history?", "If you could have dinner with any three people, living or dead, who would they be?"] }
+            ]
+          },
+          "Part 5: Functional Homework Tasks": {
+            "Homework Assignments": [
+                { level: "Tasks", items: [
+                    "Order a Coffee: Go to a coffee shop (like Tim Hortons or a local cafe) and order your favourite drink and a food item.",
+                    "Call for Business Hours: Find the phone number for a local store or library. Call them and ask, \"Hello, could you please tell me what your hours are for this Saturday?\"",
+                    "Order a Pizza: Call a local pizza place. Ask for their specials and then order a pizza for pickup or delivery. Be prepared to give your name, phone number, and address.",
+                    "Ask for a Photo: In a public place, ask a friendly-looking person: \"Excuse me, would you mind taking a picture for me?\"",
+                    "Make a Doctor's Appointment: Call your family doctor's office and say, \"Hello, I'd like to book an appointment with Dr. Brown, please.\"",
+                    "Leave a Voicemail: Call a friend or family member and leave a clear, concise voicemail. For example: \"Hi (Name), it's (your name). I'm just calling to say hello. Give me a call back when you have a chance. My number is (phone number).\"",
+                    "Ask for Directions in a Store: Approach a staff member in a grocery store or mall and ask for directions to a specific item or store. For example: \"Excuse me, can you tell me where I can find the milk?\"",
+                    "Make a Restaurant Reservation: Call a restaurant and say, \"Hello, I'd like to make a reservation for 5 people on Tuesday at six, under (your name).\"",
+                    "Return an Item: Go to a store with a receipt and an item you want to return. Say, \"Hello, I'd like to return this item, please. I have my receipt.\"",
+                    "Ask for Help at a Hardware Store: Find an employee and ask for help finding a specific item. For example, \"Excuse me, I'm looking for batteries. Can you tell me which aisle they're in?\"",
+                    "Book a Taxi: Call a taxi company and say, \"Hello, I'd like to book a taxi to [address], please. I'll be ready in ten minutes.\"",
+                    "Report a Simple Problem: Practice calling a landlord or building manager. \"Hello, this is (your name) in apartment 18. I'm calling because my kitchen sink is leaking.\"",
+                    "Thank Someone for a Gift: Call or speak to someone who gave you a gift. \"Thank you so much for the [gift]. It was very thoughtful of you.\"",
+                    "Check on an Order: Call a store where you ordered something and ask for an update. \"Hello, I'm calling to check on the status of an order I placed last week under the name [Name].\""
+                ]}
+            ]
+          },
+          "Part 6: Script Training Ideas": {
+            "Script Topics": [
+                { level: "Potential Script Topics", items: [
+                    "Your Tim Hortons/Starbucks Order: \"I'll have a medium coffee, double-double, and a toasted everything bagel with butter, please.\"",
+                    "A Detailed Restaurant Order: \"I'll start with the garden salad with Italian dressing. For my main course, I'll have the salmon, but I'd like roasted potatoes instead of the rice, please.\"",
+                    "Introducing Yourself: \"Hello, my name is [Name]. It's nice to meet you.\"",
+                    "Introducing Someone Else: \"This is my friend, [Name]. We've known each other for years.\"",
+                    "Basic Biographical Information: \"I live in Halifax with my husband. I have 2 children. Their names are Oliver and Mary and they are 12 and 15.\"",
+                    "Explaining Your Speech Difficulty (if comfortable): \"I've had a stroke, so sometimes my speech is a bit slow. Please be patient with me.\" OR \"I have a condition called apraxia, which can make it hard for me to get my words out.\"",
+                    "Your Medical History Summary: \"I had a stroke on March 8th. My main challenges are with weakness on my right side and speech.\"",
+                    "Leaving a Voicemail for a Doctor's Office: \"Hello, this is a message for Dr. Mason. My name is George Andrews, date of birth January 5th, 1965. I'm calling to book an appointment. You can reach me at (phone number). Thank you.\"",
+                    "Telling a Favourite Joke or Short Story.",
+                    "Describing Your Former Profession: \"For 30 years, I worked as a sales rep for (company). I was responsible for (brief description of duties).\"",
+                    "Explaining an Allergy: \"I have a severe allergy to peanuts. Is this dish made with any peanut products?\"",
+                    "Giving Simple Directions: \"To get to the post office from here, go straight down this street for two blocks, then turn left. It will be on your right-hand side.\"",
+                    "Describing Your Daily Routine: \"I usually wake up around 7, have breakfast, and read the paper. Then I do my exercises. In the afternoon, I like to...\"",
+                    "Explaining a Hobby: \"One of my favourite hobbies is gardening. I love being outside and growing my own vegetables in the summer. I find it very relaxing.\"",
+                    "Your \"Go-To\" Family Story: A short, rehearsed anecdote about a funny or memorable family event.",
+                    "Answering \"How was your weekend?\": \"It was good, thanks. I [did an activity with someone].\""
+                ]}
+            ]
+          }
+        };
+
+        let sessionResults = {};
+        // Stack of recent actions to support undo (Ctrl+Z)
+        // Each entry: { type: 'addTrial', part, subPart, key }
+        const undoStack = [];
+
+        // create a trial entry and push an undo record. Returns the unique key created.
+        function createTrial(part, subPart, saveLabel, data) {
+            try {
+                if (!part || !subPart || !saveLabel) return null;
+                sessionResults[part] = sessionResults[part] || {};
+                sessionResults[part][subPart] = sessionResults[part][subPart] || {};
+                // compute next trial number for this label
+                const keys = Object.keys(sessionResults[part][subPart] || {}).filter(k => k.indexOf(saveLabel + ' [Trial ') === 0);
+                const next = keys.length + 1;
+                const uniqueKey = `${saveLabel} [Trial ${next}]`;
+                sessionResults[part][subPart][uniqueKey] = Object.assign({}, data || {});
+                // push undo record
+                undoStack.push({ type: 'addTrial', part, subPart, key: uniqueKey });
+                return uniqueKey;
+            } catch (err) {
+                console.warn('createTrial error', err);
+                return null;
+            }
+        }
+
+        function updateItemUI(part, subPart, baseLabel) {
+            try {
+                // update any trial-count badges in table mode
+                const badge = document.querySelector('.trial-count[data-item="' + baseLabel.replace(/"/g, '\\"') + '"]');
+                const count = (() => {
+                    try {
+                        const results = (sessionResults[part] && sessionResults[part][subPart]) ? sessionResults[part][subPart] : {};
+                        return Object.keys(results).filter(k => k.indexOf(baseLabel + ' [Trial ') === 0).length;
+                    } catch (e) { return 0; }
+                })();
+                if (badge) badge.textContent = 'Trials: ' + count;
+
+                // update score button selection in table mode to reflect latest trial
+                try {
+                    const results = (sessionResults[part] && sessionResults[part][subPart]) ? sessionResults[part][subPart] : {};
+                    const keys = Object.keys(results).filter(k => k.indexOf(baseLabel + ' [Trial ') === 0);
+                    // find last by trial number
+                    let lastKey = null; let maxN = 0;
+                    keys.forEach(k => { const m = k.match(/\[Trial (\d+)\]$/); const n = m ? Number(m[1]) : 0; if (n > maxN) { maxN = n; lastKey = k; } });
+                    const lastScore = lastKey && results[lastKey] ? results[lastKey].score : null;
+                    // clear selection buttons for this item
+                    document.querySelectorAll('.score-btn[data-item="' + baseLabel.replace(/"/g, '\\"') + '"]').forEach(b => b.classList.remove('selected'));
+                    if (lastScore) {
+                        const btn = document.querySelector('.score-btn[data-item="' + baseLabel.replace(/"/g, '\\"') + '"][data-score="' + lastScore + '"]');
+                        if (btn) btn.classList.add('selected');
+                    }
+                } catch (err) { /* ignore UI update errors */ }
+            } catch (err) { /* ignore */ }
+        }
+
+        function doUndo() {
+            try {
+                if (!undoStack.length) {
+                    console.debug('Undo stack empty');
+                    return;
+                }
+                const last = undoStack.pop();
+                if (!last) return;
+                if (last.type === 'addTrial') {
+                    const { part, subPart, key } = last;
+                    if (sessionResults[part] && sessionResults[part][subPart] && sessionResults[part][subPart][key]) {
+                        // determine base label for UI updates
+                        const base = String(key).replace(/ \[Trial \d+\]$/, '');
+                        delete sessionResults[part][subPart][key];
+                        // Update table badges / selection
+                        updateItemUI(part, subPart, base);
+                        // If flashcard overlay is open, update its counter if present
+                        const overlayBadge = document.querySelector('#trial-counter');
+                        if (overlayBadge) {
+                            // try to recompute count by looking for nearest visible card label inside overlay
+                            try {
+                                // find a matching data-item in overlay (score input or data attributes)
+                                const cardLabelEl = document.querySelector('#flashcard-overlay [data-item]');
+                                if (cardLabelEl) {
+                                    const item = cardLabelEl.dataset.item;
+                                    const results = (sessionResults[part] && sessionResults[part][subPart]) ? sessionResults[part][subPart] : {};
+                                    const newCount = Object.keys(results).filter(k => k.indexOf(item + ' [Trial ') === 0).length;
+                                    overlayBadge.textContent = 'Trials: ' + newCount;
+                                }
+                            } catch (e) { /* ignore */ }
+                        }
+                    }
+                }
+            } catch (err) { console.warn('doUndo error', err); }
+        }
+    const mainContent = document.getElementById('main-content');
+    const CUSTOM_PART = 'Part 7: Custom Stimuli';
+    // Ensure the custom stimuli part is always present so users can see/manage decks
+    if (!stimuliData[CUSTOM_PART]) stimuliData[CUSTOM_PART] = {};
+        
+        // Keep track of listeners to remove them later
+        let currentTableListeners = {
+            click: null,
+            input: null,
+            keydown: null
+        };
+
+        // Function to clear any active event listeners on the main content area for tables
+        function clearTableListeners() {
+            if (currentTableListeners.click) {
+                mainContent.removeEventListener('click', currentTableListeners.click);
+                currentTableListeners.click = null;
+            }
+            if (currentTableListeners.input) {
+                mainContent.removeEventListener('input', currentTableListeners.input);
+                currentTableListeners.input = null;
+            }
+            if (currentTableListeners.keydown) {
+                mainContent.removeEventListener('keydown', currentTableListeners.keydown);
+                currentTableListeners.keydown = null;
+            }
+        }
+
+        function renderPartSelector() {
+            clearTableListeners(); // Clean up when navigating away from a table
+            const prebuiltPartsHTML = Object.keys(stimuliData)
+                .map(part => `
+                    <button data-part="${part}" class="part-btn bg-white p-6 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all text-left">
+                        <h3 class="text-lg font-semibold text-blue-700">${part}</h3>
+                    </button>
+                `).join('');
+
+            mainContent.innerHTML = `
+                <h2 class="text-xl font-bold text-slate-700 mb-4">Select a Stimulus Category</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    ${prebuiltPartsHTML}
+                </div>
+                <div class="mt-8 bg-white p-6 rounded-xl shadow-sm">
+                    <h2 class="text-xl font-bold text-slate-700 mb-2">Create a Custom Deck</h2>
+                    <p class="text-sm text-slate-500 mb-4">Paste a list of stimuli below (one per line) to create a new practice deck. Give the deck a clear name so you can find it later.</p>
+                    <input id="custom-deck-name" class="w-full p-2 border border-slate-300 rounded-md mb-2" placeholder="Deck name (e.g., 'Home Tasks')" />
+                    <textarea id="custom-stimuli-input" class="w-full h-24 p-2 border border-slate-300 rounded-md" placeholder="What time is it?\nHello, my name is...\nI would like a coffee, please."></textarea>
+                    <div class="flex gap-3 mt-4">
+                        <button id="create-custom-deck-btn" class="bg-green-600 text-white font-semibold px-5 py-2 rounded-md hover:bg-green-700">Create Custom Deck</button>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">Custom decks are saved to the Session Data Taker and will persist when you close the practice modal.</p>
+                </div>
+            `;
+            
+            document.querySelectorAll('.part-btn').forEach(btn => {
+                btn.addEventListener('click', () => renderSubPartSelector(btn.dataset.part));
+            });
+
+            document.getElementById('create-custom-deck-btn').addEventListener('click', () => {
+                const nameInput = document.getElementById('custom-deck-name').value.trim() || 'Untitled Deck';
+                const input = document.getElementById('custom-stimuli-input').value;
+                const items = input.split('\n').map(s => s.trim()).filter(s => s);
+                if (items.length > 0) {
+                    const partName = "Part 7: Custom Stimuli";
+                    if (!stimuliData[partName]) stimuliData[partName] = {};
+                    // Avoid name collision by appending a suffix if necessary
+                    let subPartName = nameInput;
+                    let suffix = 1;
+                    while (stimuliData[partName][subPartName]) {
+                        suffix += 1;
+                        subPartName = `${nameInput} (${suffix})`;
+                    }
+                    stimuliData[partName][subPartName] = [{ level: "Custom Items", items: items }];
+                    sessionResults[partName] = sessionResults[partName] || {};
+                    sessionResults[partName][subPartName] = sessionResults[partName][subPartName] || {};
+                    // Notify parent about custom decks
+                    postCustomDecksToParent();
+                    renderSubPartSelector(partName);
+                }
+            });
+        }
+
+        function renderSubPartSelector(part) {
+            clearTableListeners(); // Clean up when navigating away from a table
+            mainContent.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <button id="back-to-parts" class="p-2 rounded-full hover:bg-slate-100 mr-2">&larr;</button>
+                    <h2 class="text-xl font-bold text-slate-700">Select a Sub-Category: ${part}</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    ${Object.keys(stimuliData[part]).map(subPart => `
+                        <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                ${part === CUSTOM_PART ?
+                                    (`<div style="display:flex;align-items:center;gap:8px;">
+                                        <h3 contenteditable="true" spellcheck="false" class="text-lg font-semibold text-blue-700 custom-title" data-part="${part}" data-subpart="${subPart}" style="margin:0;">${subPart}</h3>
+                                        <div>
+                                            <button data-part="${part}" data-subpart="${subPart}" class="delete-deck-btn text-sm px-2 py-1 rounded border text-red-600">Delete</button>
+                                        </div>
+                                    </div>`)
+                                    :
+                                    (`<h3 class="text-lg font-semibold text-blue-700" style="margin:0;">${subPart}</h3>`)
+                                }
+                            </div>
+                            <div class="mt-4 flex flex-col space-y-2">
+                                <button data-part="${part}" data-subpart="${subPart}" class="subpart-btn btn-primary w-full text-center font-semibold px-4 py-2 rounded-md">View as Table</button>
+                                <button data-part="${part}" data-subpart="${subPart}" class="flashcard-btn btn-secondary w-full text-center font-semibold px-4 py-2 rounded-md">Flash-Card Mode</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('back-to-parts').addEventListener('click', renderPartSelector);
+            document.querySelectorAll('.subpart-btn').forEach(btn => {
+                btn.addEventListener('click', () => renderTable(btn.dataset.part, btn.dataset.subpart));
+            });
+            document.querySelectorAll('.flashcard-btn').forEach(btn => {
+                btn.addEventListener('click', () => renderFlashCardMode(btn.dataset.part, btn.dataset.subpart));
+            });
+            // Wire delete handlers for custom decks (rename is handled inline via contenteditable)
+            document.querySelectorAll('.delete-deck-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const partName = btn.dataset.part;
+                    const sub = btn.dataset.subpart;
+                    if (!confirm('Delete custom deck "' + sub + '"? This cannot be undone.')) return;
+                    deleteCustomDeck(partName, sub);
+                });
+            });
+            // Inline editable title handling for Custom Stimuli
+            if (part === CUSTOM_PART) {
+                document.querySelectorAll('.custom-title').forEach(el => {
+                    // remember original value to support escape/cancel
+                    el.addEventListener('focus', function() { this.dataset._orig = this.textContent; });
+                    el.addEventListener('blur', function() {
+                        try {
+                            const partName = this.dataset.part;
+                            const oldName = this.dataset.subpart;
+                            const newName = this.textContent.trim();
+                            if (!newName) {
+                                // revert to original if empty
+                                this.textContent = this.dataset._orig || oldName;
+                                return;
+                            }
+                            if (newName !== oldName) {
+                                renameCustomDeck(partName, oldName, newName);
+                                // update the DOM dataset so subsequent edits reflect the new name
+                                this.dataset.subpart = newName;
+                            }
+                        } catch (err) { console.warn('Error handling inline title blur', err); }
+                    });
+                    el.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+                        if (e.key === 'Escape') { this.textContent = this.dataset._orig || this.dataset.subpart; this.blur(); }
+                    });
+                });
+            }
+        }
+
+        // Respond to parent frame requests and set commands for session results via postMessage
+        // Parent sends { type: 'speechDeck:getSessionResults' } and this frame replies
+        // Parent may also send { type: 'speechDeck:setSessionResults', data: {...} } to restore state
+        // and { type: 'speechDeck:setReport', data: '<html>...</html>' } to provide saved report HTML
+        window.addEventListener('message', (ev) => {
+            try {
+                if (!ev.data) return;
+                if (ev.data.type === 'speechDeck:getSessionResults') {
+                    // Reply to the source window with the current sessionResults
+                    const reply = { type: 'speechDeck:sessionResults', data: sessionResults };
+                    try {
+                        // Prefer replying directly to the event source/origin
+                        if (ev.source && typeof ev.source.postMessage === 'function') {
+                            ev.source.postMessage(reply, ev.origin || '*');
+                        } else {
+                            // fallback to posting to parent
+                            parent.postMessage(reply, '*');
+                        }
+                    } catch (postErr) {
+                        // If posting back to origin fails, attempt a generic broadcast
+                        try { parent.postMessage(reply, '*'); } catch (err) { console.warn('Failed to post sessionResults to parent', err); }
+                    }
+                } else if (ev.data.type === 'speechDeck:getReport') {
+                    // Parent is requesting the built report HTML; send it back
+                    try {
+                        const reportHtml = (typeof buildReportHTML === 'function') ? buildReportHTML() : (document.getElementById('print-area') ? document.getElementById('print-area').innerHTML : null);
+                        const reply = { type: 'speechDeck:report', data: reportHtml, sessionResults };
+                        if (ev.source && typeof ev.source.postMessage === 'function') {
+                            ev.source.postMessage(reply, ev.origin || '*');
+                        } else {
+                            parent.postMessage(reply, '*');
+                        }
+                    } catch (err) {
+                        try { parent.postMessage({ type: 'speechDeck:report', data: null, sessionResults }, '*'); } catch (e) { /* ignore */ }
+                    }
+                } else if (ev.data.type === 'speechDeck:setSessionResults') {
+                    try {
+                        if (ev.data && ev.data.data) {
+                            // Replace current results with provided snapshot
+                            sessionResults = ev.data.data || {};
+                            // Re-render current view if necessary (best-effort)
+                            try { renderPartSelector(); } catch (e) { /* ignore */ }
+                        }
+                    } catch (err) { console.warn('Error setting sessionResults from parent', err); }
+                } else if (ev.data.type === 'speechDeck:setReport') {
+                    try {
+                        // Store the saved report HTML in-memory for potential export
+                        // but do not inject it into the modal DOM since the host
+                        // component already displays the canonical preview.
+                        if (ev.data && ev.data.data) {
+                            window.__speechDeckSavedReportHtml = ev.data.data;
+                        }
+                    } catch (err) { console.warn('Error receiving saved report HTML from parent', err); }
+                } else if (ev.data.type === 'speechDeck:setCustomDecks') {
+                    try {
+                        // Replace or merge custom decks into Part 7
+                        const custom = ev.data && ev.data.data ? ev.data.data : null;
+                        if (custom && typeof custom === 'object') {
+                            const partName = 'Part 7: Custom Stimuli';
+                            if (!stimuliData[partName]) stimuliData[partName] = {};
+                            // Support two shapes: { "Deck Name": [...] } or { customDecks: {...}, addedStimuli: {...} }
+                            const decks = custom.customDecks ? custom.customDecks : custom;
+                            Object.keys(decks).forEach(deckName => {
+                                const items = Array.isArray(decks[deckName]) ? decks[deckName].map(s => String(s).trim()).filter(Boolean) : [];
+                                if (items.length) stimuliData[partName][deckName] = [{ level: 'Custom Items', items }];
+                            });
+                            // If there are addedStimuli entries, merge them back into their original part/sub as Custom Added Stimuli groups
+                            if (custom.addedStimuli && typeof custom.addedStimuli === 'object') {
+                                Object.keys(custom.addedStimuli).forEach(k => {
+                                    const items = Array.isArray(custom.addedStimuli[k]) ? custom.addedStimuli[k].map(s => String(s).trim()).filter(Boolean) : [];
+                                    if (!items.length) return;
+                                    // Support keys encoded as JSON [part, sub] or legacy 'part||sub'
+                                    let p = null, sub = null;
+                                    try {
+                                        const parsed = JSON.parse(k);
+                                        if (Array.isArray(parsed) && parsed.length === 2) {
+                                            p = parsed[0]; sub = parsed[1];
+                                        }
+                                    } catch (e) {
+                                        // not JSON, fall back to legacy split
+                                        const parts = k.split('||');
+                                        if (parts.length === 2) { p = parts[0]; sub = parts[1]; }
+                                    }
+                                    if (!p || !sub) return;
+                                    if (!stimuliData[p]) stimuliData[p] = {};
+                                    // find or create the group
+                                    let group = (stimuliData[p][sub] || []).find(g => g.level === 'Custom Added Stimuli');
+                                    if (!group) {
+                                        group = { level: 'Custom Added Stimuli', items: [] };
+                                        if (!stimuliData[p][sub]) stimuliData[p][sub] = [];
+                                        stimuliData[p][sub].push(group);
+                                    }
+                                    // merge unique items
+                                    items.forEach(it => { if (!group.items.includes(it)) group.items.push(it); });
+                                });
+                            }
+                        }
+                    } catch (err) { console.warn('Error applying custom decks from parent', err); }
+                }
+            } catch (err) {
+                console.warn('Error handling postMessage in speech-deck iframe:', err);
+            }
+            });
+
+            // Additionally listen for a parent app-level theme message
+            window.addEventListener('message', (ev) => {
+                try {
+                    if (!ev.data) return;
+                    if (ev.data.type === 'app:theme') {
+                        const theme = ev.data && ev.data.data ? String(ev.data.data) : null;
+                        if (theme === 'dark') document.documentElement.classList.add('theme-dark');
+                        else document.documentElement.classList.remove('theme-dark');
+                    }
+                } catch (err) { /* ignore */ }
+            });
+
+            // Initialize theme: follow system preference and ask parent for the app theme
+            (function themeInit(){
+                try {
+                    const mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+                    if (mq && mq.matches) document.documentElement.classList.add('theme-dark');
+                    if (mq && typeof mq.addEventListener === 'function') {
+                        mq.addEventListener('change', (e) => {
+                            if (e.matches) document.documentElement.classList.add('theme-dark');
+                            else document.documentElement.classList.remove('theme-dark');
+                        });
+                    }
+                    try { parent.postMessage({ type: 'speechDeck:themeRequest' }, '*'); } catch (err) { /* ignore */ }
+                } catch (err) { /* ignore */ }
+            })();
+
+            // Helper to post current custom decks under Part 7 to parent
+        function postCustomDecksToParent() {
+            try {
+                const partName = 'Part 7: Custom Stimuli';
+                const out = {};
+                if (stimuliData[partName]) {
+                    Object.keys(stimuliData[partName]).forEach(sub => {
+                        const groups = stimuliData[partName][sub];
+                        // flatten items into array
+                        const items = groups.flatMap(g => g.items || []);
+                        out[sub] = items;
+                    });
+                }
+                // Also collect any "Custom Added Stimuli" groups across all parts so single-item additions
+                // made in table mode are persisted and can be restored later.
+                const added = {};
+                Object.keys(stimuliData).forEach(p => {
+                    Object.keys(stimuliData[p]).forEach(sub => {
+                        const groups = stimuliData[p][sub];
+                        groups.forEach(g => {
+                            if (g && g.level === 'Custom Added Stimuli' && Array.isArray(g.items) && g.items.length) {
+                                // Encode key as JSON array [part, sub] to avoid delimiter collisions
+                                const key = JSON.stringify([p, sub]);
+                                added[key] = (added[key] || []).concat(g.items.map(s => String(s).trim()).filter(Boolean));
+                            }
+                        });
+                    });
+                });
+                const payload = { type: 'speechDeck:customDecks', data: { customDecks: out, addedStimuli: added } };
+                try { parent.postMessage(payload, '*'); } catch (err) { console.warn('Failed to post custom decks to parent', err); }
+            } catch (err) { console.warn('Error in postCustomDecksToParent', err); }
+        }
+
+        // Rename a custom deck within stimuliData and update any sessionResults
+        function renameCustomDeck(partName, oldName, newName) {
+            try {
+                if (!partName || !oldName || !newName) return;
+                if (!stimuliData[partName] || !stimuliData[partName][oldName]) return;
+                // Avoid exact duplicate names: if exists, append a suffix
+                let finalName = newName;
+                if (stimuliData[partName][finalName]) {
+                    let i = 2;
+                    while (stimuliData[partName][finalName + ' (' + i + ')']) i++;
+                    finalName = finalName + ' (' + i + ')';
+                }
+                stimuliData[partName][finalName] = stimuliData[partName][oldName];
+                delete stimuliData[partName][oldName];
+                // Move any sessionResults entries if present
+                try {
+                    if (window.sessionResults && window.sessionResults[partName] && window.sessionResults[partName][oldName]) {
+                        window.sessionResults[partName][finalName] = window.sessionResults[partName][oldName];
+                        delete window.sessionResults[partName][oldName];
+                    }
+                } catch (e) { /* ignore */ }
+                postCustomDecksToParent();
+                try { renderSubPartSelector(partName); } catch (e) { /* ignore */ }
+            } catch (err) { console.warn('Error renaming custom deck', err); }
+        }
+
+        // Delete a custom deck and clear any associated sessionResults
+        function deleteCustomDeck(partName, name) {
+            try {
+                if (!partName || !name) return;
+                if (!stimuliData[partName] || !stimuliData[partName][name]) return;
+                delete stimuliData[partName][name];
+                // Remove sessionResults for this deck if present
+                try {
+                    if (window.sessionResults && window.sessionResults[partName] && window.sessionResults[partName][name]) {
+                        delete window.sessionResults[partName][name];
+                    }
+                } catch (e) { /* ignore */ }
+                postCustomDecksToParent();
+                try { renderPartSelector(); } catch (e) { /* ignore */ }
+            } catch (err) { console.warn('Error deleting custom deck', err); }
+        }
+
+            // If embedded inside an iframe, change the print button into a report sender
+        try {
+            const printBtn = document.getElementById('printButton');
+            if (printBtn && window !== window.parent) {
+                printBtn.textContent = 'Save Results';
+                // Force inline primary styling so host CSS cannot hide the primary look
+                try {
+                    printBtn.style.setProperty('background-color', '#0ea5e9', 'important');
+                    printBtn.style.setProperty('color', '#ffffff', 'important');
+                    printBtn.style.setProperty('border', '1px solid rgba(0,0,0,0.12)', 'important');
+                    printBtn.style.setProperty('box-shadow', '0 8px 20px rgba(14,165,233,0.12)', 'important');
+                    printBtn.style.setProperty('padding', '0.75rem 2rem', 'important');
+                    printBtn.style.setProperty('font-weight', '700', 'important');
+                    printBtn.style.setProperty('border-radius', '8px', 'important');
+                    printBtn.style.setProperty('cursor', 'pointer', 'important');
+                } catch (sErr) { /* some browsers may restrict important via JS - best-effort */ }
+                // Also add hover visual feedback via JS to ensure it looks interactive even when CSS stripped
+                const _enter = () => { try { printBtn.style.opacity = '0.95'; } catch(e){} };
+                const _leave = () => { try { printBtn.style.opacity = '1'; } catch(e){} };
+                printBtn.addEventListener('mouseenter', _enter);
+                printBtn.addEventListener('mouseleave', _leave);
+
+                // Add a capturing listener to ensure it runs BEFORE any other click handlers
+                // and prevent those handlers (which may call window.print()) from executing.
+                const capturingHandler = function(e) {
+                    try {
+                        // Prevent other listeners and default behaviour
+                        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+                        e.preventDefault();
+
+                        // Build the canonical report HTML and post to parent
+                        try {
+                            const reportHtml = buildReportHTML();
+                            const payload = { type: 'speechDeck:report', data: reportHtml, sessionResults };
+                            try { parent.postMessage(payload, '*'); } catch (err) { console.warn('Failed to post report to parent', err); }
+                        } catch (innerErr) {
+                            console.warn('Error building report for parent (capturing handler)', innerErr);
+                        }
+                    } catch (err) {
+                        console.warn('Error sending report to parent (capturing handler)', err);
+                    }
+                    return false;
+                };
+                // Use capture phase (third arg true) so this handler runs before other listeners
+                printBtn.addEventListener('click', capturingHandler, true);
+            }
+        } catch (err) {
+            console.warn('Could not override print button for iframe mode', err);
+        }
+        // Restore/ensure renderTable function header (was accidentally removed during edits)
+        function renderTable(part, subPart) {
+            clearTableListeners(); // Remove old listeners before rendering a new table and adding new ones
+            const data = stimuliData[part][subPart];
+            const isReadingPassage = part === "Part 3: Paragraph-Length Reading Passages";
+            if (!sessionResults[part]) sessionResults[part] = {};
+            if (!sessionResults[part][subPart]) sessionResults[part][subPart] = {};
+
+            // Helpers for trial-aware access in flashcard mode
+            const _countTrialsFor = (base) => {
+                try { return Object.keys(sessionResults[part][subPart] || {}).filter(k => k.indexOf(base + ' [Trial ') === 0).length; }
+                catch (err) { return 0; }
+            };
+            const _lastTrialKeyFor = (base) => {
+                try {
+                    const keys = Object.keys(sessionResults[part][subPart] || {}).filter(k => k.indexOf(base + ' [Trial ') === 0);
+                    if (!keys || keys.length === 0) return null;
+                    let maxKey = keys[0];
+                    let maxN = 1;
+                    keys.forEach(k => {
+                        const m = k.match(/\[Trial (\d+)\]$/);
+                        const n = m ? Number(m[1]) : 0;
+                        if (n > maxN) { maxN = n; maxKey = k; }
+                    });
+                    return maxKey;
+                } catch (err) { return null; }
+            };
+            const _getLatestFor = (base) => {
+                const last = _lastTrialKeyFor(base);
+                return last ? sessionResults[part][subPart][last] : { score: '', comment: '' };
+            };
+
+            
+
+            let tableHTML = `
+                <div class="flex items-center mb-4">
+                    <button id="back-to-subparts" data-part="${part}" class="p-2 rounded-full hover:bg-slate-100 mr-2">&larr;</button>
+                    <h2 class="text-xl font-bold text-slate-700">${subPart}</h2>
+                </div>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <table class="min-w-full stimulus-table">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Stimulus</th>
+                                ${isReadingPassage ? 
+                                    `<th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Score / Rate</th>` : 
+                                    `<th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-48">Score</th>`
+                                }
+                                <th class="text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stimuli-tbody" class="divide-y divide-slate-200">
+            `;
+            
+            if (isReadingPassage) {
+                data.forEach(item => {
+                    const result = _getLatestFor(item.title);
+                    const trialCount = _countTrialsFor(item.title);
+                    tableHTML += `
+                        <tr>
+                            <td class="font-medium text-slate-900">${item.title} <span class="ml-2 text-xs text-slate-500 trial-count" data-item="${item.title}">Trials: ${trialCount}</span></td>
+                            <td><input type="text" class="w-full p-2 border border-slate-300 rounded-md text-sm passage-score-input" data-item="${item.title}" data-field="score" value="${result.score}" placeholder="e.g., 95%, 120 WPM"></td>
+                            <td><input type="text" class="w-full p-2 border border-slate-300 rounded-md text-sm" data-item="${item.title}" data-field="comment" value="${result.comment}" placeholder="Notes on fluency, etc."></td>
+                        </tr>
+                    `;
+                });
+            } else {
+                data.forEach(group => {
+                    tableHTML += `<tr><td colspan="3" class="px-4 py-3 bg-slate-100 text-sm font-semibold text-slate-700">${group.level}</td></tr>`;
+                    group.items.forEach(item => {
+                         const result = _getLatestFor(item);
+                         // compute trial count for this item
+                         const trialCount = _countTrialsFor(item);
+                         tableHTML += `
+                            <tr>
+                                <td class="font-medium text-slate-900">${item} <span class="ml-2 text-xs text-slate-500 trial-count" data-item="${item}">Trials: ${trialCount}</span></td>
+                                <td>${renderScoreButtons(item, result.score)}</td>
+                                <td><input type="text" class="w-full p-2 border border-slate-300 rounded-md text-sm" data-item="${item}" data-field="comment" value="${result.comment}" placeholder="Notes on quality, cues, etc."></td>
+                            </tr>
+                         `;
+                    });
+                });
+            }
+
+            tableHTML += `
+                        </tbody>
+                        <tfoot class="bg-slate-50">
+                            <tr>
+                                <td colspan="3" class="p-4">
+                                    <form id="add-stimulus-form" class="flex items-center gap-4">
+                                        <textarea id="new-stimulus-input" placeholder="Add a custom stimulus... (For passages, paste the full text)" class="flex-grow p-2 border border-slate-300 rounded-md text-sm h-16"></textarea>
+                                        <button type="submit" class="bg-green-600 text-white font-semibold px-4 py-2 rounded-md hover:bg-green-700 self-end">Add</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+            mainContent.innerHTML = tableHTML;
+
+            document.getElementById('back-to-subparts').addEventListener('click', (e) => renderSubPartSelector(e.currentTarget.dataset.part));
+            
+            // Define and add new listeners, storing them to be removed later
+            currentTableListeners.click = e => {
+                if (e.target.closest('.score-btn')) {
+                    const btn = e.target.closest('.score-btn');
+                    const item = btn.dataset.item;
+                    const score = btn.dataset.score;
+                    // Create trial via helper so undo can remove it
+                    const createdKey = createTrial(part, subPart, item, { score: score });
+                    // visual updates
+                    btn.parentElement.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    try { updateItemUI(part, subPart, item); } catch (err) { /* ignore */ }
+                }
+            };
+
+            currentTableListeners.input = e => {
+                if (e.target.matches('input[data-field]')) {
+                    const input = e.target;
+                    const item = input.dataset.item;
+                    const field = input.dataset.field;
+                    const value = input.value;
+                    // Attach field to the most recent trial for this item (or create one)
+                    let lastKey = _lastTrialKeyFor(item);
+                    if (!lastKey) {
+                        // create via helper so undo captures it
+                        const created = createTrial(part, subPart, item, {});
+                        lastKey = created || `${item} [Trial 1]`;
+                    }
+                    sessionResults[part][subPart][lastKey] = sessionResults[part][subPart][lastKey] || {};
+                    sessionResults[part][subPart][lastKey][field] = value;
+                    // update trial count badge (in case a new trial has been created by input)
+                    try { updateItemUI(part, subPart, item); } catch (err) { /* ignore */ }
+                }
+            };
+
+            // Keydown listener to support Enter/Escape for reading passage score inputs
+            currentTableListeners.keydown = e => {
+                const tgt = e.target;
+                if (!tgt) return;
+                if (tgt.classList && tgt.classList.contains('passage-score-input')) {
+                    const item = tgt.dataset.item;
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // Create a new trial entry for this passage with the provided score
+                        const scoreVal = tgt.value.trim();
+                        // create trial via helper so undo can remove it
+                        createTrial(part, subPart, item, { score: scoreVal });
+                        try { updateItemUI(part, subPart, item); } catch (err) { /* ignore */ }
+                        // provide brief visual feedback by selecting nothing (no score buttons here)
+                        tgt.blur();
+                    } else if (e.key === 'Escape') {
+                        // revert to last saved value and blur
+                        const last = _getLatestFor(item);
+                        tgt.value = last.score || '';
+                        tgt.blur();
+                    }
+                }
+            };
+            
+            mainContent.addEventListener('click', currentTableListeners.click);
+            mainContent.addEventListener('input', currentTableListeners.input);
+            mainContent.addEventListener('keydown', currentTableListeners.keydown);
+            
+            document.getElementById('add-stimulus-form').addEventListener('submit', e => {
+                e.preventDefault();
+                const input = document.getElementById('new-stimulus-input');
+                const newItemText = input.value.trim();
+                if (newItemText) {
+                    if (isReadingPassage) {
+                        const firstSentenceEnd = newItemText.search(/[.!?]/) + 1;
+                        const title = firstSentenceEnd > 0 ? newItemText.substring(0, firstSentenceEnd).trim() : newItemText;
+                        const content = firstSentenceEnd > 0 ? newItemText.substring(firstSentenceEnd).trim() : "";
+                        const newPassage = { title, content };
+                        stimuliData[part][subPart].push(newPassage);
+                        // Initialize as Trial 1 for new passages (use helper so undo is aware)
+                        createTrial(part, subPart, title, { score: '', comment: '' });
+                        // Immediately inform parent of new custom content so it can persist added passages
+                        try { postCustomDecksToParent(); } catch (err) { console.warn('Failed to post custom decks after adding passage', err); }
+                    } else {
+                        let customGroup = stimuliData[part][subPart].find(g => g.level === "Custom Added Stimuli");
+                        if (!customGroup) {
+                            customGroup = { level: "Custom Added Stimuli", items: [] };
+                            stimuliData[part][subPart].push(customGroup);
+                        }
+                        if (!customGroup.items.includes(newItemText)) {
+                            customGroup.items.push(newItemText);
+                        }
+                        // Initialize as Trial 1 for custom added stimuli (use helper so undo is aware)
+                        createTrial(part, subPart, newItemText, { score: '', comment: '' });
+                        // Immediately inform parent so single-item additions are persisted in real time
+                        try { postCustomDecksToParent(); } catch (err) { console.warn('Failed to post custom decks after adding stimulus', err); }
+                    }
+                    renderTable(part, subPart);
+                }
+            });
+        }
+
+        function renderFlashCardMode(part, subPart) {
+            const isReadingPassage = part === "Part 3: Paragraph-Length Reading Passages";
+            const isCarrierPhrase = part === "Part 2: Carrier Phrases";
+            const isScriptTraining = part === "Part 6: Script Training Ideas";
+            const hasPlaceholder = (itemText) => /(\.\.\.|\[.*?\])/.test(itemText);
+            
+            const stimuli = isReadingPassage ? stimuliData[part][subPart] : stimuliData[part][subPart].flatMap(g => g.items);
+
+            let currentIndex = 0;
+            
+            if (!sessionResults[part]) sessionResults[part] = {};
+            if (!sessionResults[part][subPart]) sessionResults[part][subPart] = {};
+
+            // Trial helpers available to the whole flashcard mode closure
+            const _countTrialsFor = (base) => {
+                try { return Object.keys(sessionResults[part][subPart] || {}).filter(k => k.indexOf(base + ' [Trial ') === 0).length; }
+                catch (err) { return 0; }
+            };
+            const _lastTrialKeyFor = (base) => {
+                try {
+                    const keys = Object.keys(sessionResults[part][subPart] || {}).filter(k => k.indexOf(base + ' [Trial ') === 0);
+                    if (!keys || keys.length === 0) return null;
+                    let maxKey = keys[0];
+                    let maxN = 1;
+                    keys.forEach(k => {
+                        const m = k.match(/\[Trial (\d+)\]$/);
+                        const n = m ? Number(m[1]) : 0;
+                        if (n > maxN) { maxN = n; maxKey = k; }
+                    });
+                    return maxKey;
+                } catch (err) { return null; }
+            };
+            const _getLatestFor = (base) => {
+                const last = _lastTrialKeyFor(base);
+                return last ? sessionResults[part][subPart][last] : { score: '', comment: '' };
+            };
+
+            // Normalize labels and compute a display-oriented trial count.
+            // Pulling this out ensures Enter-commits and click-commits compute counts the same way.
+            const normalizeLabel = (s) => String(s || '').replace(/(\[.*?\]|\.\.\.)/g, '').trim();
+            const _trialCountForDisplay = (base) => {
+                try {
+                    const keys = Object.keys(sessionResults[part][subPart] || {});
+                    const baseNorm = normalizeLabel(base);
+                    return keys.filter(k => {
+                        const label = k.replace(/\s+\[Trial \d+\]$/, '');
+                        const labelNorm = normalizeLabel(label);
+                        return baseNorm ? labelNorm.indexOf(baseNorm) === 0 : false;
+                    }).length;
+                } catch (err) { return 0; }
+            };
+
+            // Centralized commit logic used by both click and Enter handlers so behavior is identical.
+            function commitTrial(saveLabel, score, comment) {
+                try {
+                    // Use helper to ensure undo stack records the new trial
+                    createTrial(part, subPart, saveLabel, (score !== undefined || comment !== undefined) ? { score: score, comment: comment } : {});
+
+                    // Update overlay badge and animate when increased (centralized)
+                    try { animateTrialCounter(saveLabel, true); } catch (err) { /* ignore */ }
+
+                    // Clear pending and inputs for next trial
+                    overlay._pending = {};
+                    try { const completionInput = overlay.querySelector('.carrier-completion-input'); if (completionInput) completionInput.value = ''; } catch (e) {}
+                    try { const commentInput = overlay.querySelector('.comment-input'); if (commentInput) commentInput.value = ''; } catch (e) {}
+                    try { const scoreInputEl = overlay.querySelector('input[data-field="score"]'); if (scoreInputEl) scoreInputEl.value = ''; } catch (e) {}
+                    overlay.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+                } catch (err) { console.warn('Error committing trial', err); }
+            }
+
+            // Centralized badge updater/animator so all flows (click/Enter/updateCard)
+            // produce the same animation and text for the trial counter.
+            function animateTrialCounter(baseLabel, force) {
+                try {
+                    const badge = overlay.querySelector('#trial-counter');
+                    if (!badge) return;
+                    const newCount = _trialCountForDisplay(baseLabel || '');
+                    const prev = overlay.dataset._lastTrialCount ? Number(overlay.dataset._lastTrialCount) : 0;
+                    badge.textContent = 'Trials: ' + newCount;
+                    // Diagnostic log to confirm we've entered the animator
+                    try { console.debug && console.debug('animateTrialCounter', { baseLabel, newCount, prev, force }); } catch (err) {}
+                    // No animation: only update when count changed or forced
+                    if (!(force || newCount > prev)) {
+                        // nothing more to do
+                    }
+                    overlay.dataset._lastTrialCount = String(newCount);
+                } catch (err) { /* ignore */ }
+            }
+
+            const overlay = document.createElement('div');
+            overlay.id = 'flashcard-overlay';
+            document.body.appendChild(overlay);
+            
+            const _scoreButtonsForOverlay = () => Array.from(overlay.querySelectorAll('.score-btn'));
+
+
+            function updateCard() {
+                const item = isReadingPassage ? stimuli[currentIndex].title : stimuli[currentIndex];
+                const content = isReadingPassage ? stimuli[currentIndex].content : item;
+                const result = _getLatestFor(item);
+
+                // Compute a user-friendly trial count for this flashcard.
+                const _trialCountForDisplay = (base) => {
+                    try {
+                        const keys = Object.keys(sessionResults[part][subPart] || {});
+                        // Normalize base by removing placeholders like '...' or '[...]'
+                        const normalize = (s) => String(s || '').replace(/(\[.*?\]|\.\.\.)/g, '').trim();
+                        const baseNorm = normalize(base);
+                        return keys.filter(k => {
+                            const label = k.replace(/\s+\[Trial \d+\]$/, '');
+                            const labelNorm = normalize(label);
+                            return baseNorm ? labelNorm.indexOf(baseNorm) === 0 : false;
+                        }).length;
+                    } catch (err) { return 0; }
+                };
+
+                let scoringHTML = '';
+                if (isReadingPassage) {
+                    scoringHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                            <div class="md:col-span-1">
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Score / Rate</label>
+                                <input type="text" class="w-full p-2 border border-slate-300 rounded-md text-sm" data-item="${item}" data-field="score" value="${result.score || ''}" placeholder="e.g., 95%, 120 WPM">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Comments</label>
+                                <input type="text" class="w-full p-2 border border-slate-300 rounded-md text-sm" data-item="${item}" data-field="comment" value="${result.comment || ''}" placeholder="Notes on fluency, etc.">
+                            </div>
+                        </div>
+                    `;
+                } else {
+                     scoringHTML = `
+                        <div class="flex-grow"><input type="text" class="w-full p-2 border border-slate-300 rounded-md text-sm comment-input" placeholder="Notes on quality, cues, etc."></div>
+                        <div class="flex-shrink-0">${renderScoreButtons(item, (_getLatestFor(item).score || ''))}</div>
+                    `;
+                }
+                
+                let cardContentHTML = '';
+                const isFillable = hasPlaceholder(item);
+
+                if (isReadingPassage) {
+                    cardContentHTML = `
+                        <h2 class="text-3xl font-bold text-center mb-4 flex-shrink-0">${item}</h2>
+                        <p class="text-lg text-left">${content.replace(/\n/g, '<br>')}</p>
+                    `;
+                } else if (isCarrierPhrase || isFillable) {
+                     const parts = item.split(/(\[.*?\]|\.\.\.)/);
+                     cardContentHTML = `
+                        <div class="flex-grow flex flex-col items-center justify-center text-center">
+                           <p class="text-4xl md:text-5xl font-bold text-slate-800">${parts[0]}</p>
+                           <input type="text" class="carrier-completion-input text-4xl md:text-5xl font-bold bg-transparent border-b-4 border-slate-300 focus:outline-none focus:border-blue-500 w-full text-center mt-4" placeholder="${(parts[1] || '...').replace(/[\[\]]/g, '')}"/>
+                           ${parts[2] ? `<p class="text-4xl md:text-5xl font-bold text-slate-800 mt-4">${parts[2]}</p>` : ''}
+                        </div>
+                    `;
+                } else {
+                    cardContentHTML = `
+                        <div class="flex-grow flex items-center justify-center">
+                           <p class="text-4xl md:text-6xl font-bold text-center">${content}</p>
+                        </div>
+                    `;
+                }
+
+
+                const trialCount = _trialCountForDisplay(item);
+
+                overlay.innerHTML = `
+                    <div class="flex justify-between items-center text-white mb-4 flex-shrink-0">
+                        <div class="text-lg font-bold">Flash-Card Mode: ${subPart}</div>
+                            <div class="text-lg">Card ${currentIndex + 1} of ${stimuli.length}</div>
+                        <div class="flex items-center gap-3">
+                            <div id="trial-counter" class="text-sm font-medium opacity-90 bg-white/10 px-3 py-1 rounded">Trials: ${trialCount}</div>
+                            <!-- Fullscreen toggle -->
+                            <button id="fullscreen-toggle" class="p-2 rounded-full hover:bg-white/20 text-xl leading-none">⛶</button>
+                            <!-- Make the exit button skipped in the Tab order so initial focus lands on the leftmost input -->
+                            <button id="exit-flashcard" tabindex="-1" class="p-2 rounded-full hover:bg-white/20 text-3xl leading-none">&times;</button>
+                        </div>
+                    </div>
+                    <div class="flex-grow flex items-center justify-center relative">
+                        <div class="w-full max-w-4xl h-full max-h-[70vh] bg-white rounded-2xl shadow-2xl flex flex-col p-6 flashcard-inner">
+                            <div class="flex-grow flex flex-col overflow-y-auto p-4">${cardContentHTML}</div>
+                            <div class="flex-shrink-0 flex items-end justify-between gap-4 mt-4">${scoringHTML}</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-4 flex-shrink-0">
+                        <button id="prev-card" class="flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50" ${currentIndex === 0 ? 'disabled' : ''}>&larr; Previous</button>
+                        <button id="next-card" class="flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50" ${currentIndex === stimuli.length - 1 ? 'disabled' : ''}>Next &rarr;</button>
+                    </div>
+                `;
+
+                // Centralized animation to ensure consistent visual behavior
+                try { animateTrialCounter(item); } catch (err) { /* ignore animation errors */ }
+
+                    // Fullscreen helpers
+                    const flashcardInner = overlay.querySelector('.flashcard-inner');
+                    const fsToggle = overlay.querySelector('#fullscreen-toggle');
+
+                    function isDocumentFullscreen() {
+                        return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+                    }
+
+                    function enterFullscreen() {
+                        try {
+                            if (overlay.requestFullscreen) return overlay.requestFullscreen();
+                            if (overlay.webkitRequestFullscreen) return overlay.webkitRequestFullscreen();
+                            if (overlay.msRequestFullscreen) return overlay.msRequestFullscreen();
+                        } catch (err) { console.warn('Fullscreen request failed', err); }
+                    }
+
+                    function exitFullscreen() {
+                        try {
+                            if (document.exitFullscreen) return document.exitFullscreen();
+                            if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+                            if (document.msExitFullscreen) return document.msExitFullscreen();
+                        } catch (err) { console.warn('Exit fullscreen failed', err); }
+                    }
+
+                    function syncFullscreenUI() {
+                        const active = isDocumentFullscreen();
+                        if (active) {
+                            overlay.classList.add('fullscreen');
+                            if (fsToggle) fsToggle.setAttribute('aria-pressed', 'true');
+                        } else {
+                            overlay.classList.remove('fullscreen');
+                            if (fsToggle) fsToggle.setAttribute('aria-pressed', 'false');
+                        }
+                    }
+
+                    if (fsToggle) {
+                        fsToggle.addEventListener('click', (ev) => {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            if (isDocumentFullscreen()) {
+                                exitFullscreen();
+                            } else {
+                                enterFullscreen();
+                            }
+                        });
+                    }
+
+                    // Keep UI in sync with fullscreenchange
+                    const fsChangeHandler = () => syncFullscreenUI();
+                    document.addEventListener('fullscreenchange', fsChangeHandler);
+                    document.addEventListener('webkitfullscreenchange', fsChangeHandler);
+                    document.addEventListener('msfullscreenchange', fsChangeHandler);
+
+                // Do not auto-focus any input on open. Instead, if the user presses Tab
+                // while the overlay is open (and focus isn't already inside an overlay input),
+                // move focus to the comment box. This preserves ArrowLeft/Right navigation
+                // when users haven't started tabbing.
+            }
+
+            function handleInteraction(e) {
+                const item = isReadingPassage ? stimuli[currentIndex].title : stimuli[currentIndex];
+                const isFillable = hasPlaceholder(item);
+
+                // Ensure sessionResults containers exist
+                sessionResults[part] = sessionResults[part] || {};
+                sessionResults[part][subPart] = sessionResults[part][subPart] || {};
+
+                
+
+                if (e.target.closest('.score-btn')) {
+                    const btn = e.target.closest('.score-btn');
+                    const score = btn.dataset.score;
+
+                    // For carrier/fillable items, capture the completion text; otherwise use base item
+                    const completionInput = overlay.querySelector('.carrier-completion-input');
+                    const commentInput = overlay.querySelector('.comment-input');
+                    const completionText = completionInput ? completionInput.value.trim() : '';
+                    const commentText = commentInput ? (commentInput.value || '').trim() : '';
+
+                    let saveLabel = item;
+                    if ((isCarrierPhrase || isFillable) && completionText) {
+                        if (isFillable) {
+                            saveLabel = item.replace(/(\[.*?\]|\.\.\.)/, `"${completionText}"`);
+                        } else {
+                            saveLabel = `${item} ${completionText}`;
+                        }
+                    }
+
+                    // Use centralized commit so click and Enter behave the same
+                    commitTrial(saveLabel, score, commentText);
+                    try { updateCard(); } catch (e) { /* ignore */ }
+                    // provide focus for quick repeated entries
+                    try { if (completionInput) completionInput.focus(); } catch (err) {}
+                }
+
+                if (e.target.matches('input[data-field]') || e.target.classList.contains('comment-input')) {
+                    const input = e.target;
+                    const field = input.dataset ? input.dataset.field : 'comment';
+                    const value = input.value;
+                    // Buffer edits for all flashcard subsets; commit only on Enter or score button
+                    overlay._pending = overlay._pending || {};
+                    overlay._pending[field] = value;
+                    // do not persist into sessionResults yet here
+                }
+            }
+
+                // For reading passages: Enter commits buffered score/comment as a new trial; Escape reverts
+                const overlayKeydown = (e) => {
+                    // Universal handler: Enter commits a trial for any flashcard subset when focused in inputs,
+                    // Escape reverts inputs. Works for reading passages, carrier phrases, scripts, and simple cards.
+                    const tgt = e.target;
+                    if (!tgt || !tgt.tagName) return;
+                    const tag = tgt.tagName.toUpperCase();
+                    if (tag !== 'INPUT' && tag !== 'TEXTAREA') return;
+
+                    const item = isReadingPassage ? (stimuli[currentIndex].title) : stimuli[currentIndex];
+                    if (!item) return;
+
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        overlay._pending = overlay._pending || {};
+
+                        // Resolve score/comment/completion from buffered pending or DOM
+                        const scoreInputEl = overlay.querySelector('input[data-field="score"]');
+                        const commentInputEl = overlay.querySelector('input[data-field="comment"]');
+                        const completionInputEl = overlay.querySelector('.carrier-completion-input');
+
+                        const scoreVal = (overlay._pending.score !== undefined) ? String(overlay._pending.score).trim() : (scoreInputEl ? scoreInputEl.value.trim() : '');
+                        const commentVal = (overlay._pending.comment !== undefined) ? String(overlay._pending.comment).trim() : (commentInputEl ? commentInputEl.value.trim() : '');
+                        const completionVal = (overlay._pending.completion !== undefined) ? String(overlay._pending.completion).trim() : (completionInputEl ? completionInputEl.value.trim() : '');
+
+                        let saveLabel = item;
+                        if ((isCarrierPhrase || hasPlaceholder(item)) && completionVal) {
+                            if (hasPlaceholder(item)) {
+                                saveLabel = item.replace(/(\[.*?\]|\.\.\.)/, `"${completionVal}"`);
+                            } else {
+                                saveLabel = `${item} ${completionVal}`;
+                            }
+                        }
+
+                        // Centralized commit
+                        commitTrial(saveLabel, scoreVal, commentVal);
+                        try { updateCard(); } catch (e) { /* ignore */ }
+                        return;
+                    }
+
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // revert to last saved values for this item
+                        const base = isReadingPassage ? item : item;
+                        const last = _getLatestFor(base);
+                        try {
+                            const scoreInput = overlay.querySelector('input[data-field="score"]');
+                            const commentInput = overlay.querySelector('input[data-field="comment"]');
+                            const completionInput = overlay.querySelector('.carrier-completion-input');
+                            if (scoreInput) scoreInput.value = last.score || '';
+                            if (commentInput) commentInput.value = last.comment || '';
+                            if (completionInput) completionInput.value = '';
+                        } catch (err) { /* ignore */ }
+                        overlay._pending = {};
+                        tgt.blur();
+                        return;
+                    }
+                };
+
+                overlay.addEventListener('keydown', overlayKeydown);
+            
+            function navigate(direction) {
+                currentIndex = Math.max(0, Math.min(stimuli.length - 1, currentIndex + direction));
+                updateCard();
+            }
+
+            const keydownHandler = (e) => {
+                // Ignore when typing into inputs
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                // Handle Tab navigation inside the overlay. We want to preserve
+                // Arrow navigation until the user starts tabbing. When Tab is pressed
+                // from root overlay focus, focus the preferred input depending on
+                // card type. When focus is already inside score buttons, advance
+                // between them with Tab.
+                if (e.key === 'Tab') {
+                    const active = document.activeElement;
+                    const isAtRootFocus = (active === document.body || active === overlay || active === document.documentElement);
+
+                    // If focus is on a score button, handle Tab to move within the score group
+                    if (active && active.classList && active.classList.contains('score-btn')) {
+                        const btns = Array.from(overlay.querySelectorAll('.score-btn'));
+                        const idx = btns.indexOf(active);
+                        if (idx >= 0) {
+                            // forward Tab
+                            if (!e.shiftKey) {
+                                const next = btns[idx + 1];
+                                if (next) {
+                                    e.preventDefault();
+                                    try { next.focus(); } catch (err) { /* ignore */ }
+                                    return;
+                                }
+                                // move to comment input when no more score buttons
+                                const commentEl = overlay.querySelector('.comment-input, input[data-field="comment"]');
+                                if (commentEl) {
+                                    e.preventDefault();
+                                    try { commentEl.focus(); if (typeof commentEl.select === 'function') commentEl.select(); } catch (err) { /* ignore */ }
+                                    return;
+                                }
+                            } else {
+                                // Shift+Tab: move to previous score button if exists
+                                const prev = btns[idx - 1];
+                                if (prev) {
+                                    e.preventDefault();
+                                    try { prev.focus(); } catch (err) { /* ignore */ }
+                                    return;
+                                }
+                            }
+                        }
+                        // allow default if nothing handled
+                    }
+
+                    // If Tab was pressed from a root-level focus (overlay not yet focused),
+                    // intercept and focus the preferred input for the card type
+                    if (isAtRootFocus && !e.shiftKey) {
+                        let focusTarget = null;
+                        try {
+                            if (isReadingPassage) {
+                                focusTarget = overlay.querySelector('input[data-field="score"]');
+                            } else if (isCarrierPhrase || hasPlaceholder(stimuli[currentIndex] || '')) {
+                                focusTarget = overlay.querySelector('.carrier-completion-input');
+                            }
+                            if (!focusTarget) focusTarget = overlay.querySelector('.comment-input, input[data-field="comment"]');
+                        } catch (err) { /* ignore */ }
+                        if (focusTarget) {
+                            e.preventDefault();
+                            try { focusTarget.focus(); if (typeof focusTarget.select === 'function') focusTarget.select(); } catch (err) { /* ignore */ }
+                            return;
+                        }
+                    }
+                }
+
+                // If Enter is pressed and a score button is focused (Tabbed to), activate it
+                if (e.key === 'Enter') {
+                    const active = document.activeElement;
+                    if (active && active.classList && active.classList.contains('score-btn')) {
+                        e.preventDefault();
+                        active.click();
+                        return;
+                    }
+                }
+
+                // Card navigation: ArrowLeft/ArrowRight or L/R
+                if ((e.key === 'ArrowRight' || e.key.toLowerCase() === 'r') && currentIndex < stimuli.length - 1) {
+                    e.preventDefault();
+                    navigate(1);
+                    return;
+                }
+                if ((e.key === 'ArrowLeft' || e.key.toLowerCase() === 'l') && currentIndex > 0) {
+                    e.preventDefault();
+                    navigate(-1);
+                    return;
+                }
+
+                // Escape closes the overlay
+                if (e.key === 'Escape') {
+                    try { overlay.removeEventListener('keydown', overlayKeydown); } catch (err) { /* ignore */ }
+                    try { document.removeEventListener('fullscreenchange', fsChangeHandler); document.removeEventListener('webkitfullscreenchange', fsChangeHandler); document.removeEventListener('msfullscreenchange', fsChangeHandler); } catch (err) {}
+                    try { if (isDocumentFullscreen()) exitFullscreen(); } catch (err) {}
+                    overlay.remove();
+                    window.removeEventListener('keydown', keydownHandler);
+                }
+            };
+
+            updateCard();
+            overlay.addEventListener('click', e => {
+                if (e.target.id === 'exit-flashcard') {
+                    try { overlay.removeEventListener('keydown', overlayKeydown); } catch (err) { /* ignore */ }
+                    try { document.removeEventListener('fullscreenchange', fsChangeHandler); document.removeEventListener('webkitfullscreenchange', fsChangeHandler); document.removeEventListener('msfullscreenchange', fsChangeHandler); } catch (err) {}
+                    try { if (isDocumentFullscreen()) exitFullscreen(); } catch (err) {}
+                    overlay.remove();
+                    window.removeEventListener('keydown', keydownHandler);
+                }
+                if (e.target.id === 'prev-card') navigate(-1);
+                if (e.target.id === 'next-card') navigate(1);
+                handleInteraction(e);
+            });
+            overlay.addEventListener('input', handleInteraction);
+            window.addEventListener('keydown', keydownHandler);
+        }
+
+        function renderScoreButtons(item, selectedScore) {
+            const scores = ['+', '+/-', '-'];
+            return `
+                <div class="flex space-x-2 bg-slate-100 p-2 rounded-full">
+                    ${scores.map(score => `
+                        <button type="button" class="score-btn hover:bg-slate-200" data-item="${item}" data-score="${score}">
+                            <span class="text-lg font-bold">${score}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        // Legacy print-button fallback (removed). The unified handler using
+        // buildReportHTML() is defined later and used for both embedded posting
+        // and standalone printing.
+        // --- Popover Logic ---
+        const howToUseBtn = document.getElementById('how-to-use-btn');
+        const popover = document.getElementById('how-to-use-popover');
+
+        function togglePopover(e) {
+            e.stopPropagation();
+            popover.classList.toggle('hidden');
+        }
+
+        function hidePopover() {
+            if (!popover.classList.contains('hidden')) {
+                popover.classList.add('hidden');
+            }
+        }
+
+        howToUseBtn.addEventListener('click', togglePopover);
+        
+        window.addEventListener('click', (e) => {
+            if (!popover.contains(e.target) && e.target !== howToUseBtn) {
+                hidePopover();
+            }
+        });
+        // Build the canonical report HTML used by print and by the parent-posting flow
+        function buildReportHTML() {
+
+            // Return a compact report body (host manages top-level metadata/prefix)
+            let reportHTML = `
+                <div class="p-4 space-y-8">
+            `;
+
+            // --- Summary Section ---
+            let summaryHTML = '<section class="space-y-4"><h3 class="text-xl font-bold border-b-2 border-slate-800 pb-1">Summary</h3>';
+            let hasSummaryData = false;
+
+            for (const part in sessionResults) {
+                for (const subPart in sessionResults[part]) {
+                    const results = sessionResults[part][subPart];
+                    const isReadingPassage = part === "Part 3: Paragraph-Length Reading Passages";
+                    const scoredItems = Object.values(results).filter(res => res.score && res.score.trim() !== '');
+                    
+                    if (scoredItems.length > 0) {
+                        hasSummaryData = true;
+                        summaryHTML += `<div class="p-2"><h3 class="font-semibold text-md">${part}: ${subPart}</h3>`;
+                        
+                        if (isReadingPassage) {
+                            summaryHTML += `<p class="text-sm text-slate-600">Scores/Rates recorded for ${scoredItems.length} passage(s).</p>`;
+                        } else {
+                            const total = scoredItems.length;
+                            const plusCount = scoredItems.filter(s => s.score === '+').length;
+                            const plusMinusCount = scoredItems.filter(s => s.score === '+/-').length;
+                            const minusCount = scoredItems.filter(s => s.score === '-').length;
+
+                            const plusPercent = ((plusCount / total) * 100).toFixed(0);
+                            const plusMinusPercent = ((plusMinusCount / total) * 100).toFixed(0);
+                            const minusPercent = ((minusCount / total) * 100).toFixed(0);
+
+                            summaryHTML += `
+                                <p class="text-sm text-slate-600">Total Scored Trials: ${total}</p>
+                                <p class="text-sm mt-1"><strong>Accuracy:</strong> ${plusPercent}% Accurate (+), ${plusMinusPercent}% Partial (+/-), ${minusPercent}% Off-Target/NR (-)</p>
+                            `;
+                        }
+                        summaryHTML += `</div>`;
+                    }
+                }
+            }
+            summaryHTML += '</section>';
+            if(hasSummaryData) {
+                reportHTML += summaryHTML;
+            }
+
+
+            // --- Detailed Results Section ---
+            for (const part in sessionResults) {
+                for (const subPart in sessionResults[part]) {
+                    const results = sessionResults[part][subPart];
+                    // scoredTrials are those with explicit score text (used for summary/accuracy)
+                    const scoredTrials = Object.keys(results).filter(k => results[k] && results[k].score && String(results[k].score).trim() !== '');
+                    // allTrials includes empty-score trials (NR) so they appear in the detailed report
+                    const allTrials = Object.keys(results || {});
+
+                    if (allTrials.length > 0) {
+                        reportHTML += `
+                            <section class="space-y-2">
+                                <h3 class="text-xl font-bold border-b-2 border-slate-800 pb-1">${part}: ${subPart}</h3>
+                                <table class="min-w-full text-sm">
+                                    <thead class="bg-slate-100">
+                                        <tr>
+                                            <th class="p-2 text-left font-semibold">Stimulus</th>
+                                            <th class="p-2 text-left font-semibold w-24">Score</th>
+                                            <th class="p-2 text-left font-semibold">Comments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y">
+                                        ${allTrials.map(item => `
+                                            <tr>
+                                                <td class="p-2">${item.replace(/ \[Trial \d+\]$/, '')}</td>
+                                                <td class="p-2">${(results[item] && results[item].score && String(results[item].score).trim() !== '') ? results[item].score : ''}</td>
+                                                <td class="p-2">${(results[item] && results[item].comment) ? results[item].comment : ''}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </section>
+                        `;
+                    }
+                }
+            }
+            
+            reportHTML += `
+                    <footer class="pt-12 text-center text-xs text-slate-500">
+                        <p>Report generated on ${new Date().toLocaleString()}</p>
+                    </footer>
+                </div>
+            `;
+
+            return reportHTML;
+        }
+
+    document.getElementById('printButton').addEventListener('click', (e) => {
+            // If embedded in an iframe, short-circuit the native print flow to avoid
+            // opening the print dialog inside the iframe (which can freeze the host).
+            // Prefer posting the generated report to the parent. This also acts as
+            // a fallback in case the earlier onclick override did not attach.
+            if (window !== window.parent) {
+                e.preventDefault();
+                try {
+                    const reportHtml = buildReportHTML();
+                    const payload = { type: 'speechDeck:report', data: reportHtml, sessionResults };
+                    try { parent.postMessage(payload, '*'); } catch (err) { console.warn('Failed to post report to parent (from fallback handler)', err); }
+                } catch (err) {
+                    console.warn('Error preparing report for parent (fallback handler):', err);
+                }
+                return;
+            }
+
+            const reportHTML = buildReportHTML();
+            document.getElementById('print-area').innerHTML = reportHTML;
+            window.print();
+        
+        });
+
+        // --- Final initialization ---
+        // The sessionDate input was removed when patient metadata was migrated
+        // to the host. Guard access here so initialization doesn't throw when
+        // that element is absent (embedded host will supply metadata).
+        try {
+            const sessionDateEl = document.getElementById('sessionDate');
+            if (sessionDateEl && 'valueAsDate' in sessionDateEl) {
+                sessionDateEl.valueAsDate = new Date();
+            }
+        } catch (e) {
+            // Non-fatal: continue initializing the app even if setting date fails
+            console.warn('Could not set sessionDate valueAsDate during init', e);
+        }
+        // Global undo (Ctrl+Z / Cmd+Z) - avoid interfering while user types
+        window.addEventListener('keydown', (e) => {
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const undoPressed = (isMac ? e.metaKey : e.ctrlKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z');
+            if (!undoPressed) return;
+            const active = document.activeElement;
+            // don't intercept when focus is inside inputs, textareas, or contenteditable
+            if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+            e.preventDefault();
+            doUndo();
+        });
+
+        renderPartSelector();
+
+        } catch (err) {
+            // Surface runtime initialization errors into the UI so the host can
+            // capture the message when debugging embedded iframe issues.
+            console.error('Initialization error in speech-deck:', err);
+            const errHtml = `<div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded">` +
+                `<h3 class="font-bold">Initialization error</h3><pre style="white-space:pre-wrap">${err.stack || err}</pre></div>`;
+            const pa = document.getElementById('print-area');
+            if (pa) pa.innerHTML = errHtml;
+            const mc = document.getElementById('main-content');
+            if (mc) mc.innerHTML = '<div class="p-4 text-sm text-slate-600">There was an error initializing the Speech Deck. See the report area for details.</div>';
+        }
+    });
+    </script>
+</body>
+</html>

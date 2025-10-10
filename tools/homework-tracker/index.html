@@ -27,7 +27,7 @@
         <script defer src="homework-tracker.js"></script>
 </head>
 <body>
-    <header class="app-header no-print">
+    <header class="app-header homework-reset no-print">
         <div class="branding">
             <a href="../../index.html" class="back-btn back-btn-inline-reset">← Session Wizard</a>
         </div>
@@ -145,7 +145,7 @@
                         <p>Click or drag components from the left panel to create your custom log template.</p>
                     </div>
                     <div class="template-header-actions">
-                        <button id="clearTemplate" class="clear-template-btn">Clear Log Template</button>
+                        <button id="clearTemplate" class="clear-template-btn btn btn-danger">Clear Log Template</button>
                     </div>
                 </div>
                 
@@ -204,9 +204,9 @@
 
     <div id="modalOverlay" class="modal-overlay no-print"></div>
     
-    <footer class="app-footer no-print">
-        <small>&copy; <span id="year"></span> Session Wizard. Modular SLP toolkit (alpha).</small>
-    </footer>
+    <footer class="app-footer no-print"></footer>
+    <script src="../../assets/js/app-meta.js"></script>
+    <script src="../../assets/js/footer.js"></script>
     <div class="page-actions">
         <button id="previewMode" class="secondary-btn">Preview Mode</button>
         <button id="printBtn" class="primary-btn">Print Log</button>

@@ -10,6 +10,156 @@
  * Notes:
  *  - Avoid introducing global symbol collisions; all additions should namespace future helpers or wrap in IIFEs.
  */
+// --- SpeechDeck stimuli data (full migrated object) ---
+// Migrated from SpeechDeck Functional Cards v5.html (copied from docs/speech-deck)
+const stimuliData = {
+    "Part 1: Short Functional Phrases": {
+        "Greetings & Social Phrases": [
+            { level: "1-2 Words", items: ["Hello", "Hi there", "Hey", "Good morning", "Good afternoon", "Good evening", "How are you?", "I'm fine", "I'm okay", "Not bad", "Thank you", "Thanks", "You're welcome", "No problem", "My pleasure", "Excuse me", "Pardon me", "See you", "So long", "Goodbye", "Take care"] },
+            { level: "3-4 Words", items: ["How are you doing?", "How's it going?", "I'm doing well.", "Pretty good, thanks.", "Can't complain.", "Thanks so much.", "I appreciate it.", "It's nice to see you.", "Good to see you.", "Have a good day.", "You too.", "See you later.", "See you soon.", "Talk to you soon.", "Take care now."] },
+            { level: "5-8 Words", items: ["It is very nice to finally meet you.", "How has your week been so far?", "I haven't seen you in a long time.", "Thanks for coming to see me today.", "I hope you have a great afternoon.", "Let's try to catch up again soon.", "It was really nice talking with you."] },
+            { level: "Longer Phrases", items: ["It's been a while, how have you been?", "I'm very pleased to meet you in person.", "It was really nice meeting you today.", "Thank you for your help, I really appreciate it.", "I hope you have a wonderful and relaxing weekend.", "What have you been up to lately?"] }
+        ],
+        "Personal & Biographical Information": [
+            { level: "1-3 Words", items: ["My name is...", "I'm...", "I live in...", "I am from...", "I am [age] years old.", "Yes, I am.", "No, I'm not.", "I'm married.", "I'm single.", "I'm retired."] },
+            { level: "4-5 Words", items: ["My full name is...", "You can call me...", "I live on [street name].", "My birthday is in [month].", "I have [number] children.", "I have [number] grandchildren.", "I used to work as a...", "I'm retired now.", "I'm originally from..."] },
+            { level: "5-8 Words", items: ["My phone number is [phone number].", "I was born in the year [year].", "I have lived here for many years.", "My oldest child's name is [name].", "I worked at [company] for [number] years.", "My favourite hobby is [hobby]."] },
+            { level: "Longer Phrases", items: ["My address is [number], [street name], [city].", "I was born in [city, province/country].", "I grew up in a small town called...", "Before I retired, I was a [profession].", "My children's names are [names].", "My spouse's name is [name]."] }
+        ],
+        "Requests": [
+            { level: "1-2 Words", items: ["Help, please.", "Water, please.", "The remote.", "The phone.", "My glasses.", "Come here.", "One moment.", "Just a minute.", "Stop that.", "Over here.", "A little more.", "That's enough."] },
+            { level: "3-4 Words", items: ["Can you help me?", "I need a napkin.", "Please pass the salt.", "Could you open this?", "I'd like some tea.", "I need some help.", "Turn the TV on.", "Turn the lights off.", "Can you repeat that?", "Please speak slowly.", "Could you check this?", "I need the nurse."] },
+            { level: "5-8 Words", items: ["Could you please pass me my book?", "I would like another cup of coffee.", "Can you please turn the volume up?", "Would you mind closing the door, please?", "I need some help with my shoes.", "Can you please get that for me?", "Please write that down on the board."] },
+            { level: "Longer Phrases", items: ["Could you please help me get dressed?", "I would like a glass of water, please.", "Can you please write that down for me?", "Would you mind turning the volume down?", "Could you grab my glasses from the table?", "I'm having trouble with this, can you assist?"] }
+        ],
+        "Expressing Feelings & Opinions": [
+            { level: "1-2 Words", items: ["I'm happy.", "I'm sad.", "I'm tired.", "I'm sore.", "I'm thirsty.", "I'm hungry.", "I'm cold.", "I'm hot.", "I agree.", "I disagree.", "That's good.", "That's bad.", "I like it.", "I don't like it.", "Of course.", "No way."] },
+            { level: "3-4 Words", items: ["I feel much better.", "I have a headache.", "I'm feeling frustrated.", "I'm a little confused.", "That's a good idea.", "I'm not sure about that.", "I think you're right.", "This is delicious.", "I'm in a lot of pain.", "I feel very weak.", "That makes me happy."] },
+            { level: "5-8 Words", items: ["I'm feeling a lot stronger today.", "I think that's a wonderful idea.", "I don't agree with that at all.", "This is the best I've felt all week.", "My pain is a little better now.", "I'm not very happy about this situation.", "That sounds like a lot of fun."] },
+            { level: "Longer Phrases", items: ["To be honest, I'm a little bit worried.", "I'm very excited about the visit today.", "I don't think that's the best way to do it.", "In my opinion, we should wait and see.", "I'm so proud of how much progress I've made.", "I'm disappointed that the event was cancelled."] }
+        ],
+        "Home & Daily Living": [
+            { level: "1-2 Words", items: ["I'm home.", "What's new?", "Time to eat.", "I'm tired.", "Good night.", "Where is it?", "It's lost.", "Clean up.", "Do the dishes."] },
+            { level: "3-4 Words", items: ["Where are my keys?", "What's for supper?", "The floor is wet.", "I need to rest.", "Turn off the stove.", "Lock the front door.", "Let's watch a movie.", "I'll be in the garden.", "I need to do laundry."] },
+            { level: "5-8 Words", items: ["Did you remember to take the garbage out?", "I can't find the remote control anywhere.", "What time do we need to leave?", "The dog needs to go for a walk.", "Can you help me with these groceries?", "I'm going to take a nap now.", "Let's sit on the porch for a while."] },
+            { level: "Longer Phrases", items: ["Could you please water the plants in the living room?", "I think I left my reading glasses on the nightstand.", "We need to make a grocery list for this week.", "Don't forget that your appointment is tomorrow morning.", "I'm going to read my book for a little while."] }
+        ],
+        "Questions": [
+            { level: "1-2 Words", items: ["What's that?", "What's new?", "Who is it?", "Where is it?", "When is it?", "Why not?", "How come?", "Are you sure?", "Is it time?", "Really?", "For me?"] },
+            { level: "3-4 Words", items: ["What time is it?", "What's for dinner?", "Where is the washroom?", "What is your name?", "How much is this?", "Can you spell that?", "Are you coming with us?", "Is this the right way?", "What day is it today?", "Can I ask something?", "What does that mean?", "Is that a fact?"] },
+            { level: "5-8 Words", items: ["What is on the schedule for today?", "Could you tell me where the cafeteria is?", "Do you know when the doctor will be here?", "What is the weather forecast for tomorrow?", "Can you explain that to me again?", "How long will the appointment take?", "Where did I put my wallet?"] },
+            { level: "Longer Phrases", items: ["What is the name of that new medication I'm taking?", "Could you please tell me how to get to the main lobby?", "Do you happen to know if the gift shop is open now?", "How much does that particular item cost with tax?", "Can you explain the difference between these two options?"] }
+        ],
+        "Transactional & Community Phrases": [
+            { level: "1-3 Words", items: ["Just looking.", "I'll take it.", "Debit, please.", "Cash or credit?", "A coffee, please.", "A small double-double.", "Do you have...?", "I need a stamp.", "Fill it up, please. (Gas)", "One ticket, please.", "I'd like this.", "That's all."] },
+            { level: "4-5 Words", items: ["I'm here for an appointment.", "How much is that all together?", "Do you have this in a different size?", "I'd like to make a return.", "Can I get a receipt, please?", "A table for two, please.", "I'd like to make a withdrawal.", "I need to fill a prescription.", "Does this bus go downtown?", "Where is the fitting room?"] },
+            { level: "5-8 Words", items: ["I have an appointment at three o'clock.", "Could I please have a bag for this?", "I'm looking for the cereal aisle.", "Do you take credit cards here?", "I'd like to book a haircut, please.", "This is the wrong size for me.", "Can you tell me where the library is?"] },
+            { level: "Longer Phrases", items: ["I have an appointment with Dr. [Name] at 2.", "I'm looking for the bread aisle, can you point me in the right direction?", "Could you please tell me if you have any more of these in the back?", "I'd like to book a follow-up appointment for next week, please.", "I need to mail this package to an address in Ontario."] }
+        ]
+    },
+    "Part 2: Carrier Phrases": {
+        "All Carrier Phrases": [
+            { level: "Carrier Phrases", items: ["I want the...", "I see a...", "I hear a...", "I feel...", "I smell...", "I need to...", "I have to...", "I like to...", "I love to...", "I plan to...", "I hope to...", "I don't want...", "I don't like...", "I don't understand...", "I can't find the...", "I can't remember the...", "I can't believe that...", "Can I have the... ?", "Can you pass the... ?", "Can we go to... ?", "Could you get me... ?", "Could you help me with... ?", "Where is the... ?", "When is the... ?", "Why is the... ?", "Who is the... ?", "How do you... ?", "How much is... ?", "How long does... ?", "How many... ?", "I'm looking for the...", "I'm thinking about...", "I'm worried about...", "I'm happy about...", "I'm excited about...", "I'm feeling...", "It looks like...", "It sounds like...", "It feels like...", "I have to go to the...", "Don't forget to...", "Did you remember to... ?", "The best part was...", "The worst part was...", "The funniest thing was...", "My favourite kind of... is...", "My least favourite... is...", "I'm not sure if...", "I was wondering if...", "The problem is that...", "The reason for this is...", "The next step is to...", "Before we do that, we should...", "After we finish, let's..."] }
+        ]
+    },
+    "Part 3: Paragraph-Length Reading Passages": {
+        "Reading Passages": [
+            { "title": "How Sleep Works", "content": "Sleep is more than just resting. It is a very important time for your brain and body. When you sleep, your brain works hard to sort and store memories from the day. This helps you learn and remember things. Your body also uses this time to repair muscles, grow tissue, and strengthen your immune system. Adults usually need seven to nine hours of sleep each night to feel their best. Not getting enough sleep can make it hard to focus and can affect your mood. A good night's sleep is one of the best things you can do for your health." },
+            { "title": "The Importance of Coral Reefs", "content": "Coral reefs are often called the \"rainforests of the sea.\" They are large underwater structures made of the skeletons of tiny animals called corals. Reefs are found in warm, clear ocean waters. They are home to thousands of different kinds of fish, plants, and animals. This makes them one of the most diverse ecosystems on Earth. Coral reefs also protect coastlines from large waves and storms. Sadly, many reefs are in danger because of pollution and climate change. Scientists are working hard to protect these beautiful and important underwater worlds." },
+            { "title": "The Story of the Guide Dog", "content": "For over a century, guide dogs have helped people who are blind or visually impaired to live more independently. The idea became popular after World War I, to help soldiers who had lost their sight. These special dogs, usually Labradors or Golden Retrievers, go through intense training. They learn to navigate around obstacles, stop at curbs, and ignore distractions. The bond between a guide dog and its owner is very strong. The dog provides not just safety, but also companionship and confidence. It is a partnership built on trust and communication." },
+            { "title": "The Story of Terry Fox", "content": "Terry Fox is one of Canada's greatest heroes. After losing his leg to cancer, he decided to run across the country to raise money for cancer research. He called his journey the Marathon of Hope. He started in St. John's, Newfoundland, in 1980. He ran almost a full marathon every single day for 143 days. He ran through six provinces. Sadly, his cancer returned, and he had to stop his run near Thunder Bay, Ontario. Terry Fox did not survive, but his legacy lives on. Every year, Canadians participate in the Terry Fox Run to continue his dream of finding a cure for cancer." },
+            { "title": "The Northern Lights", "content": "The Northern Lights, or Aurora Borealis, are a beautiful natural light show in the sky. They are often seen in Canada's northern regions, like the Yukon and Northwest Territories. The lights are caused by particles from the sun hitting the Earth's atmosphere. When these particles collide with gases, they create beautiful colours like green, pink, and purple. The lights dance and move across the night sky. Many Indigenous cultures have stories and legends about the lights. For them, the lights have a deep spiritual meaning. Seeing the Northern Lights is an unforgettable experience." },
+            { "title": "The Bluenose", "content": "The Bluenose was a fishing and racing schooner from Nova Scotia. It was launched in Lunenburg in 1921. The ship was designed to be a fast fishing vessel, but it became a racing legend. For 17 years, the Bluenose was the undefeated champion of the International Fisherman's Race. It became a symbol of Nova Scotia's shipbuilding and sailing skills. The Bluenose was so famous that it was put on the Canadian dime in 1937, where it still appears today. The original ship is gone, but a replica called the Bluenose II now sails as Nova Scotia's sailing ambassador." },
+            { "title": "The Invention of Basketball", "content": "Many people don't know that a Canadian invented the sport of basketball. His name was James Naismith. He was born in Ontario in 1861. He became a physical education teacher at a school in Massachusetts. In the winter of 1891, he was asked to create a new indoor game that was less rough than football. He came up with 13 basic rules, using peach baskets as hoops. The game was an instant success. Basketball quickly spread across the world, and today it is one of the most popular sports on the planet, all thanks to a creative Canadian teacher." },
+            { "title": "How Bees Make Honey", "content": "Honey starts as a sweet liquid called nectar, which bees collect from flowers. They use their long tongues to take up nectar and store it in a special stomach called a 'honey stomach.' Back at the hive, the bees pass the nectar to other worker bees. They chew the nectar for about half an hour, which adds special enzymes to it. Then, they spread the mixture into the honeycomb cells and fan it with their wings to help the water evaporate. This makes the nectar thick and turns it into the sweet honey we love to eat." },
+            { "title": "The Halifax Explosion", "content": "On December 6, 1917, a terrible accident happened in Halifax, Nova Scotia. A French ship carrying explosives collided with another ship in the harbour. The crash caused a huge explosion, the largest man-made blast before the atomic bomb. It destroyed a large part of the city. People from all over, especially from Boston, sent help right away. Every year, Halifax sends a special Christmas tree to Boston to say thank you for their kindness. This event changed Halifax forever and is an important part of Canadian history." },
+            { "title": "How to Pack a Suitcase Like a Pro", "content": "Packing a suitcase well can save you space and keep your clothes neat. Many travel experts say that rolling your clothes is better than folding them. Rolled clothes take up less room and get fewer wrinkles. For bigger items like jackets, it's best to fold them flat at the bottom. Put your shoes in bags along the sides of the suitcase to keep your clothes clean. Any small items or things you need to grab quickly should go on top. This simple method can make packing for your next trip much easier." },
+            { "title": "The Courage of Viola Desmond", "content": "Viola Desmond was a brave businesswoman from Halifax, Nova Scotia. In 1946, she went to a movie theatre in New Glasgow. Because she wanted to see better, she sat in the main floor section, which the theatre had reserved only for white visitors. She was told to move, but she refused. For this act of courage, she was arrested. Her story was not well known for many years, but it was an important moment in the fight for civil rights in Canada. Today, Viola Desmond is celebrated as a hero. Her face is on the Canadian ten-dollar bill to honour her stand against injustice." },
+            { "title": "The Mysterious Giant Squid", "content": "Deep in the ocean lives a mysterious creature called the giant squid. It is one of the largest animals in the world, growing up to 13 meters long. That's as long as a school bus! Giant squids have the largest eyes of any animal on Earth, as big as dinner plates. These huge eyes help them see in the dark, deep water. For a long time, no one had ever seen a live giant squid. Finally, in 2004, scientists took the first pictures of a giant squid in its natural home, solving a long-held mystery of the deep sea." },
+            { "title": "The Rideau Canal", "content": "The Rideau Canal is a famous waterway in Ontario, Canada, that connects the cities of Ottawa and Kingston. It was built almost 200 years ago for military reasons, to have a safe supply route. Today, the canal is used for fun. In the summer, people enjoy boating on it. In the winter, a part of the canal in Ottawa becomes the world's largest skating rink. The Rideau Canal is a UNESCO World Heritage Site, recognized for its history and beauty." },
+            { "title": "The Mystery of Yawning", "content": "Everyone yawns, but scientists are still not exactly sure why we do it. For a long time, people thought yawning was a sign that our body needed more oxygen. But studies have shown this is not true. A newer idea is that yawning helps to cool down our brains. When we are tired, our brain temperature can rise slightly. A big yawn brings a deep breath of cool air into our bodies, which can help bring the brain's temperature back to normal. And why is yawning contagious? Seeing someone else yawn might be a way our bodies show empathy." },
+            { "title": "The Klondike Gold Rush", "content": "In 1896, gold was discovered in a creek in the Yukon region of northwestern Canada. This news started one of the biggest gold rushes in history. Over 100,000 people tried to travel to the Klondike to find their fortune. The journey was very long and difficult. Many had to climb steep, icy mountains and travel down dangerous rivers. Most people who went to the Klondike did not get rich, but the gold rush changed the region forever. It led to the creation of the Yukon Territory and the growth of cities like Dawson City." },
+            { "title": "The Lifecycle of a Butterfly", "content": "A butterfly goes through four amazing stages in its life. This process is called metamorphosis. It begins when a butterfly lays its eggs on a leaf. From the egg hatches a larva, which we call a caterpillar. The caterpillar's main job is to eat and grow. Once it is big enough, it forms a chrysalis around itself. This is the pupa stage. Inside, the caterpillar completely changes its body. Finally, a beautiful butterfly emerges, ready to fly, drink nectar, and start the cycle all over again." },
+            { "title": "The Group of Seven", "content": "The Group of Seven were famous Canadian painters from the 1920s. They wanted to create a new style of art that was truly Canadian. They believed that Canada's wild landscape was its most important feature. They travelled by canoe and train to remote areas to sketch and paint. Their paintings are known for their bright colours and bold brush strokes. At first, some people thought their art was too different, but soon they became very popular. The Group of Seven helped Canada see the beauty of its own wilderness." },
+            { "title": "How GPS Works", "content": "GPS, which stands for Global Positioning System, helps us find our way. It works using a group of about 30 satellites that are always circling the Earth. Each satellite sends out a special signal. A GPS receiver, like the one in your phone or car, listens for these signals. When your receiver gets signals from at least four different satellites, it can figure out exactly where you are. It does this by measuring the time it takes for each signal to travel from the satellite to you. It's like a very, very smart ruler in the sky." },
+            { "title": "How to Brew a Perfect Cup of Tea", "content": "Making a great cup of tea is simple, but a few details matter. First, start with fresh, cold water. If you are making black tea, bring the water to a full boil. For green tea, the water should be hot but not boiling, as boiling water can make it taste bitter. Use one tea bag or one teaspoon of loose tea leaves for each cup. Let the tea steep, or sit in the hot water, for the right amount of time. Black tea usually needs three to five minutes, while green tea only needs one to three minutes. Steeping for too long can also make tea taste bitter." },
+            { "title": "The Invention of the Telephone", "content": "The telephone was invented by Alexander Graham Bell in 1876. Bell was a scientist who was working on ways to help deaf people. He was trying to send speech over electrical wires. One day, while working on his device, he accidentally spilled some acid on his pants. He called out to his assistant in another room, saying, 'Mr. Watson, come here! I want to see you.' Watson heard Bell's voice clearly through the machine. This was the very first telephone call. Bell's invention completely changed the way people communicate over long distances." },
+            { "title": "The Water Cycle", "content": "The Earth has a limited amount of water, which is always moving in a process called the water cycle. It starts with evaporation, when the sun heats up water in oceans and lakes, turning it into a gas called water vapour. This vapour rises into the air. As it gets higher and colder, it turns back into liquid water drops, forming clouds. This is called condensation. When the clouds get too full of water, the water falls back to Earth as rain, snow, or hail. This is called precipitation. The water then collects in rivers and oceans, ready to start the cycle all over again." }
+        ]
+    },
+    "Part 4: Conversation Topics & Starters": {
+        "Food & Cooking": [
+            { level: "Simple Prompts", items: ["What's your favourite food?", "Do you prefer coffee or tea?", "What did you have for breakfast?", "Do you like to cook?", "Do you prefer sweet or salty snacks?", "What is your favourite fruit?"] },
+            { level: "Intermediate Prompts", items: ["What's a meal you enjoy cooking?", "Are there any foods you dislike?", "What is a traditional food from your family's culture?", "What's your favourite restaurant?", "Do you prefer eating at home or eating out? Why?", "What is a food that reminds you of your childhood?"] },
+            { level: "Complex Prompts", items: ["Describe the best meal you've ever had. Where were you and what made it so special?", "If you were to host a dinner party, what would you serve your guests?", "Walk me through the steps of a recipe you know by heart.", "How has your taste in food changed over the years?"] }
+        ],
+        "Travel & Geography": [
+            { level: "Simple Prompts", items: ["What's your favourite season?", "Do you prefer the city or the country?", "Do you like hot weather or cold weather?", "Have you ever been on a boat?", "Have you ever been to Toronto?", "Do you prefer the beach or the mountains?"] },
+            { level: "Intermediate Prompts", items: ["What is the most beautiful place you have ever visited in Canada?", "If you could travel anywhere in the world, where would you go?", "Describe your hometown.", "What do you like about living in your current city/town?", "Tell me about a trip you took as a child."] },
+            { level: "Complex Prompts", items: ["Talk about a memorable trip you took. What went well and what challenges did you face?", "What advice would you give to a tourist visiting your province for the first time?", "If you had to move to another country, which one would you choose and why?"] }
+        ],
+        "Hobbies & Interests": [
+            { level: "Simple Prompts", items: ["Do you like to read?", "What kind of music do you listen to?", "Do you watch sports?", "Do you have a pet?", "Do you like movies?", "Do you like to garden?"] },
+            { level: "Intermediate Prompts", items: ["What do you like to do on the weekend?", "Tell me about your favourite movie or TV show.", "What was the last book you read?", "Do you play any musical instruments or games?"] },
+            { level: "Complex Prompts", items: ["Explain the rules of your favourite sport or game.", "Describe a hobby you are passionate about and what you enjoy about it."] }
+        ],
+        "Personal History & Family": [
+            { level: "Simple Prompts", items: ["Where did you grow up?", "Do you have brothers or sisters?", "Are you married?", "Do you have children?", "Do you have grandchildren?", "What colour are your eyes?"] },
+            { level: "Intermediate Prompts", items: ["What was your first job?", "Tell me about your family.", "What is a favourite memory from your childhood?", "What were you like as a teenager?"] },
+            { level: "Complex Prompts", items: ["What is one of the most important lessons you have learned in your life?", "Describe a person who has had a major influence on you."] }
+        ],
+        "Work & Education": [
+            { level: "Simple Prompts", items: ["Did you like school?", "What was your favourite subject?", "Did you work?", "What was your job?"] },
+            { level: "Intermediate Prompts", items: ["Describe a typical day at your old job.", "What was the best part of your job? What was the worst part?"] },
+            { level: "Complex Prompts", items: ["What was the most challenging project you ever worked on?", "What advice would you give to a young person starting their career today?"] }
+        ],
+        "Hypotheticals & Opinions": [
+            { level: "Simple Prompts", items: ["What's your favourite animal?", "What's your favourite colour?", "Are you a morning person or a night person?"] },
+            { level: "Intermediate Prompts", items: ["If you could have any superpower, what would it be?", "What is more important: being rich or being happy?"] },
+            { level: "Complex Prompts", items: ["If you won the lottery, what are the first five things you would do?", "If you could give one piece of advice to your younger self, what would it be?"] }
+        ]
+    },
+    "Part 5: Functional Homework Tasks": {
+        "Homework Assignments": [
+            { level: "Tasks", items: [
+                "Order a Coffee: Go to a coffee shop (like Tim Hortons or a local cafe) and order your favourite drink and a food item.",
+                "Call for Business Hours: Find the phone number for a local store or library. Call them and ask, \"Hello, could you please tell me what your hours are for this Saturday?\"",
+                "Order a Pizza: Call a local pizza place. Ask for their specials and then order a pizza for pickup or delivery. Be prepared to give your name, phone number, and address.",
+                "Ask for a Photo: In a public place, ask a friendly-looking person: \"Excuse me, would you mind taking a picture for me?\"",
+                "Make a Doctor's Appointment: Call your family doctor's office and say, \"Hello, I'd like to book an appointment with Dr. Brown, please.\"",
+                "Leave a Voicemail: Call a friend or family member and leave a clear, concise voicemail. For example: \"Hi (Name), it's (your name). I'm just calling to say hello. Give me a call back when you have a chance. My number is (phone number).\"",
+                "Ask for Directions in a Store: Approach a staff member in a grocery store or mall and ask for directions to a specific item or store. For example, \"Excuse me, can you tell me where I can find the milk?\"",
+                "Make a Restaurant Reservation: Call a restaurant and say, \"Hello, I'd like to make a reservation for 5 people on Tuesday at six, under (your name).\"",
+                "Return an Item: Go to a store with a receipt and an item you want to return. Say, \"Hello, I'd like to return this item, please. I have my receipt.\"",
+                "Ask for Help at a Hardware Store: Find an employee and ask for help finding a specific item. For example, \"Excuse me, I'm looking for batteries. Can you tell me which aisle they're in?\"",
+                "Book a Taxi: Call a taxi company and say, \"Hello, I'd like to book a taxi to [address], please. I'll be ready in ten minutes.\"",
+                "Report a Simple Problem: Practice calling a landlord or building manager. \"Hello, this is (your name) in apartment 18. I'm calling because my kitchen sink is leaking.\"",
+                "Thank Someone for a Gift: Call or speak to someone who gave you a gift. \"Thank you so much for the [gift]. It was very thoughtful of you.\"",
+                "Check on an Order: Call a store where you ordered something and ask for an update. \"Hello, I'm calling to check on the status of an order I placed last week under the name [Name].\""
+            ] }
+        ]
+    },
+    "Part 6: Script Training Ideas": {
+        "Script Topics": [
+            { level: "Potential Script Topics", items: [
+                "Your Tim Hortons/Starbucks Order: \"I'll have a medium coffee, double-double, and a toasted everything bagel with butter, please.\"",
+                "A Detailed Restaurant Order: \"I'll start with the garden salad with Italian dressing. For my main course, I'll have the salmon, but I'd like roasted potatoes instead of the rice, please.\"",
+                "Introducing Yourself: \"Hello, my name is [Name]. It's nice to meet you.\"",
+                "Introducing Someone Else: \"This is my friend, [Name]. We've known each other for years.\"",
+                "Basic Biographical Information: \"I live in Halifax with my husband. I have 2 children. Their names are Oliver and Mary and they are 12 and 15.\"",
+                "Explaining Your Speech Difficulty (if comfortable): \"I've had a stroke, so sometimes my speech is a bit slow. Please be patient with me.\" OR \"I have a condition called apraxia, which can make it hard for me to get my words out.\"",
+                "Your Medical History Summary: \"I had a stroke on March 8th. My main challenges are with weakness on my right side and speech.\"",
+                "Leaving a Voicemail for a Doctor's Office: \"Hello, this is a message for Dr. Mason. My name is George Andrews, date of birth January 5th, 1965. I'm calling to book an appointment. You can reach me at (phone number). Thank you.\"",
+                "Telling a Favourite Joke or Short Story.",
+                "Describing Your Former Profession: \"For 30 years, I worked as a sales rep for (company). I was responsible for (brief description of duties).\"",
+                "Explaining an Allergy: \"I have a severe allergy to peanuts. Is this dish made with any peanut products?\"",
+                "Your \"Go-To\" Family Story: A short, rehearsed anecdote about a funny or memorable family event.",
+                "Answering \"How was your weekend?\": \"It was good, thanks. I [did an activity with someone].\""
+            ] }
+        ]
+    }
+};
+
 // === MODULE: Print / Export (Printable Page) ===
 // Printable Page functionality
 // Ensure this runs only once after DOM is loaded
@@ -33,112 +183,63 @@ window.addEventListener('DOMContentLoaded', () => {
             // Start building printable HTML
             let html = `<!DOCTYPE html><html><head><title>Session Data</title><style>
                 :root { --print-bg: var(--tdst-surface, var(--color-surface, #fff)); --print-text: var(--tdst-text, var(--color-text, #000)); --print-muted: var(--tdst-muted, var(--color-border, #999)); }
-                body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 16px; background: var(--print-bg); line-height: 1.5; color: var(--print-text); }
-                h1 { font-size: 1.6em; margin-bottom: 0.5em; color: var(--color-accent, #2196f3); border-bottom: 1px solid var(--color-accent, #2196f3); padding-bottom: 0.2em; font-weight: 600; }
-                h2 { font-size: 1.1em; margin-top: 1em; margin-bottom: 0.4em; color: var(--print-text); font-weight: 500; }
-                .meta-row { margin-bottom: 1em; font-size: 1em; padding: 8px; background: var(--print-bg); border-left: 2px solid var(--print-text); }
-                .meta-label { font-weight: 600; margin-right: 0.5em; color: var(--print-text); }
-                .component-block { margin-bottom: 1em; page-break-inside: avoid; border: 1px solid var(--print-muted); padding: 10px; border-radius: 2px; }
-                .component-title { font-weight: 600; font-size: 1.05em; margin-bottom: 0.4em; color: var(--print-text); border-bottom: 1px solid var(--print-muted); padding-bottom: 0.2em; }
-                .component-content { margin-bottom: 0.4em; white-space: pre-wrap; color: var(--print-text); }
-                table { border-collapse: collapse; width: 100%; margin-bottom: 0.6em; font-size: 0.9em; }
-                th, td { border: 1px solid var(--print-muted); padding: 4px 6px; text-align: left; }
+                /* Base print layout (compact by default) */
+                body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 12px; background: var(--print-bg); line-height: 1.3; color: var(--print-text); font-size: 10pt; }
+                h1 { font-size: 1.25em; margin: 0 0 6px 0; color: var(--color-accent, #2196f3); border-bottom: 1px solid var(--color-accent, #2196f3); padding-bottom: 0.2em; font-weight: 600; }
+                h2 { font-size: 1.02em; margin: 6px 0 2px 0; color: var(--print-text); font-weight: 500; }
+                .meta-row { margin-bottom: 6px; font-size: 9.5pt; padding: 6px 4px; background: var(--print-bg); border-left: 1.5px solid var(--print-text); display:flex; gap:8px; align-items:center; }
+                .meta-label { font-weight: 600; margin-right: 0.4em; color: var(--print-text); }
+                .component-block { margin-bottom: 6px; page-break-inside: avoid; border: 1px solid var(--print-muted); padding: 6px; border-radius: 2px; }
+                .component-title { font-weight: 600; font-size: 1em; margin-bottom: 4px; color: var(--print-text); border-bottom: 1px solid var(--print-muted); padding-bottom: 0.15em; }
+                .component-content { margin-bottom: 4px; /* avoid preserving user blank lines in print */ white-space: normal; color: var(--print-text); }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 4px; font-size: 9pt; }
+                th, td { border: 1px solid var(--print-muted); padding: 3px 5px; text-align: left; }
                 th { background: var(--tdst-surface-alt, var(--color-surface-alt, #f0f0f0)); font-weight: 600; color: var(--print-text); }
-                tbody tr:nth-child(even) { background: color-mix(in srgb, var(--tdst-surface, var(--color-surface, #fff)) 95%, var(--tdst-muted, var(--color-border, #999)) 5%); }
-                .stats-row { margin-bottom: 3px; font-size: 0.9em; }
-                .swallow-stats-display, .swallow-analysis-container { margin-bottom: 0.4em; padding: 6px; background: var(--print-bg); border-radius: 2px; }
+                tbody tr:nth-child(even) { background: transparent; }
+                .stats-row { margin-bottom: 2px; font-size: 0.9em; }
+                .swallow-stats-display, .swallow-analysis-container { margin-bottom: 4px; padding: 4px; background: var(--print-bg); border-radius: 2px; }
                 .trial-success { color: var(--print-text); font-weight: 600; }
                 .trial-fail { color: var(--print-text); font-weight: 600; text-decoration: underline; }
-                .status-indicator { font-weight: 600; margin-bottom: 0.3em; padding: 4px; border-radius: 2px; }
-                .status-pass { background: var(--tdst-surface-alt, var(--color-surface-alt, #f0f0f0)); color: var(--print-text); border: 1px solid var(--print-muted); }
-                .status-fail { background: var(--tdst-surface-alt, var(--color-surface-alt, #f0f0f0)); color: var(--print-text); border: 1px solid var(--print-muted); }
-                .status-in-progress { background: var(--tdst-surface-alt, var(--color-surface-alt, #f0f0f0)); color: var(--print-text); border: 1px solid var(--print-muted); }
+                .status-indicator { font-weight: 600; margin-bottom: 2px; padding: 3px; border-radius: 2px; }
+                .status-pass, .status-fail, .status-in-progress { background: var(--tdst-surface-alt, var(--color-surface-alt, #f0f0f0)); color: var(--print-text); border: 1px solid var(--print-muted); padding: 2px 4px; }
                 /* Discourse Transcript Editor Styles */
                 .discourse-transcript-textarea[contenteditable] { font-family: inherit; }
-                .discourse-transcript-textarea[contenteditable][data-placeholder]:empty::before {
-                    content: attr(data-placeholder);
-                    color: #666;
-                    font-style: italic;
-                    pointer-events: none;
-                }
+                .discourse-transcript-textarea[contenteditable][data-placeholder]:empty::before { content: attr(data-placeholder); color: #666; font-style: italic; pointer-events: none; }
                 .discourse-transcript-textarea[contenteditable]:focus::before { display: none; }
-                .excluded-word { 
-                    color: #000 !important; 
-                    text-decoration: line-through; 
-                    background-color: #f0f0f0; 
-                    padding: 1px 2px;
-                    border-radius: 1px;
-                    border: 1px solid #999;
-                }
-                .ciu-word {
-                    color: #000 !important;
-                    background-color: #f0f0f0;
-                    padding: 1px 2px;
-                    border-radius: 1px;
-                    font-weight: 600;
-                    border: 1px solid #999;
-                }
-                /* Print-specific styles for discourse transcript markings */
-                .discourse-transcript-print {
-                    line-height: 1.5;
-                    margin: 6px 0;
-                    padding: 6px;
-                    background: #f8f8f8;
-                    border-left: 2px solid #333;
-                    border-radius: 2px;
-                }
+                .excluded-word { color: #000 !important; text-decoration: line-through; background-color: #f0f0f0; padding: 1px 2px; border-radius: 1px; border: 1px solid #999; }
+                .ciu-word { color: #000 !important; background-color: #f0f0f0; padding: 1px 2px; border-radius: 1px; font-weight: 600; border: 1px solid #999; }
+                /* Print-specific small adjustments */
+                .discourse-transcript-print { line-height: 1.35; margin: 3px 0; padding: 4px; background: #f8f8f8; border-left: 1.5px solid #333; border-radius: 2px; }
+
+                /* Speech-deck specific compact rules (used when embedding speech-deck report) */
+                .speech-deck-embedded-report { font-size: 9.5pt; }
+                .speech-deck-summary-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px; }
+                .speech-deck-summary-title { font-weight:600; }
+                .speech-deck-summary-total { font-size:0.95em; color:var(--print-muted); }
+                .speech-deck-summary .component-block { padding:6px; margin-bottom:6px; }
+                .speech-deck-summary p, .speech-deck-summary .component-content { margin:2px 0; }
+
+                /* Collapse margins for all elements inside component-content (prevent large vertical gaps) */
+                .component-content * { margin-top: 2px !important; margin-bottom: 2px !important; }
+                .component-content p, .component-content h1, .component-content h2, .component-content h3, .component-content ul, .component-content ol, .component-content li { margin: 2px 0 !important; padding: 0 !important; }
+                .component-content br { display: none; }
+
                 @media print {
-                    body { padding: 12px; font-size: 10pt; }
-                    .excluded-word { 
-                        color: #000 !important; 
-                        text-decoration: line-through !important; 
-                        background-color: #f0f0f0 !important; 
-                        padding: 1px 2px !important;
-                        border-radius: 1px !important;
-                        border: 0.5pt solid #999 !important;
-                    }
-                    .ciu-word {
-                        color: #000 !important;
-                        background-color: #f0f0f0 !important;
-                        padding: 1px 2px !important;
-                        border-radius: 1px !important;
-                        font-weight: 600 !important;
-                        border: 0.5pt solid #999 !important;
-                    }
-                    .discourse-transcript-print {
-                        background: #f8f8f8 !important;
-                        border-left: 1pt solid #333 !important;
-                        margin: 4pt 0 !important;
-                        padding: 4pt !important;
-                    }
-                    .component-block { 
-                        border: 0.5pt solid #999; 
-                        margin-bottom: 8pt; 
-                        padding: 6pt;
-                    }
-                    h1 { 
-                        border-bottom: 1pt solid #2196f3; 
-                        color: #2196f3;
-                        font-size: 14pt;
-                        margin-bottom: 6pt;
-                    }
-                    h2 {
-                        font-size: 11pt;
-                        margin-top: 6pt;
-                        margin-bottom: 3pt;
-                    }
-                    .meta-row {
-                        padding: 4pt;
-                        margin-bottom: 6pt;
-                        font-size: 9pt;
-                    }
-                    table {
-                        font-size: 8pt;
-                    }
-                    th, td {
-                        padding: 2pt 3pt;
-                        border: 0.5pt solid #999;
-                    }
+                    /* keep print compact and avoid large default margins */
+                    body { padding: 8pt; font-size: 10pt; line-height: 1.25; }
+                    .component-block { border: 0.5pt solid #999; margin-bottom: 4pt; padding: 4pt; }
+                    h1 { border-bottom: 1pt solid #2196f3; color: #2196f3; font-size: 13pt; margin-bottom: 4pt; }
+                    h2 { font-size: 11pt; margin-top: 4pt; margin-bottom: 2pt; }
+                    .meta-row { padding: 3pt; margin-bottom: 4pt; font-size: 9pt; }
+                    table { font-size: 8.5pt; margin-bottom: 2pt; }
+                    th, td { padding: 2pt 3pt; border: 0.4pt solid #999; }
+                    .discourse-transcript-print { margin: 2pt 0; padding: 3pt; }
+                    /* speech-deck embedded tweaks */
+                    .speech-deck-embedded-report { font-size: 9pt; }
+                    .speech-deck-summary-header { margin-bottom: 2pt; }
+                    .speech-deck-summary .component-block { padding: 3pt; margin-bottom: 3pt; }
+                    /* further collapse any remaining spacing inside reports */
+                    .speech-deck-summary p, .speech-deck-summary div, .speech-deck-summary span { margin: 2px 0 !important; }
                 }
             </style></head><body>`;
 
@@ -150,6 +251,58 @@ window.addEventListener('DOMContentLoaded', () => {
                 const labelEl = compEl.querySelector('.component-label, .component-label-editable');
                 const label = labelEl ? (labelEl.textContent || labelEl.value || '').trim() : '';
                 if (!label) return;
+
+                // Special-case: Speech Deck component
+                const isSpeechDeck = (typeof compEl.getAttribute === 'function' && compEl.getAttribute('data-type') === 'speech-deck') || (compEl._componentInstance && compEl._componentInstance.config && compEl._componentInstance.config.type === 'speech-deck');
+                if (isSpeechDeck) {
+                    const instance = compEl._componentInstance || {};
+                    const reportHtml = instance.data && instance.data.speechDeckReportHtml;
+                    html += `<div class='component-block'><div class='component-title'>${label}</div>`;
+                    if (reportHtml) {
+                        // Sanitize Speech Deck report HTML to collapse repeated blank lines and <br> sequences
+                        let safeReport = String(reportHtml);
+                        // Replace multiple <br> (or variants) with a single <br>
+                        safeReport = safeReport.replace(/(<br\s*\/?>\s*){2,}/gi, '<br/>');
+                        // Remove empty paragraph-like tags: <p>\s*</p>
+                        safeReport = safeReport.replace(/<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '');
+                        // Collapse runs of whitespace-only lines
+                        safeReport = safeReport.replace(/(\n\s*){2,}/g, '\n');
+                        // Trim leading/trailing whitespace
+                        safeReport = safeReport.trim();
+
+                        // Inject sanitized content
+                        html += `<div class='component-content'>${safeReport}</div>`;
+                    } else {
+                        // Fallback: build a compact summary from persisted sessionResults
+                        const sessionResults = (instance.data && instance.data.sessionResults) || {};
+                        let partHtml = '<div class="component-content">';
+                        partHtml += '<strong>Practice Results (summary)</strong><br/>';
+                        let total = 0, scored = 0;
+                        Object.keys(sessionResults).forEach(p => {
+                            Object.keys(sessionResults[p] || {}).forEach(sub => {
+                                const entries = sessionResults[p][sub] || {};
+                                const keys = Object.keys(entries || {});
+                                const partCount = keys.length;
+                                let partScored = 0;
+                                keys.forEach(k => {
+                                    const e = entries[k] || {};
+                                    // Count any non-empty score as scored; 'NR' is part of the Off-Target/NR label and should be treated as a valid score
+                                    if (e && e.score !== undefined && e.score !== null && String(e.score).trim() !== '') partScored++;
+                                });
+                                total += partCount;
+                                scored += partScored;
+                                const pct = partCount ? Math.round((partScored / partCount) * 100) : 0;
+                                partHtml += `<div><strong>${p} — ${sub}:</strong> ${partCount} trials, ${partScored} scored (${pct}%)</div>`;
+                            });
+                        });
+                        const partUnrated = Math.max(0, total - scored);
+                        partHtml += `<div style="margin-top:6px"><em>${total} total trials, ${scored} scored — Rated: ${scored} / ${total} (Unrated: ${partUnrated})</em></div>`;
+                        partHtml += '</div>';
+                        html += partHtml;
+                    }
+                    html += `</div>`;
+                    return; // Skip the rest of the generic handlers for this component
+                }
 
                 html += `<div class='component-block'><div class='component-title'>${label}</div>`;
 
@@ -257,7 +410,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     const originalHeader = paceTable.querySelector('thead').innerHTML;
                     // Remove the last header column (delete button column)
                     const cleanHeader = originalHeader.replace(/<th[^>]*><\/th>\s*(?=<\/tr>)/, '');
-                    html += `<table class='pace-table'><thead>${cleanHeader}</thead><tbody>`;
+                    html += `<table class='pace-table data-table'><thead>${cleanHeader}</thead><tbody>`;
                     rows.forEach(row => {
                         html += '<tr>';
                         // Trial number
@@ -284,7 +437,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     const rows = practiceTable.querySelectorAll('tbody tr');
                     const originalHeader = practiceTable.querySelector('thead').innerHTML;
                     const cleanHeader = originalHeader.replace(/<th[^>]*><\/th>\s*(?=<\/tr>)/, '');
-                    html += `<table class='practice-table'><thead>${cleanHeader}</thead><tbody>`;
+                    html += `<table class='practice-table data-table'><thead>${cleanHeader}</thead><tbody>`;
                     rows.forEach(row => {
                         const trialCell = row.children[0];
                         const stimulusCell = row.children[1];
@@ -301,9 +454,10 @@ window.addEventListener('DOMContentLoaded', () => {
                         performanceValue = performanceMap[performanceValue] || performanceValue;
                         const supportRadio = supportCell.querySelector('div[data-type="level"] input:checked');
                         let supportValue = supportRadio ? supportRadio.value : '';
-                        // Ensure consistent capitalization (already correct in source but just in case)
-                        if (supportValue.toLowerCase() === 'independent') supportValue = 'Independent';
-                        if (supportValue.toLowerCase() === 'cued') supportValue = 'Cued';
+                        // Normalize legacy support level values to current labels
+                        // Older data may use 'Independent'/'Cued' — normalize them to 'Accurate'/'Partial'
+                        if (supportValue.toLowerCase() === 'independent') supportValue = 'Accurate';
+                        if (supportValue.toLowerCase() === 'cued') supportValue = 'Partial';
                         const commentsValue = commentsCell.querySelector('[data-type="comments"]')?.value || '';
 
                         html += '<tr>' +
@@ -339,7 +493,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     // Build arrays of visible headers and their keys, skipping any with data-key 'delete'
                     const visible = ths.map((th, idx) => ({ el: th, key: th.dataset.key || `col${idx}`, idx })).filter(h => h.key !== 'delete');
                     const cleanHeader = `<tr>${visible.map(h => `<th>${(h.el.textContent || '').trim()}</th>`).join('')}</tr>`;
-                    html += `<table class='custom-data-table'><thead>${cleanHeader}</thead><tbody>`;
+                    html += `<table class='custom-data-table data-table'><thead>${cleanHeader}</thead><tbody>`;
 
                     // For each row, extract cells by using the visible header indices so we don't pick the delete column
                     rows.forEach(row => {
@@ -410,7 +564,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     const originalHeader = srtTable.querySelector('thead').innerHTML;
                     // Remove the last header column (delete button column)
                     const cleanHeader = originalHeader.replace(/<th[^>]*><\/th>\s*(?=<\/tr>)/, '');
-                    html += `<table class='srt-table'><thead>${cleanHeader}</thead><tbody>`;
+                    html += `<table class='srt-table data-table'><thead>${cleanHeader}</thead><tbody>`;
                     const rows = compEl.querySelectorAll('table.srt-table tbody tr');
                     rows.forEach(row => {
                         html += '<tr>';
@@ -512,7 +666,7 @@ window.addEventListener('DOMContentLoaded', () => {
 class SessionTimer {
     constructor() {
         this.isRunning = false;
-        this.startTime = null;
+    this.startTime = null;
         this.elapsedTime = 0;
         this.targetTime = 0;
         this.mode = 'stopwatch'; // 'stopwatch' or 'timer'
@@ -525,7 +679,7 @@ class SessionTimer {
     
     init() {
         this.createElement();
-        this.updateDisplay();
+        this.updateDisplay(); // Initialize display
     }
     
     createElement() {
@@ -554,9 +708,13 @@ class SessionTimer {
     this.tabElement.title = 'Stopwatch/Timer';
     this.tabElement.appendChild(this.tabIcon);
         
-        // Create the panel content
-        this.panelContent = document.createElement('div');
-        this.panelContent.className = 'tds-pullout-panel';
+    // Create the panel content
+    this.panelContent = document.createElement('div');
+    this.panelContent.className = 'tds-pullout-panel';
+    // Prefer CSS variables so the panel follows theme toggles. Avoid snapshotting computed values which
+    // don't update when the document's data-theme changes. We keep opacity set defensively.
+    this.panelContent.style.backgroundColor = 'var(--color-surface, white)';
+    this.panelContent.style.opacity = '1';
         
         // Panel header
         this.panelHeader = document.createElement('div');
@@ -567,6 +725,10 @@ class SessionTimer {
             padding-bottom: 8px;
             border-bottom: 1px solid var(--color-border, #e3e7ed);
         `;
+
+    // Ensure panel uses CSS variables (repeat for safety); do not snapshot values
+    this.panelContent.style.backgroundColor = 'var(--color-surface, white)';
+    this.panelContent.style.opacity = '1';
         
         this.panelTitle = document.createElement('h4');
         this.panelTitle.textContent = 'Stopwatch/Timer';
@@ -959,7 +1121,7 @@ class SessionTimer {
             this.setTimerTarget();
             if (this.targetTime === 0) {
                 // Still no target time set, use default 5 minutes
-                this.targetTime = 5 * 60 * 1000;
+                this.targetTime = 300000; // 5 minutes in milliseconds
                 this.timerInput.value = '5:00';
             }
         }
@@ -1354,10 +1516,11 @@ class SessionBuilder {
         this.registerComponent('word-list', WordListComponent);
         this.registerComponent('sentence-list', SentenceListComponent);
         this.registerComponent('discourse-transcript', DiscourseTranscriptComponent);
+        this.registerComponent('speech-deck', SpeechDeckComponent);
     }
 
     registerTemplates() {
-        // Register template presets
+    // Register template presets
         this.templateManager.register('default', {
             name: 'Default Session Template',
             components: [
@@ -1427,6 +1590,20 @@ class SessionBuilder {
                 { type: 'sentence-list', label: 'Sentence List' },
                 { type: 'discourse-transcript', label: 'Discourse Transcript' },
                 { type: 'textarea', label: 'Comments/Observations' },
+                { type: 'textarea', label: 'Session Summary/Analysis of Progress' },
+                { type: 'textarea', label: 'Feedback and Homework Provided' },
+                { type: 'textarea', label: 'Plan for Next Session' }
+            ]
+        });
+
+        // Motor Speech Drills template (includes Speech Deck / Stimulus List)
+        this.templateManager.register('MotorSpeechDrills', {
+            name: 'Motor Speech',
+            components: [
+                { type: 'textarea', label: 'Aim' },
+                { type: 'textarea', label: 'Check-In Info and Results of Homework' },
+                { type: 'textarea', label: 'Target Topic/Stimuli' },
+                { type: 'speech-deck', label: 'Speech Deck' },
                 { type: 'textarea', label: 'Session Summary/Analysis of Progress' },
                 { type: 'textarea', label: 'Feedback and Homework Provided' },
                 { type: 'textarea', label: 'Plan for Next Session' }
@@ -1760,6 +1937,632 @@ class CustomTextFieldComponent extends BaseComponent {
     }
 }
 
+// StimulusListComponent removed: replaced by SpeechDeck practice component
+
+// --- SpeechDeckComponent: full practice modal with Table & Flashcard modes ---
+class SpeechDeckComponent extends BaseComponent {
+    constructor(app, config) {
+        super(app, config);
+        // persist practice session results per component instance
+        this.data.sessionResults = this.data.sessionResults || {};
+    }
+
+    createContent() {
+        this.contentContainer = document.createElement('div');
+        this.contentContainer.style.marginLeft = '16px';
+
+        const startBtn = document.createElement('button');
+        startBtn.type = 'button';
+        startBtn.className = 'primary-btn';
+        // Make the Open Speech Deck button slightly larger for better discoverability
+        startBtn.style.fontSize = '14px';
+        startBtn.style.padding = '10px 14px';
+        startBtn.style.minWidth = '160px';
+        startBtn.style.borderRadius = '6px';
+        startBtn.style.boxSizing = 'border-box';
+        startBtn.textContent = 'Open Speech Deck';
+        startBtn.addEventListener('click', () => this.openPracticeModal());
+
+        this.resultsDisplay = document.createElement('div');
+        this.resultsDisplay.className = 'speech-deck-results-display';
+        this.resultsDisplay.style.marginTop = '8px';
+        this.updateResultsDisplay();
+
+        this.contentContainer.appendChild(startBtn);
+        this.contentContainer.appendChild(this.resultsDisplay);
+        this.preventDragEvents(this.contentContainer);
+    }
+
+    getComponentType() { return 'speech-deck'; }
+
+    openPracticeModal() {
+        // Create overlay + large modal that will host the original SpeechDeck HTML
+        const overlay = document.createElement('div');
+        overlay.className = 'stimulus-modal-overlay';
+        overlay.style.zIndex = 9999;
+
+        const modal = document.createElement('div');
+        modal.className = 'stimulus-modal-content large-speech-deck';
+        modal.style.width = '90vw';
+        modal.style.maxWidth = '1200px';
+        modal.style.height = '90vh';
+        modal.style.overflow = 'auto';
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'modal-close-btn';
+        closeBtn.type = 'button';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', () => {
+            // If the embedded SpeechDeck page defines sessionResults, copy it back
+            try {
+                // The embedded UI attaches sessionResults as a global inside the modal iframe area
+                // We'll look for a variable or an element with id 'sessionResultsData' that the embedded script updates
+                let embeddedResults = null;
+                const embeddedEl = modal.querySelector('#__speech_deck_session_results');
+                if (embeddedEl) {
+                    try { embeddedResults = JSON.parse(embeddedEl.textContent || embeddedEl.value || '{}'); } catch (e) { embeddedResults = null; }
+                }
+
+                // Fallback: if the embedded script attaches sessionResults to window (global), try to read it
+                if (!embeddedResults && window.sessionResults) embeddedResults = window.sessionResults;
+
+                if (embeddedResults) {
+                    this.data.sessionResults = embeddedResults;
+                }
+            } catch (err) {
+                console.warn('Failed to extract embedded SpeechDeck sessionResults:', err);
+            }
+
+            overlay.remove();
+            this.updateResultsDisplay();
+            this.setData({ sessionResults: this.data.sessionResults });
+        });
+
+        // Embed the canonical speech-deck.html inside an iframe to preserve scripts/styles
+        const iframe = document.createElement('iframe');
+        iframe.src = './speech-deck.html';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = '0';
+        iframe.className = 'speech-deck-iframe';
+
+        // When closing, ask the iframe for its sessionResults via postMessage
+        const requestResultsFromIframe = () => {
+            return new Promise((resolve) => {
+                const responder = (ev) => {
+                    try {
+                        if (!ev.data) return;
+                        if (ev.data && ev.data.type === 'speechDeck:sessionResults') {
+                            window.removeEventListener('message', responder);
+                            resolve(ev.data.data || null);
+                        }
+                    } catch (e) {
+                        window.removeEventListener('message', responder);
+                        resolve(null);
+                    }
+                };
+                window.addEventListener('message', responder);
+
+                // send a request; the iframe should listen for this and reply
+                try { iframe.contentWindow.postMessage({ type: 'speechDeck:getSessionResults' }, '*'); } catch (e) { resolve(null); }
+
+                // Fallback timeout: if no reply in 800ms, resolve null
+                setTimeout(() => { window.removeEventListener('message', responder); resolve(null); }, 800);
+            });
+        };
+
+        modal.appendChild(closeBtn);
+        modal.appendChild(iframe);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        // Ensure Quick Tools (.tds-pullout) render above the modal overlay in all stacking-context scenarios.
+        // Some browsers/platforms create stacking contexts that can make z-index alone insufficient.
+        // Move any existing pullouts to the end of <body> and set a high inline z-index so they appear above the overlay.
+        try {
+            document.querySelectorAll('.tds-pullout').forEach(el => {
+                el.style.zIndex = '10003';
+                // Re-append moves the element to the end of the body, helping it escape earlier stacking contexts.
+                document.body.appendChild(el);
+            });
+        } catch (e) { /* non-fatal */ }
+
+        // When the iframe finishes loading, send any persisted sessionResults
+        // and saved report HTML so the embedded app can restore its state.
+        iframe.addEventListener('load', () => {
+            try {
+                const payload = { type: 'speechDeck:setSessionResults', data: this.data.sessionResults || {} };
+                try { iframe.contentWindow.postMessage(payload, '*'); } catch (err) { console.warn('Failed to post sessionResults to speech-deck iframe', err); }
+
+                if (this.data.speechDeckReportHtml) {
+                    const reportPayload = { type: 'speechDeck:setReport', data: this.data.speechDeckReportHtml };
+                    try { iframe.contentWindow.postMessage(reportPayload, '*'); } catch (err) { /* non-fatal */ }
+                }
+                // Also send any persisted custom decks
+                if (this.data.customDecks || this.data.addedStimuli) {
+                    try { iframe.contentWindow.postMessage({ type: 'speechDeck:setCustomDecks', data: { customDecks: this.data.customDecks || {}, addedStimuli: this.data.addedStimuli || {} } }, '*'); } catch (err) { /* ignore */ }
+                }
+            } catch (err) {
+                console.warn('Error sending initial data to speech-deck iframe:', err);
+            }
+        });
+
+        // Listen for a report message from the iframe: when the embedded UI sends the printable report
+        // (type: 'speechDeck:report'), capture the HTML and sessionResults, persist them to the component,
+        // update the results display, and close the modal.
+        const reportHandler = (ev) => {
+            try {
+                if (!ev.data || ev.data.type !== 'speechDeck:report') return;
+                // Accept the report and sessionResults
+                const reportHtml = ev.data.data || '';
+                const embeddedResults = ev.data.sessionResults || ev.data.sessionResults || null;
+                if (embeddedResults) this.data.sessionResults = embeddedResults;
+                this.data.speechDeckReportHtml = reportHtml;
+
+                // Persist and clean up
+                this.setData({ sessionResults: this.data.sessionResults, speechDeckReportHtml: this.data.speechDeckReportHtml });
+                this.updateResultsDisplay();
+                window.removeEventListener('message', reportHandler);
+                // remove modal overlay
+                if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            } catch (err) {
+                console.warn('Error handling speechDeck report message:', err);
+            }
+        };
+        window.addEventListener('message', reportHandler);
+
+        // Handle custom deck messages coming from iframe
+        const customDeckHandler = (ev) => {
+            try {
+                if (!ev.data || ev.data.type !== 'speechDeck:customDecks') return;
+                const payload = ev.data.data || {};
+                // payload may be { customDecks: {...}, addedStimuli: {...} } or a flat map
+                if (payload && typeof payload === 'object' && (payload.customDecks || payload.addedStimuli)) {
+                    this.data.customDecks = payload.customDecks || {};
+                    this.data.addedStimuli = payload.addedStimuli || {};
+                } else {
+                    // backwards-compatible: old shape where ev.data.data was the decks map
+                    this.data.customDecks = payload || {};
+                    this.data.addedStimuli = this.data.addedStimuli || {};
+                }
+                this.setData({ customDecks: this.data.customDecks, addedStimuli: this.data.addedStimuli });
+                this.updateResultsDisplay();
+            } catch (err) { console.warn('Error handling customDecks message', err); }
+        };
+        window.addEventListener('message', customDeckHandler);
+
+        // Reply to embedded iframe theme requests so the speech-deck iframe can sync to the app theme
+        const themeRequestHandler = (ev) => {
+            try {
+                if (!ev.data || ev.data.type !== 'speechDeck:themeRequest') return;
+                // Determine current theme: prefer document attribute, fall back to matchMedia
+                let theme = null;
+                try { theme = document.documentElement && document.documentElement.getAttribute ? document.documentElement.getAttribute('data-theme') : null; } catch (e) { theme = null; }
+                if (!theme) {
+                    try { theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch (e) { theme = 'light'; }
+                }
+
+                const payload = { type: 'app:theme', data: theme };
+                // Prefer replying to the original source if possible
+                try {
+                    if (ev.source && typeof ev.source.postMessage === 'function') ev.source.postMessage(payload, ev.origin || '*');
+                    else if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage(payload, '*');
+                } catch (err) { /* ignore non-fatal */ }
+            } catch (err) {
+                // swallow errors to avoid breaking other message handlers
+            }
+        };
+        window.addEventListener('message', themeRequestHandler);
+
+        // override close to request results then close (fallback)
+        closeBtn.addEventListener('click', async () => {
+            try {
+                const embeddedResults = await requestResultsFromIframe();
+                if (embeddedResults) this.data.sessionResults = embeddedResults;
+            } catch (err) {
+                console.warn('Error requesting sessionResults from iframe:', err);
+            }
+            // Also request the built report HTML from the iframe (best-effort)
+            try {
+                const reportResponder = (ev) => {
+                    try {
+                        if (!ev.data) return;
+                        if (ev.data.type === 'speechDeck:report') {
+                            if (ev.data.data) this.data.speechDeckReportHtml = ev.data.data;
+                            window.removeEventListener('message', reportResponder);
+                        }
+                    } catch (e) { window.removeEventListener('message', reportResponder); }
+                };
+                window.addEventListener('message', reportResponder);
+                try { iframe.contentWindow.postMessage({ type: 'speechDeck:getReport' }, '*'); } catch (e) { /* ignore */ }
+                // allow a short time for reply
+                await new Promise(r => setTimeout(r, 400));
+            } catch (err) {
+                console.warn('Error requesting report HTML from iframe:', err);
+            }
+
+            if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            this.updateResultsDisplay();
+            this.setData({ sessionResults: this.data.sessionResults, speechDeckReportHtml: this.data.speechDeckReportHtml });
+            window.removeEventListener('message', reportHandler);
+        }, { once: true });
+    }
+
+    _renderPartSelector(container) {
+        container.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'stimulus-modal-header';
+    header.innerHTML = '<h2>Speech Deck — Select Part</h2>';
+        container.appendChild(header);
+
+        const parts = Object.keys(stimuliData || {});
+        const grid = document.createElement('div');
+        grid.className = 'stimulus-parts-grid';
+        parts.forEach(part => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'part-btn';
+            btn.textContent = part;
+            btn.addEventListener('click', () => { this._current.part = part; this._renderSubPartSelector(container); });
+            grid.appendChild(btn);
+        });
+        container.appendChild(grid);
+    }
+
+    _renderSubPartSelector(container) {
+        container.innerHTML = '';
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'modal-back-btn';
+        back.textContent = '\u2190 Back';
+        back.addEventListener('click', () => this._renderPartSelector(container));
+        container.appendChild(back);
+
+        const title = document.createElement('h3');
+        title.textContent = this._current.part;
+        container.appendChild(title);
+
+        const list = document.createElement('div');
+        list.className = 'stimulus-subparts-list';
+        Object.keys(stimuliData[this._current.part] || {}).forEach(sub => {
+            const item = document.createElement('div');
+            item.className = 'subpart-item';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'subpart-btn';
+            btn.textContent = sub;
+            btn.addEventListener('click', () => { this._current.subPart = sub; this._renderModeSelector(container); });
+            item.appendChild(btn);
+            list.appendChild(item);
+        });
+        container.appendChild(list);
+    }
+
+    _renderModeSelector(container) {
+        container.innerHTML = '';
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'modal-back-btn';
+        back.textContent = '\u2190 Back';
+        back.addEventListener('click', () => this._renderSubPartSelector(container));
+        container.appendChild(back);
+
+        const title = document.createElement('h3');
+        title.textContent = `${this._current.part} — ${this._current.subPart}`;
+        container.appendChild(title);
+
+        const modeRow = document.createElement('div');
+        modeRow.style.margin = '8px 0';
+
+        const tableBtn = document.createElement('button');
+        tableBtn.type = 'button';
+        tableBtn.className = 'primary-btn';
+        tableBtn.textContent = 'Table Mode';
+        tableBtn.addEventListener('click', () => this._renderTableMode(container));
+
+        const flashBtn = document.createElement('button');
+        flashBtn.type = 'button';
+        flashBtn.className = 'primary-btn';
+        flashBtn.textContent = 'Flashcard Mode';
+        flashBtn.style.marginLeft = '8px';
+        flashBtn.addEventListener('click', () => this._renderFlashcardMode(container));
+
+        modeRow.appendChild(tableBtn);
+        modeRow.appendChild(flashBtn);
+        container.appendChild(modeRow);
+    }
+
+    _renderTableMode(container) {
+        container.innerHTML = '';
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'modal-back-btn';
+        back.textContent = '\u2190 Back';
+        back.addEventListener('click', () => this._renderModeSelector(container));
+        container.appendChild(back);
+
+        const title = document.createElement('h3');
+        title.textContent = `${this._current.part} — ${this._current.subPart} (Table Mode)`;
+        container.appendChild(title);
+
+        const table = document.createElement('table');
+        table.className = 'practice-table';
+        table.innerHTML = `<thead><tr><th>Item</th><th style="width:120px">Score</th></tr></thead><tbody></tbody>`;
+
+        const tbody = table.querySelector('tbody');
+        const data = stimuliData[this._current.part] && stimuliData[this._current.part][this._current.subPart] ? stimuliData[this._current.part][this._current.subPart] : [];
+        const flatItems = [].concat(...(data.map(g => g.items || [])));
+        flatItems.forEach((text, idx) => {
+            const tr = document.createElement('tr');
+            const tdText = document.createElement('td');
+            tdText.textContent = text;
+            const tdScore = document.createElement('td');
+            tdScore.style.textAlign = 'left';
+
+            const scoreSelect = document.createElement('select');
+            scoreSelect.innerHTML = `<option value="">-</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option><option value="NR">NR</option>`;
+            scoreSelect.value = (this.data.sessionResults[this._current.part] && this.data.sessionResults[this._current.part][this._current.subPart] && this.data.sessionResults[this._current.part][this._current.subPart][text]) || '';
+            scoreSelect.addEventListener('change', (e) => {
+                this._saveScore(text, e.target.value);
+            });
+
+            tdScore.appendChild(scoreSelect);
+            tr.appendChild(tdText);
+            tr.appendChild(tdScore);
+            tbody.appendChild(tr);
+        });
+
+        container.appendChild(table);
+
+        const doneBtn = document.createElement('button');
+        doneBtn.type = 'button';
+        doneBtn.className = 'primary-btn';
+        doneBtn.textContent = 'Done';
+        doneBtn.style.marginTop = '10px';
+        doneBtn.addEventListener('click', () => {
+            const overlay = document.querySelector('.stimulus-modal-overlay');
+            if (overlay) overlay.remove();
+            this.updateResultsDisplay();
+            this.setData({ sessionResults: this.data.sessionResults });
+        });
+        container.appendChild(doneBtn);
+    }
+
+    _renderFlashcardMode(container) {
+        container.innerHTML = '';
+        const back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'modal-back-btn';
+        back.textContent = '\u2190 Back';
+        back.addEventListener('click', () => this._renderModeSelector(container));
+        container.appendChild(back);
+
+        const title = document.createElement('h3');
+        title.textContent = `${this._current.part} — ${this._current.subPart} (Flashcard Mode)`;
+        container.appendChild(title);
+
+        const data = stimuliData[this._current.part] && stimuliData[this._current.part][this._current.subPart] ? stimuliData[this._current.part][this._current.subPart] : [];
+        const flatItems = [].concat(...(data.map(g => g.items || [])));
+        let idx = 0;
+
+        const card = document.createElement('div');
+        card.className = 'flashcard';
+        card.style.padding = '20px';
+        card.style.border = '1px solid var(--color-border, #ddd)';
+        card.style.borderRadius = '6px';
+        card.style.marginTop = '10px';
+
+        const textEl = document.createElement('div');
+        textEl.style.fontSize = '18px';
+        textEl.style.minHeight = '48px';
+        textEl.textContent = flatItems[idx] || '';
+        card.appendChild(textEl);
+
+        const btnRow = document.createElement('div');
+        btnRow.style.marginTop = '12px';
+
+        const showNext = (score) => {
+            const currentText = flatItems[idx];
+            if (score !== null) this._saveScore(currentText, score);
+            idx++;
+            if (idx >= flatItems.length) {
+                // finished
+                const overlay = document.querySelector('.stimulus-modal-overlay');
+                if (overlay) overlay.remove();
+                this.updateResultsDisplay();
+                this.setData({ sessionResults: this.data.sessionResults });
+                return;
+            }
+            textEl.textContent = flatItems[idx];
+        };
+
+        const scores = ['5','4','3','2','1','NR'];
+        scores.forEach(s => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'score-btn';
+            b.textContent = s;
+            b.style.marginRight = '6px';
+            b.addEventListener('click', () => showNext(s));
+            btnRow.appendChild(b);
+        });
+
+        card.appendChild(btnRow);
+        container.appendChild(card);
+    }
+
+    _saveScore(itemText, score) {
+        this.data.sessionResults = this.data.sessionResults || {};
+        if (!this.data.sessionResults[this._current.part]) this.data.sessionResults[this._current.part] = {};
+        if (!this.data.sessionResults[this._current.part][this._current.subPart]) this.data.sessionResults[this._current.part][this._current.subPart] = {};
+        this.data.sessionResults[this._current.part][this._current.subPart][itemText] = score;
+    }
+
+    updateResultsDisplay() {
+        if (!this.resultsDisplay) return;
+        // If the embedded Speech Deck has produced a full printable report HTML,
+        // prefer showing that here so users can see the detailed trial table and
+        // statistical summaries. Fall back to the compact summary when absent.
+        if (this.data && this.data.speechDeckReportHtml) {
+            try {
+                this.resultsDisplay.innerHTML = '';
+                // Parse the report HTML to compute totals/scored so we can show
+                // rated/unrated counts even when the embedded report is used.
+                const temp = document.createElement('div');
+                temp.innerHTML = this.data.speechDeckReportHtml;
+                // Count rows that look like trial rows (tbody tr or table tr excluding thead)
+                let rows = Array.from(temp.querySelectorAll('table tbody tr'));
+                if (rows.length === 0) {
+                    // fallback: look for any table rows that aren't header rows
+                    rows = Array.from(temp.querySelectorAll('table tr')).filter(r => !r.closest('thead'));
+                }
+                let total = 0, scored = 0;
+                rows.forEach(r => {
+                    const tds = Array.from(r.querySelectorAll('td'));
+                    if (tds.length === 0) return; // skip non-data rows
+                    total += 1;
+                    // Try to find a 'Score' cell by header mapping
+                    let scoreText = '';
+                    // If there is a thead, find which column is 'Score'
+                    const thead = temp.querySelector('table thead');
+                    if (thead) {
+                        const ths = Array.from(thead.querySelectorAll('th'));
+                        const scoreIdx = ths.findIndex(h => (h.textContent || '').trim().toLowerCase() === 'score');
+                        if (scoreIdx >= 0 && tds[scoreIdx]) scoreText = (tds[scoreIdx].textContent || '').trim();
+                    }
+                    // Fallback: look for a cell that matches common score values or any non-empty cell excluding stimulus/comments heuristics
+                    if (!scoreText) {
+                        // prefer small cells like '+' '+/-' '-' 'NR'
+                        for (let td of tds) {
+                            const txt = (td.textContent || '').trim();
+                            if (!txt) continue;
+                            // If cell is short (<=5 chars) and matches expected score patterns, take it
+                            if (txt.length <= 5 && /^(\+|\+\/-|\-|nr|NR|NR\.?|NR\s*)$/.test(txt) || /^(\+|\-|\+\/-)$/.test(txt)) { scoreText = txt; break; }
+                        }
+                        if (!scoreText) {
+                            // last-resort: take the middle cell for 3-col tables (Stimulus/Score/Comments)
+                            if (tds.length >= 3) scoreText = (tds[1].textContent || '').trim();
+                        }
+                    }
+                    if (scoreText && String(scoreText).trim() !== '') {
+                        // any non-empty score (including 'NR') counts as a scored trial
+                        scored += 1;
+                    }
+                });
+
+                const unrated = Math.max(0, total - scored);
+                const header = document.createElement('div');
+                header.className = 'speech-deck-summary-header';
+                header.style.display = 'flex';
+                header.style.justifyContent = 'space-between';
+                header.style.alignItems = 'center';
+                header.style.marginBottom = '6px';
+                header.innerHTML = `<div class="speech-deck-summary-title"><strong>Practice Results</strong></div><div class="speech-deck-summary-total">Scored: ${scored} / ${total} trials</div>`;
+                this.resultsDisplay.appendChild(header);
+
+                // Insert the report HTML directly. It's generated locally by the
+                // embedded iframe and intended for display/printing.
+                const wrapper = document.createElement('div');
+                wrapper.className = 'speech-deck-embedded-report';
+                wrapper.innerHTML = this.data.speechDeckReportHtml;
+                this.resultsDisplay.appendChild(wrapper);
+                return;
+            } catch (err) {
+                console.warn('Failed to render speechDeckReportHtml in results display', err);
+                // fall through to render compact summary
+            }
+        }
+        const parts = Object.keys(this.data.sessionResults || {});
+        if (parts.length === 0) {
+            this.resultsDisplay.innerHTML = '<em>No practice results yet.</em>';
+            return;
+        }
+        // Compute aggregate trial count across all parts/subparts and how many were rated
+        let aggregateTrials = 0;
+        let scoredTrials = 0;
+        parts.forEach(p => {
+            Object.keys(this.data.sessionResults[p] || {}).forEach(sub => {
+                const scores = this.data.sessionResults[p][sub] || {};
+                Object.keys(scores).forEach(k => {
+                    aggregateTrials += 1;
+                    const e = scores[k] || {};
+                    if (e && e.score !== undefined && e.score !== null && String(e.score).trim() !== '') scoredTrials += 1;
+                });
+            });
+        });
+
+        const header = document.createElement('div');
+        header.className = 'speech-deck-summary-header';
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.marginBottom = '6px';
+    const unratedTrials = Math.max(0, aggregateTrials - scoredTrials);
+    header.innerHTML = `<div class="speech-deck-summary-title"><strong>Practice Results</strong></div><div class="speech-deck-summary-total">Rated: ${scoredTrials} / ${aggregateTrials} trials (Unrated: ${unratedTrials})</div>`;
+        this.resultsDisplay.appendChild(header);
+        // If there are persisted custom decks, render controls to rename/delete
+        if (this.data && this.data.customDecks && Object.keys(this.data.customDecks).length) {
+            const customHeader = document.createElement('div');
+            customHeader.style.marginTop = '8px';
+            customHeader.innerHTML = '<strong>Custom Decks</strong>';
+            this.resultsDisplay.appendChild(customHeader);
+            const list = document.createElement('ul');
+            list.style.marginTop = '6px';
+            Object.keys(this.data.customDecks).forEach(deckName => {
+                const li = document.createElement('li');
+                li.style.marginBottom = '6px';
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = deckName + ' (' + (this.data.customDecks[deckName] ? this.data.customDecks[deckName].length : 0) + ')';
+                nameSpan.style.marginRight = '8px';
+                li.appendChild(nameSpan);
+                // Rename is handled inline in the embedded Speech Deck UI; host shows Delete only.
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.textContent = 'Delete';
+                delBtn.style.color = 'red';
+                delBtn.addEventListener('click', () => {
+                    if (!confirm('Delete custom deck "' + deckName + '"?')) return;
+                    delete this.data.customDecks[deckName];
+                    // Persist both shapes so addedStimuli aren't lost
+                    this.setData({ customDecks: this.data.customDecks, addedStimuli: this.data.addedStimuli });
+                    // Send updated shape (customDecks + addedStimuli) to iframe if open
+                    try {
+                        const ifr = document.querySelector('iframe.speech-deck-iframe');
+                        if (ifr && ifr.contentWindow) {
+                            ifr.contentWindow.postMessage({ type: 'speechDeck:setCustomDecks', data: { customDecks: this.data.customDecks || {}, addedStimuli: this.data.addedStimuli || {} } }, '*');
+                        }
+                    } catch (e) { /* ignore */ }
+                    this.updateResultsDisplay();
+                });
+                li.appendChild(delBtn);
+                list.appendChild(li);
+            });
+            this.resultsDisplay.appendChild(list);
+        }
+        // Render a detailed table showing each trial (stimulus, score, comments)
+        const table = document.createElement('table');
+        table.className = 'speech-deck-summary';
+        table.innerHTML = `<thead><tr><th>Part</th><th>SubPart</th><th>Stimulus</th><th>Score</th><th>Comments</th></tr></thead><tbody></tbody>`;
+        const tbody = table.querySelector('tbody');
+        parts.forEach(p => {
+            Object.keys(this.data.sessionResults[p] || {}).forEach(sub => {
+                const scores = this.data.sessionResults[p][sub] || {};
+                // For each trial entry (keys like 'Stimulus [Trial 1]'), render a row
+                Object.keys(scores).forEach(key => {
+                    const entry = scores[key] || {};
+                    // Strip trailing ' [Trial N]' for display
+                    const stimulus = String(key).replace(/\s+\[Trial \d+\]$/, '');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${p}</td><td>${sub}</td><td>${stimulus}</td><td>${entry.score || ''}</td><td>${entry.comment || ''}</td>`;
+                    tbody.appendChild(tr);
+                });
+            });
+        });
+        this.resultsDisplay.innerHTML = '';
+        this.resultsDisplay.appendChild(table);
+    }
+}
+
 class TextComponent extends CustomTextFieldComponent {
     constructor(app, config) {
         super(app, config);
@@ -1886,7 +2689,7 @@ class PaceTableComponent extends BaseComponent {
         
         // Create table
         this.table = document.createElement('table');
-        this.table.className = 'pace-table';
+    this.table.className = 'pace-table data-table';
         this.table.innerHTML = `
             <thead>
                 <tr>
@@ -1903,7 +2706,7 @@ class PaceTableComponent extends BaseComponent {
         // Create add row button
         this.addRowBtn = document.createElement('button');
         this.addRowBtn.type = 'button';
-        this.addRowBtn.className = 'pace-add-row-btn';
+    this.addRowBtn.className = 'pace-add-row-btn btn add-row-btn';
         this.addRowBtn.textContent = '+ Add Row';
         this.addRowBtn.style.margin = '10px 0 0 0';
         this.addRowBtn.onclick = () => this.addRow();
@@ -1913,6 +2716,10 @@ class PaceTableComponent extends BaseComponent {
         
         // Create PACE scoring explainer
         this.explainerContainer = document.createElement('div');
+
+
+
+        
         this.explainerContainer.className = 'pace-explainer';
         this.explainerContainer.style.cssText = `
             margin: 12px 0;
@@ -2297,7 +3104,7 @@ class PracticeDataTableComponent extends BaseComponent {
         
     // Create table (add distinct class for identification in print builder)
     this.table = document.createElement('table');
-    this.table.className = 'pace-table practice-table'; // retains styling, adds identifier
+    this.table.className = 'pace-table practice-table data-table'; // retains styling, adds identifier
         this.table.innerHTML = `
             <thead>
                 <tr>
@@ -2315,7 +3122,7 @@ class PracticeDataTableComponent extends BaseComponent {
         // Create add row button
         this.addRowBtn = document.createElement('button');
         this.addRowBtn.type = 'button';
-        this.addRowBtn.className = 'pace-add-row-btn';
+    this.addRowBtn.className = 'pace-add-row-btn btn add-row-btn';
         this.addRowBtn.textContent = '+ Add Row';
         this.addRowBtn.style.margin = '10px 0 0 0';
         this.addRowBtn.onclick = () => this.addRow();
@@ -2632,7 +3439,7 @@ class PracticeDataTableComponent extends BaseComponent {
     updatePracticeStats() {
         const totalTrials = this.data.rows.length;
         
-        // Count support levels
+        // Count support levels (table default labels)
         const levelCounts = {
             'Independent': 0,
             'Cued': 0
@@ -2657,10 +3464,11 @@ class PracticeDataTableComponent extends BaseComponent {
                     totalPerformanceScore += performanceValue;
                     performanceTrialCount++;
                     
-                    // Track performance by support level
-                    if (row.level === 'Independent') {
+                    // Track performance by support level (normalize legacy values where present)
+                    const normalizedLevel = (row.level || '').toString();
+                    if (normalizedLevel === 'Accurate' || normalizedLevel === 'Independent') {
                         independentTrials.push(performanceValue);
-                    } else if (row.level === 'Cued') {
+                    } else if (normalizedLevel === 'Partial' || normalizedLevel === 'Cued') {
                         cuedTrials.push(performanceValue);
                     }
                 }
@@ -2681,9 +3489,9 @@ class PracticeDataTableComponent extends BaseComponent {
         const cuedAveragePercent = cuedTrials.length > 0 ? 
             ((cuedTrials.reduce((sum, val) => sum + val, 0) / cuedTrials.length / 2) * 100).toFixed(1) : 0;
         
-        // Calculate percentages for support levels
-        const independentPercent = totalTrials > 0 ? ((levelCounts['Independent'] / totalTrials) * 100).toFixed(1) : 0;
-        const cuedPercent = totalTrials > 0 ? ((levelCounts['Cued'] / totalTrials) * 100).toFixed(1) : 0;
+    // Calculate percentages for support levels
+    const independentPercent = totalTrials > 0 ? ((levelCounts['Independent'] / totalTrials) * 100).toFixed(1) : 0;
+    const cuedPercent = totalTrials > 0 ? ((levelCounts['Cued'] / totalTrials) * 100).toFixed(1) : 0;
         
         // Get or set default moving average window size (max 20)
         const movingAvgInput = this.statsContainer.querySelector('.moving-avg-input');
@@ -2693,7 +3501,7 @@ class PracticeDataTableComponent extends BaseComponent {
         let movingAvgStats = '';
         if (totalTrials > 0) {
             // If window size >= total trials, use overall stats
-            if (movingAvgSize >= totalTrials) {
+                if (movingAvgSize >= totalTrials) {
                 movingAvgStats = `
                     <div class="stats-row" style="display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">
                         <div>
@@ -2780,7 +3588,7 @@ class PracticeDataTableComponent extends BaseComponent {
                 <div class="stats-row" style="display: flex; justify-content: space-between;">
                     <div>
                         <span># Trials: <strong>${totalTrials}</strong></span>
-                        <span style="margin-left: 20px;"># Independent: <strong>${levelCounts['Independent']}</strong></span>
+                            <span style="margin-left: 20px;"># Independent: <strong>${levelCounts['Independent']}</strong></span>
                         <span style="margin-left: 20px;"># Cued: <strong>${levelCounts['Cued']}</strong></span>
                     </div>
                     <div>
@@ -2865,19 +3673,19 @@ class SRTTableComponent extends BaseComponent {
         
         // Create table
         this.table = document.createElement('table');
-        this.table.className = 'srt-table';
+    this.table.className = 'srt-table data-table';
         
         // Create buttons
         this.addRowBtn = document.createElement('button');
         this.addRowBtn.type = 'button';
-        this.addRowBtn.className = 'srt-add-row-btn';
+    this.addRowBtn.className = 'srt-add-row-btn btn add-row-btn';
         this.addRowBtn.textContent = '+ Add Row';
         this.addRowBtn.style.margin = '10px 0 0 0';
         this.addRowBtn.onclick = () => this.addRow();
         
         this.addColBtn = document.createElement('button');
         this.addColBtn.type = 'button';
-        this.addColBtn.className = 'srt-add-col-btn';
+    this.addColBtn.className = 'srt-add-col-btn btn add-col-btn';
         this.addColBtn.textContent = '+ Add Interval';
         this.addColBtn.style.margin = '10px 0 0 8px';
         this.addColBtn.onclick = () => this.addInterval();
@@ -3057,7 +3865,7 @@ class SRTTableComponent extends BaseComponent {
                 
                 const incorrect = document.createElement('span');
                 incorrect.className = 'srt-mark srt-incorrect' + (rowData.marks[idx] === 'incorrect' ? ' active' : '');
-                incorrect.title = 'Incorrect';
+                incorrect.title = 'Off-Target/NR';
                 incorrect.innerHTML = '&#x2716;';
                 incorrect.tabIndex = rowData.marks[idx] === 'incorrect' ? 0 : -1;
                 incorrect.onclick = () => {
@@ -3109,7 +3917,7 @@ class SRTTableComponent extends BaseComponent {
             const delCell = document.createElement('td');
             const delBtn = document.createElement('button');
             delBtn.type = 'button';
-            delBtn.className = 'srt-row-delete';
+            delBtn.className = 'srt-row-delete btn btn-danger';
             delBtn.title = 'Delete Row';
             delBtn.innerHTML = '&times;';
             delBtn.onclick = () => this.removeRow(i);
@@ -3290,12 +4098,12 @@ class CustomDataTableComponent extends BaseComponent {
         
         // Create table (add distinct class for identification in print builder)
         this.table = document.createElement('table');
-    this.table.className = 'custom-data-table';
+    this.table.className = 'custom-data-table data-table';
         
         // Create add row button
         this.addRowBtn = document.createElement('button');
         this.addRowBtn.type = 'button';
-        this.addRowBtn.className = 'pace-add-row-btn';
+    this.addRowBtn.className = 'pace-add-row-btn btn add-row-btn';
         this.addRowBtn.textContent = '+ Add Row';
         this.addRowBtn.style.margin = '10px 0 0 0';
         this.addRowBtn.onclick = () => this.addRow();
@@ -3341,10 +4149,10 @@ class CustomDataTableComponent extends BaseComponent {
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         `;
         
-        const toggleBtn = document.createElement('button');
+    const toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.textContent = '⚙️ Configure Columns';
-        toggleBtn.className = 'pace-add-row-btn';
+    toggleBtn.className = 'pace-add-row-btn btn add-row-btn';
         toggleBtn.style.cssText = `
             margin-bottom: 8px;
             background: var(--color-primary, #2196f3);
@@ -3595,7 +4403,7 @@ class CustomDataTableComponent extends BaseComponent {
         if (this.data.extraColumns.length < 2) {
             const addColBtn = document.createElement('button');
             addColBtn.type = 'button';
-            addColBtn.className = 'pace-add-row-btn';
+            addColBtn.className = 'pace-add-row-btn btn add-row-btn';
             addColBtn.textContent = '+ Add Text Column';
             addColBtn.style.marginRight = '8px';
             addColBtn.onclick = () => this.addExtraColumn();
@@ -3606,17 +4414,17 @@ class CustomDataTableComponent extends BaseComponent {
         if (this.data.extraColumns.length > 0) {
             const removeColBtn = document.createElement('button');
             removeColBtn.type = 'button';
-            removeColBtn.className = 'pace-add-row-btn';
+            removeColBtn.className = 'pace-add-row-btn btn add-row-btn';
             removeColBtn.textContent = '- Remove Last Column';
             removeColBtn.onclick = () => this.removeExtraColumn();
             this.columnControls.appendChild(removeColBtn);
             this.preventDragEvents(removeColBtn);
         }
 
-        // Add toggle button for Data Column 2 visibility with confirmation when hiding
-        const toggleDataCol2Btn = document.createElement('button');
-        toggleDataCol2Btn.type = 'button';
-        toggleDataCol2Btn.className = 'pace-add-row-btn';
+    // Add toggle button for Data Column 2 visibility with confirmation when hiding
+    const toggleDataCol2Btn = document.createElement('button');
+    toggleDataCol2Btn.type = 'button';
+    toggleDataCol2Btn.className = 'pace-add-row-btn btn add-row-btn';
         toggleDataCol2Btn.textContent = this.data.hasDataCol2 ? 'Hide Data Column 2' : 'Show Data Column 2';
         toggleDataCol2Btn.style.marginLeft = '8px';
         toggleDataCol2Btn.onclick = () => {
@@ -4571,7 +5379,7 @@ class SwallowDataComponent extends BaseComponent {
         
         this.statsDisplay.innerHTML = `
             <div class="stats-row">
-                <span>Total Trials: <strong>${totalTrials}</strong></span>
+                <span>Total Scored Trials: <strong>${totalTrials}</strong></span>
                 <span>Successful: <strong>${successfulCount}</strong></span>
                 <span>Success Rate: <strong>${successRate}%</strong></span>
                 <span>Total Swallows: <strong>${totalSwallows}</strong></span>
@@ -5794,8 +6602,10 @@ class DragHandler {
             'SRT Data Table': 'srt-table',
             'Bolus Therapy Data Table': 'swallow-data'
         };
+    // Map user-facing 'Speech Deck' to the new practice component
+        typeMap['Speech Deck'] = 'speech-deck';
         
-        return typeMap[displayName] || 'text'; // default to text if not found
+    return typeMap[displayName] || 'text'; // default to text if not found
     }
 
     init() {
@@ -6651,6 +7461,28 @@ function _runComponentAdapter(type, compInstance, savedData, el) {
                 if (typeof compInstance.updateStats === 'function') compInstance.updateStats();
                 break;
             }
+            case 'speech-deck': {
+                try {
+                    // Restore internal Speech Deck state: sessionResults and saved report HTML
+                    const newData = { ...(compInstance.data || {}), ...(savedData || {}) };
+                    // Only copy the known fields to avoid surprising substitutions
+                    if (savedData && typeof savedData.sessionResults !== 'undefined') newData.sessionResults = savedData.sessionResults;
+                    if (savedData && typeof savedData.speechDeckReportHtml !== 'undefined') newData.speechDeckReportHtml = savedData.speechDeckReportHtml;
+                    if (typeof compInstance.setData === 'function') compInstance.setData(newData);
+                    else compInstance.data = newData;
+
+                    // If component provides a UI update hook, call it to reflect restored state
+                    if (typeof compInstance.updateResultsDisplay === 'function') compInstance.updateResultsDisplay();
+                    // Mark any stored HTML container as restored so DOM reapplication won't clobber it
+                    try {
+                        if (el && el.querySelector) {
+                            const rep = el.querySelector('.speech-deck-results-display');
+                            if (rep) try { rep.dataset.tdstRestored = '1'; } catch (e) {}
+                        }
+                    } catch (e) {}
+                } catch (e) { /* ignore restoration errors for this component */ }
+                break;
+            }
             default: {
                 // Generic fallback: if component exposes setData and render, use them
                 if (typeof compInstance.setData === 'function') compInstance.setData(savedData);
@@ -6669,7 +7501,7 @@ function restoreSnapshot(snapshot) {
     try {
         if (!snapshot || snapshot.tool !== 'therapy-data-session-taker') return false;
         const meta = snapshot.meta || {};
-        if (document.getElementById('patientName')) document.getElementById('patientName').value = meta.patient || '';
+    if (document.getElementById('patientName')) document.getElementById('patientName').value = meta.clientName || meta.patient || '';
         if (document.getElementById('sessionDate')) document.getElementById('sessionDate').value = meta.date || '';
 
         const dropzone = document.getElementById('templateDropzone');
@@ -6731,7 +7563,7 @@ async function saveSnapshotToFile(snapshot) {
         const _formatSnapshotFilename = (snap, toolName) => {
             const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
             const meta = snap && snap.meta ? snap.meta : {};
-            const rawName = String(meta.patient || meta.clientName || meta.patientName || 'session');
+            const rawName = String(meta.clientName || meta.patient || meta.patientName || 'session');
             const normalized = rawName.normalize ? rawName.normalize('NFKD').replace(/\p{Diacritic}/gu, '') : rawName;
             const patient = normalized.replace(/[^0-9A-Za-z]/g, '');
             // Parse ISO YYYY-MM-DD as local date to avoid timezone offset
@@ -6856,7 +7688,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const patient = patientInput ? patientInput.value.trim() : '';
             const date = dateInput ? dateInput.value.trim() : '';
             let output = 'SESSION DATA\n';
-            output += `Patient: ${patient}\nDate: ${date}\n\n`;
+            output += `Client: ${patient}\nDate: ${date}\n\n`;
 
 
             // Iterate components and format output
@@ -7005,6 +7837,69 @@ document.addEventListener('DOMContentLoaded', () => {
                         output += '\n';
                     }
                     return; // Skip the standard input processing for this component
+                }
+
+                // Special-case: Speech Deck component for clipboard summary (plain text only)
+                const isSpeechDeck = (typeof compEl.getAttribute === 'function' && compEl.getAttribute('data-type') === 'speech-deck') || (compEl._componentInstance && compEl._componentInstance.config && compEl._componentInstance.config.type === 'speech-deck');
+                if (isSpeechDeck) {
+                    output += `${label}\n`;
+                    const instance = compEl._componentInstance || {};
+                    const sessionResults = (instance.data && instance.data.sessionResults) || {};
+                    // Build summary lines: per part/subpart and totals
+                    let total = 0, scored = 0;
+                    Object.keys(sessionResults).forEach(p => {
+                        Object.keys(sessionResults[p] || {}).forEach(sub => {
+                            const entries = sessionResults[p][sub] || {};
+                            const keys = Object.keys(entries || {});
+                            const partCount = keys.length;
+                            // Collect scored items (any non-empty score)
+                            const scoredItems = keys.map(k => entries[k]).filter(e => e && e.score !== undefined && e.score !== null && String(e.score).trim() !== '');
+                            const partScored = scoredItems.length;
+
+                            // Map scores into accuracy buckets: plus, plusMinus, minus (include 'NR' in minus)
+                            const mapToBucket = (s) => {
+                                const t = String(s).trim();
+                                if (t === '+') return 'plus';
+                                if (t === '+/-') return 'partial';
+                                if (t === '-' || t.toUpperCase() === 'NR') return 'minus';
+                                // numeric mapping: 5/4 -> plus, 3 -> partial, 2/1 -> minus
+                                if (/^[1-5]$/.test(t)) {
+                                    if (t === '5' || t === '4') return 'plus';
+                                    if (t === '3') return 'partial';
+                                    return 'minus';
+                                }
+                                return null;
+                            };
+
+                            let plusCount = 0, plusMinusCount = 0, minusCount = 0;
+                            scoredItems.forEach(si => {
+                                const b = mapToBucket(si.score);
+                                if (b === 'plus') plusCount++;
+                                else if (b === 'partial') plusMinusCount++;
+                                else if (b === 'minus') minusCount++;
+                            });
+
+                            total += partCount;
+                            scored += partScored;
+                            const pct = partCount ? Math.round((partScored / partCount) * 100) : 0;
+                            output += `${p} — ${sub}: ${partCount} trials, ${partScored} scored (${pct}%)\n`;
+
+                            // Provide Accuracy summary similar to embedded report when there are scored items and not a reading passage
+                            const isReadingPassage = (p === "Part 3: Paragraph-Length Reading Passages");
+                            if (!isReadingPassage && partScored > 0) {
+                                const plusPercent = ((plusCount / partScored) * 100).toFixed(0);
+                                const plusMinusPercent = ((plusMinusCount / partScored) * 100).toFixed(0);
+                                const minusPercent = ((minusCount / partScored) * 100).toFixed(0);
+                                output += `Accuracy: ${plusPercent}% Accurate (+), ${plusMinusPercent}% Partial (+/-), ${minusPercent}% Off-Target/NR (-)\n`;
+                            } else if (isReadingPassage && partScored > 0) {
+                                output += `Scores/Rates recorded for ${partScored} passage(s).\n`;
+                            }
+
+                        });
+                    });
+                    const unrated = Math.max(0, total - scored);
+                    output += `${total} total trials, ${scored} scored — Rated: ${scored} / ${total} (Unrated: ${unrated})\n\n`;
+                    return; // done for this component
                 }
 
                 // Standard text/textarea
