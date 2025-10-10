@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "npx live-server --quiet --watch=./ ./",
-    "build": "echo \"No build step yet\""
+    "build": "echo \"No build step yet\"",
+    "bump-and-build": "node ./tools/version-bump/bump-and-build.js"
   },
   "dependencies": {
     "jsdom": "^22.1.0"

@@ -8,7 +8,7 @@ Session Wizard is a modular toolkit to help Speech-Language Pathologists (SLPs) 
 - Therapy Session Data Taker — customizable real-time data collection templates
 - Homework Tracker — printable, customizable home program logs
 
-Works cited
+Works Cited
 
 This toolkit is grounded in evidence-based practices from cognitive rehabilitation research, especially *Transforming Cognitive Rehabilitation: Effective Instructional Methods* (Sohlberg, Hamilton, & Turkstra, 2023).
 
