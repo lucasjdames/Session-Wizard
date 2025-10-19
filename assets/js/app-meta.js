@@ -1,3 +1,3 @@
 // Auto-generated app meta
 window.APP_META = window.APP_META || {};
-window.APP_META.version = '1.1.0';
+window.APP_META.version = '1.2.0';

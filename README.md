@@ -7,6 +7,7 @@ Session Wizard is a modular toolkit to help Speech-Language Pathologists (SLPs) 
 - Goal Builder — SMART goal and Goal Attainment Scale (GAS) templates
 - Therapy Session Data Taker — customizable real-time data collection templates
 - Homework Tracker — printable, customizable home program logs
+- Progress Monitor — visualizes changes in task performance across sessions and across the levels/steps of complex tasks
 
 Works Cited
 

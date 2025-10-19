@@ -4,27 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress Monitor</title>
-        <style>
-            :root{ --critical-bg:#f5f7fa; --critical-surface:#ffffff; --critical-border:#d8dee6; --critical-text:#1f2630; }
-            html,body{ background:var(--color-bg, var(--critical-bg)); color:var(--color-text, var(--critical-text)); }
-            .app-header{ background:rgba(255,255,255,.85); border-bottom:1px solid var(--color-border, var(--critical-border)); height:var(--app-header-height,64px); }
-            .app-header .branding .back-btn{ background:var(--color-accent,#4f8cff); color:#fff; }
-        </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        :root{ --critical-bg:#f5f7fa; --critical-surface:#ffffff; --critical-border:#d8dee6; --critical-text:#1f2630; }
+        html,body{ background:var(--color-bg, var(--critical-bg)); color:var(--color-text, var(--critical-text)); }
+        .app-header{ background:rgba(255,255,255,.85); border-bottom:1px solid var(--color-border, var(--critical-border)); height:var(--app-header-height,64px); }
+        .app-header .branding .back-btn{ background:var(--color-accent,#4f8cff); color:#fff; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <!-- Prefetch main shell assets to speed up back navigation (use relative paths for file:// contexts) -->
     <link rel="prefetch" href="../../index.html" as="document">
     <link rel="prefetch" href="../../assets/css/main.css" as="style">
     <link rel="prefetch" href="../../assets/js/main.js" as="script">
     <link rel="preload" href="../../assets/fonts/inter/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../goal-builder/goal-builder.css">
     <link rel="stylesheet" href="progress-monitor.css">
     <script src="../../assets/js/theme.js"></script>
-    <script defer src="../../assets/js/shared/data-utils.js"></script>
     <script defer src="../../assets/js/shared/dom-utils.js"></script>
     <script defer src="../../assets/js/prefetch-back.js"></script>
-    <script defer src="progress-monitor.js"></script>
 </head>
 <body>
     <header class="app-header">
@@ -35,99 +34,177 @@
             <button id="themeToggle" class="ghost-btn" aria-pressed="false" aria-label="Toggle theme">🌙</button>
         </div>
     </header>
+
     <div class="main-container">
-    <div class="pm-page-header">
-        <h1>Progress Monitor</h1>
-		<p class="tool-description">Compare progress from session to session.</p>
-        <div class="meta-row pm-meta-row">
-            <label for="patientName" class="meta-label">Client:</label>
-            <input type="text" id="patientName" class="meta-inputbox client-input" placeholder="Enter client name..." />
-            <label for="goalDate" class="meta-label">Date:</label>
-            <input type="date" id="goalDate" class="meta-inputbox" />
+        <div class="gb-page-header">
+            <div class="gb-header-left">
+                <h1>Progress Monitor</h1>
+                <p class="tool-description">Track, visualize, and review progress across sessions.</p>
+                <div class="meta-row gb-meta-row">
+                    <label for="patientName" class="meta-label">Client:</label>
+                    <input type="text" id="patientName" class="meta-inputbox client-input form-input" placeholder="Enter client name..." aria-label="Client name" />
+                    <label for="goalDate" class="meta-label">Date:</label>
+                    <input type="date" id="goalDate" class="meta-inputbox date-input form-input" aria-label="Date" />
+                    <button id="clearAllBtn" class="btn btn-danger">Clear All</button>
+                </div>
+            </div>
+            <div class="page-meta-actions" aria-hidden="true"></div>
+        </div>
+
+        <section class="template-area">
+            <h2>Progress Monitor Table</h2>
+            <div class="template-stack">
+                <div class="card control-card">
+                    <div class="controls page-meta-actions gb-meta-row">
+                        <div class="left target-selector-group">
+                            <label for="target-selector" class="meta-label">Target:</label>
+                            <select id="target-selector" class="form-input target-selector" aria-label="Select target"></select>
+                            <button id="add-target" class="primary-btn btn-sm">+ New Target</button>
+                        </div>
+                        <div class="right">
+                            <div class="quick-add-inner">
+                                <button id="quick-add-btn" class="primary-btn btn-sm" title="Add session for selected date">+ Add session (date):</button>
+                                <input id="quick-add-date" type="date" class="form-input" aria-label="Quick add session date" title="Pick a date to quick-add a session" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="viz-panel card" id="viz-panel">
+                    <div class="viz-panel-header" onclick="document.getElementById('viz-panel-content').classList.toggle('collapsed')">
+                        <h3>📊 Visualization &amp; Display</h3>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="viz-panel-content" id="viz-panel-content">
+                        <div class="viz-controls-grid">
+                            <div class="viz-control-group">
+                                <label class="viz-label">
+                                    <input type="checkbox" id="viz-graph-mode" />
+                                    <span><strong>📈 Graph Mode</strong></span>
+                                </label>
+                                <label class="viz-label">
+                                    <input type="checkbox" id="viz-show-overlay" checked />
+                                    <span>Track Overall Performance</span>
+                                </label>
+                                <label class="viz-label">
+                                    <input type="checkbox" id="viz-show-level-overlay" />
+                                    <span>Track Performance within Levels</span>
+                                </label>
+                                <label class="viz-label">
+                                    <input type="checkbox" id="viz-show-cell-shading" checked />
+                                    <span>Show Cell Shading</span>
+                                </label>
+                                <label class="viz-label">
+                                    <input type="checkbox" id="viz-show-data-points" checked />
+                                    <span>Show Data Point Markers</span>
+                                </label>
+                            </div>
+
+                            <div class="viz-control-group">
+                                <label class="viz-label">
+                                    <input type="checkbox" id="viz-show-rulers" checked />
+                                    <span>Show Cell Rulers</span>
+                                </label>
+                                <label class="viz-label">
+                                    <input type="checkbox" id="viz-show-comments" checked />
+                                    <span>Show Comments</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="table-wrap card table-card">
+                    <div class="table-scroll">
+                        <table id="grid" class="grid data-table"></table>
+                        <svg id="overlay" class="overlay" aria-hidden="true"></svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="page-actions">
+            <button id="printCurrentBtn" class="primary-btn">Print Current Target</button>
+            <button id="printAllBtn" class="secondary-btn">Print All Targets</button>
         </div>
     </div>
-    <div class="tool-container">
-        <div class="pm-fields">
-            <label class="form-label">Target</label>
-            <textarea id="target" class="form-textarea" rows="2" placeholder="Describe the target..."></textarea>
-            <label class="form-label">Training Phase</label>
-            <textarea id="trainingPhase" class="form-textarea" rows="2" placeholder="Describe the training phase..."></textarea>
-        </div>
-        <div class="pm-summary-measure">
-            <div class="pm-summary-label">Select the summary measure being tracked (must use the same from each session):</div>
-            <div class="pm-radio-group">
-                <label><input type="radio" name="summaryMeasure" value="Retention probe result from start of each session" checked> Retention probe result from start of each session</label>
-                <label><input type="radio" name="summaryMeasure" value="Average of each session's practice trial results"> Average of each session's practice trial results</label>
-                <label><input type="radio" name="summaryMeasure" value="Other"> Other: <input type="text" id="otherSummary" class="pm-other-input" placeholder="Describe other measure..." /></label>
+
+    <footer class="app-footer no-print"></footer>
+
+    <script>
+        document.querySelectorAll('.dropdown-header').forEach(h => {
+            h.addEventListener('click', () => {
+                const tgt = h.getAttribute('data-target');
+                const el = document.getElementById(tgt);
+                const expanded = h.getAttribute('aria-expanded') === 'true';
+                h.setAttribute('aria-expanded', String(!expanded));
+                if (el) el.classList.toggle('dropdown-content-open');
+            });
+        });
+    </script>
+
+    <div id="modal" class="modal hidden" role="dialog" aria-hidden="true">
+        <div class="modal-body">
+            <h3>Edit data</h3>
+            <label>Performance <input id="m-performance" class="form-input"></label>
+            <label>Support <input id="m-support" class="form-input"></label>
+            <label>Comments <textarea id="m-comments" class="form-textarea"></textarea></label>
+            <div class="modal-actions">
+                <button id="m-save" class="primary-btn">Save</button>
+                <button id="m-cancel" class="secondary-btn">Cancel</button>
             </div>
         </div>
-        <div class="pm-table-section">
-            <table id="pmTable" class="pm-table">
-                <thead>
-                    <tr id="pmDateRow">
-                        <th></th>
-                        <th class="pm-date-col">
-                            <label class="sr-only" for="pmDate1">Date column 1</label>
-                            <input id="pmDate1" type="date" class="pm-date-input" value="" />
-                        </th>
-                        <th class="pm-date-col">
-                            <label class="sr-only" for="pmDate2">Date column 2</label>
-                            <input id="pmDate2" type="date" class="pm-date-input" value="" />
-                        </th>
-                        <th class="pm-date-col">
-                            <label class="sr-only" for="pmDate3">Date column 3</label>
-                            <input id="pmDate3" type="date" class="pm-date-input" value="" />
-                        </th>
-                        <th class="pm-date-col">
-                            <label class="sr-only" for="pmDate4">Date column 4</label>
-                            <input id="pmDate4" type="date" class="pm-date-input" value="" />
-                        </th>
-                        <th><button id="addDateBtn" class="pm-add-date-btn btn btn-success" title="Add date column">+</button></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="pm-editable-subheader" data-section="task"><td colspan="100%"><label class="sr-only" for="pmSubheaderTask">Task Step/Level</label><input id="pmSubheaderTask" type="text" class="pm-subheader-input" value="Task Step/Level" /></td></tr>
-                    <tr class="pm-row" data-section="task">
-                        <td class="pm-row-label"><label class="sr-only">Task Steps</label><textarea class="pm-table-input pm-label-input" placeholder="Task Steps..." aria-label="Task steps"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><button class="pm-add-row-btn btn btn-success" data-section="task" title="Add row">+</button></td>
-                    </tr>
-                    <tr class="pm-editable-subheader" data-section="prompts"><td colspan="100%"><label class="sr-only" for="pmSubheaderPrompts">Prompts/Cues/Supports</label><input id="pmSubheaderPrompts" type="text" class="pm-subheader-input" value="Prompts/Cues/Supports" /></td></tr>
-                    <tr class="pm-row" data-section="prompts">
-                        <td class="pm-row-label"><label class="sr-only">Prompts/Supports</label><textarea class="pm-table-input pm-label-input" placeholder="Prompts/Supports..." aria-label="Prompts supports"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><button class="pm-add-row-btn btn btn-success" data-section="prompts" title="Add row">+</button></td>
-                    </tr>
-                    <tr class="pm-editable-subheader" data-section="other"><td colspan="100%"><label class="sr-only" for="pmSubheaderOther">Other/Comments</label><input id="pmSubheaderOther" type="text" class="pm-subheader-input" value="Other/Comments" /></td></tr>
-                    <tr class="pm-row" data-section="other">
-                        <td class="pm-row-label"><label class="sr-only">Other</label><textarea class="pm-table-input pm-label-input" placeholder="Other..." aria-label="Other"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><textarea class="pm-table-input" aria-label="PM cell"></textarea></td>
-                        <td><button class="pm-add-row-btn btn btn-success" data-section="other" title="Add row">+</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="button-row">
-            <button id="exportCsvBtn" class="secondary-btn">Export to CSV</button>
-            <label class="sr-only" for="importCsvInput">Import CSV file</label>
-            <input type="file" id="importCsvInput" accept=".csv" class="hidden">
-            <button id="importCsvBtn" class="secondary-btn">Import from CSV</button>
-              <button id="copyClipboardBtn" class="secondary-btn">Copy to Clipboard</button>
-              <button id="printPageBtn" class="primary-btn">Printable Page</button>
+    </div>
+
+    <div id="qual-modal" class="modal hidden" role="dialog" aria-hidden="true">
+        <div class="modal-body">
+            <h3 id="qual-modal-title">Edit Qualitative Options</h3>
+            <p id="qual-modal-lead" class="small">Enter one option per line. Order them from best (top) to worst (bottom).</p>
+            <label>
+                <textarea id="qual-list" rows="6" class="form-textarea"></textarea>
+            </label>
+            <div class="modal-actions">
+                <button id="qual-save" class="primary-btn">Save</button>
+                <button id="qual-cancel" class="secondary-btn">Cancel</button>
+            </div>
         </div>
     </div>
+
+    <div id="settings-modal" class="modal hidden settings-modal" role="dialog" aria-hidden="true">
+        <div class="modal-body">
+            <h3>Progress Monitor Settings</h3>
+            <div class="settings-grid">
+                <div>
+                    <label>Default performance type</label>
+                    <select id="default-perf" class="form-input">
+                        <option value="numeric">Numeric</option>
+                        <option value="percent">Percent (%)</option>
+                        <option value="qual">Qualitative</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Default support type</label>
+                    <select id="default-support" class="form-input">
+                        <option value="numeric">Numeric</option>
+                        <option value="percent">Percent (%)</option>
+                        <option value="qual">Qualitative</option>
+                    </select>
+                </div>
+                <div class="full">
+                    <label class="small">Default qualitative options (one per line, best→worst)</label>
+                    <textarea id="default-qual" class="form-textarea" rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="settings-save" class="primary-btn">Save</button>
+                <button id="settings-cancel" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
     </div>
-    <footer class="app-footer no-print"></footer>
+
     <script src="../../assets/js/app-meta.js"></script>
     <script src="../../assets/js/footer.js"></script>
+    <script src="progress-monitor.js" type="module"></script>
+    <script defer src="../../assets/js/shared/temp-autosave.js"></script>
 </body>
 </html>

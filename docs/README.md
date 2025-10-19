@@ -7,6 +7,7 @@ Session Wizard is a modular toolkit to help Speech-Language Pathologists (SLPs) 
 - Goal Builder — SMART goal composer with Goal Attainment Scale (GAS) support
 - Therapy Session Data Taker — customizable real-time data collection templates
 - Homework Tracker — printable, customizable home program logs
+- Progress Monitor — visualize changes in task performance across sessions and across the levels/steps of complex activities
 
 ### Technical highlights
 
@@ -40,6 +41,7 @@ Primary tools
 - Goal Builder: assemble SMART goals using drag-and-drop components. The interface guides you through measurable, time-bound, and functional goal components and helps you construct Goal Attainment Scales (GAS) to quantify outcome expectations. Use the included checklists to improve goal quality and reproducibility.
 - Therapy Session Data Taker: build or select a template for in-session data collection. Templates support a wide range of component types (text, numeric, checkboxes) and special components for common interventions (PACE, structured discourse, spaced retrieval). The custom data table lets you record trial-by-trial performance and export the resulting data for analysis or records. You can click on the Quick Tool tabs (right side of the the window) to open the Stopwatch/Timer and Clicker Counter tools.
 - Homework Tracker: design printable home-program logs by dragging exercises onto the canvas, setting labels, descriptions, and frequency. The Log Details allows you to customise identifying information and the number of weeks to print. The Exercise Group component bundles related activities into a compact layout for easy printing and client handouts. The Reflection section offers text-box or visual analog scale fields for self-reflection/rating and comments on a weekly, rather than daily, schedule.
+- Progress Monitor: track how accuracy/support metrics evolve across therapy sessions and across the levels/steps of complex tasks. Visual overlays and print views help clinicians spot within-level gains, generalisation to higher levels, and changing support needs over time.
 
 Tips
 - 

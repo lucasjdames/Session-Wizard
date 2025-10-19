@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format loosely follows Keep a Changelog and uses semantic, human-readable descriptions.
 
+## [1.2.0] - 2025-10-19
+### Added
+- Progress Monitor tool has been added: an interactive table visualizing change in task performance metrics accross sessions and across different levels/steps in a task.
+Printable views mirror the interactive table, including per-level overlays, performance trend lines, data point markers, and optional cell shading.
+
 ## [1.1.0] - 2025-09-30
 ### Added
 - Speech Deck integration in the Therapy Data Session Taker: printable reports, live scoring modes (Table/Flash-Card), and clipboard export.

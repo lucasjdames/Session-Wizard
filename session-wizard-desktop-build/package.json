@@ -1,7 +1,7 @@
 {
   "name": "session-wizard-desktop-build",
   "productName": "Session Wizard",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Electron wrapper for Session Wizard web app",
   "main": "main.js",
   "scripts": {
@@ -24,7 +24,7 @@
     },
     "icon": "..\\assets\\img\\icon-512.png",
     "extraMetadata": {
-      "version": "1.1.1",
+  "version": "1.2.0",
       "main": "session-wizard-desktop-build/main.js"
     },
     "asar": true,
