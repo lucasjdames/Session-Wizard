@@ -1,14 +1,12 @@
 {
   "name": "session-wizard",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "npx live-server --quiet --watch=./ ./",
     "build": "echo \"No build step yet\"",
-    "bump-and-build": "node ./tools/version-bump/bump-and-build.js"
-  },
-  "dependencies": {
-    "jsdom": "^22.1.0"
+    "clean": "node ./tools/maintenance/clean.js",
+    "bump-and-build": "node ./tools/version-bump/bump-and-build.cjs"
   }
 }

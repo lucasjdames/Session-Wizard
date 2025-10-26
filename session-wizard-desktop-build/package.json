@@ -1,7 +1,7 @@
 {
   "name": "session-wizard-desktop-build",
   "productName": "Session Wizard",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Electron wrapper for Session Wizard web app",
   "main": "main.js",
   "scripts": {
@@ -24,7 +24,7 @@
     },
     "icon": "..\\assets\\img\\icon-512.png",
     "extraMetadata": {
-  "version": "1.2.0",
+      "version": "1.2.1",
       "main": "session-wizard-desktop-build/main.js"
     },
     "asar": true,
@@ -41,10 +41,17 @@
       "manifest.json",
       "assets/**",
       "tools/**",
-      "session-wizard-desktop-build/**",
-      "js/**",
-      "docs/**",
-      "README.md"
+      "README.md",
+      "session-wizard-desktop-build/main.js",
+      "session-wizard-desktop-build/preload.js",
+      "session-wizard-desktop-build/preview-preload.js",
+      "session-wizard-desktop-build/package.json",
+      "!docs/**",
+      "!_archive/**",
+      "!node_modules/**",
+      "!session-wizard-desktop-build/dist/**",
+      "!session-wizard-desktop-build/node_modules/**",
+      "!**/*.log"
     ],
     "win": {
       "icon": "..\\assets\\img\\icon-192.ico",

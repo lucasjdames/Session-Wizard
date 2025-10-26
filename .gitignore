@@ -1,4 +1,5 @@
 session-wizard-desktop-build/dist/
 session-wizard-desktop-build/node_modules/
+node_modules/
 *.exe
 *.blockmap

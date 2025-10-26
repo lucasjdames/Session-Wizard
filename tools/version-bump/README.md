@@ -7,7 +7,7 @@ Usage
 
 From the repository root:
 
-node tools/version-bump/bump-and-build.js 1.2.3
+node tools/version-bump/bump-and-build.cjs 1.2.3
 
 Options:
 

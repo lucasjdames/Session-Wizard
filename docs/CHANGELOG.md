@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format loosely follows Keep a Changelog and uses semantic, human-readable descriptions.
 
+## [1.2.1] - 2025-10-26
+## [1.2.1] - 2025-10-26
+### Changed
+- Desktop packaging now excludes development archives, logs, and node modules, yielding a smaller installer footprint without altering runtime behaviour.
+- Added `npm run clean` to purge build outputs and configuration files created by electron-builder.
+
+### Removed
+- Deleted redundant icon backup assets and the unused service worker script to avoid shipping dead code.
+
 ## [1.2.0] - 2025-10-19
 ### Added
 - Progress Monitor tool has been added: an interactive table visualizing change in task performance metrics accross sessions and across different levels/steps in a task.
