@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format loosely follows Keep a Changelog and uses semantic, human-readable descriptions.
 
-## [1.2.1] - 2025-10-26
+## [Unreleased]
+### Added
+- Release automation script (`tools/version-bump/release.cjs`) to bump versions, build, and publish GitHub releases in one command.
+
+## [1.3.0] - 2025-11-02
+### Added
+- Speech Deck performance summary has been overhauled visually and includes data visualization.
+
 ## [1.2.1] - 2025-10-26
 ### Changed
 - Desktop packaging now excludes development archives, logs, and node modules, yielding a smaller installer footprint without altering runtime behaviour.

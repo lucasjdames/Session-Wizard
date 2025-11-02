@@ -83,7 +83,16 @@
     .theme-dark .section-title { color: var(--accent); font-weight: 600; }
     /* Ensure utility blue headings match host accent in dark mode */
     .theme-dark .text-blue-700 { color: var(--accent) !important; }
-    .theme-dark #exit-flashcard { border-color: var(--color-border, rgba(255,255,255,0.06)); }
+    /* Keep exit button vibrant in dark mode */
+    .theme-dark #exit-flashcard {
+        background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+        border-color: rgba(0,0,0,0.2);
+        box-shadow: 0 2px 8px rgba(248,113,113,0.5);
+    }
+    .theme-dark #exit-flashcard:hover {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 4px 12px rgba(248,113,113,0.7);
+    }
 
         /* Button system for dark mode to match main app */
         .theme-dark .btn, .theme-dark .button, .theme-dark button {
@@ -240,8 +249,8 @@
 
         /* Close button (more visible) */
         #exit-flashcard {
-            background: var(--close-bg);
-            color: var(--text);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
             width: 40px;
             height: 40px;
             display: inline-flex;
@@ -250,10 +259,15 @@
             border-radius: 8px;
             font-size: 20px;
             line-height: 1;
-            border: 1px solid rgba(255,255,255,0.06);
-            box-shadow: 0 2px 8px rgba(2,6,23,0.4);
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(239,68,68,0.4);
+            transition: all 0.2s ease;
         }
-        #exit-flashcard:hover { transform: translateY(-1px); }
+        #exit-flashcard:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 4px 12px rgba(239,68,68,0.6);
+        }
         /* Print-specific styles */
         @media print {
             body * {
@@ -287,7 +301,11 @@
         <header class="bg-white p-6 rounded-xl shadow-sm mb-8">
             <div class="relative flex justify-between items-start">
                 <h1 class="text-2xl font-bold text-slate-800 mb-4">Speech Deck: Motor Speech Practice Stimuli</h1>
-                <div class="relative">
+                <div class="relative flex gap-2">
+                    <button id="scoring-settings-btn" class="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                        Scoring
+                    </button>
                     <button id="how-to-use-btn" class="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors p-2 rounded-lg hover:bg-slate-100">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
                         How to Use
@@ -297,7 +315,7 @@
                             <h2 class="text-lg font-bold text-slate-800 mb-3">How to Use</h2>
                             <div class="text-sm text-slate-600 space-y-3">
                                 <p><strong>Modes:</strong> <em>Table</em> for row-based scoring and comments; <em>Flash-Card</em> for focused, one-item practice (type a completion then score).</p>
-                                <p><strong>Scoring:</strong> Use + (Accurate), +/- (Partial), and - (Off-Target/NR) buttons.</p>
+                                <p><strong>Scoring:</strong> Use the scoring buttons (customizable via Scoring Settings).</p>
                                 <p><strong>Custom Decks:</strong> Paste a list (one per line) and click <em>Create Custom Deck</em>, or add single items in Table View. Custom decks persist when you close the pop-up.</p>
                                 <p><strong>Save:</strong> Always click Save Results before closing the popup to preserve your session data.</p>
                                 <p class="text-xs text-slate-500">Shortcuts: ← / → (navigate), Esc (close).</p>
@@ -308,6 +326,33 @@
             </div>
             <!-- Session metadata (patient, DOB, session date, SLP) is provided by the host Data Taker tool; inputs removed here. -->
         </header>
+        
+        <!-- Scoring Settings Modal -->
+        <div id="scoring-settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-slate-800">Customize Scoring System</h2>
+                        <button id="close-scoring-modal" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4">Define up to 2 categories with up to 5 options each. Examples: Performance (1-5), Support (Independent/Cued), Accuracy (+/+/-/-).</p>
+                    
+                    <div id="scoring-categories-container" class="space-y-4 mb-4">
+                        <!-- Categories will be rendered here -->
+                    </div>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <button id="add-category-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-semibold disabled:opacity-50" disabled>+ Add Category</button>
+                        <button id="reset-to-default-btn" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md hover:bg-slate-300 text-sm font-semibold">Reset to Default</button>
+                    </div>
+                    
+                    <div class="flex justify-end gap-2 pt-4 border-t">
+                        <button id="cancel-scoring-btn" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md hover:bg-slate-300">Cancel</button>
+                        <button id="save-scoring-btn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Save & Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <main id="main-content">
             <!-- Navigation and content will be injected here -->
@@ -506,6 +551,33 @@
         // Stack of recent actions to support undo (Ctrl+Z)
         // Each entry: { type: 'addTrial', part, subPart, key }
         const undoStack = [];
+        
+        // Scoring configuration: customizable categories and options
+        let scoringConfig = {
+            categories: [
+                {
+                    name: 'Performance',
+                    options: [
+                        { value: '+', label: '+' },
+                        { value: '+/-', label: '+/-' },
+                        { value: '-', label: '-' }
+                    ]
+                }
+            ]
+        };
+        
+        // Load saved scoring config from localStorage if available
+        try {
+            const savedConfig = localStorage.getItem('speechDeck_scoringConfig');
+            if (savedConfig) {
+                const parsed = JSON.parse(savedConfig);
+                if (parsed && parsed.categories && Array.isArray(parsed.categories)) {
+                    scoringConfig = parsed;
+                }
+            }
+        } catch (err) {
+            console.warn('Could not load saved scoring config', err);
+        }
 
         // create a trial entry and push an undo record. Returns the unique key created.
         function createTrial(part, subPart, saveLabel, data) {
@@ -550,8 +622,17 @@
                     // clear selection buttons for this item
                     document.querySelectorAll('.score-btn[data-item="' + baseLabel.replace(/"/g, '\\"') + '"]').forEach(b => b.classList.remove('selected'));
                     if (lastScore) {
-                        const btn = document.querySelector('.score-btn[data-item="' + baseLabel.replace(/"/g, '\\"') + '"][data-score="' + lastScore + '"]');
-                        if (btn) btn.classList.add('selected');
+                        if (typeof lastScore === 'string') {
+                            // Legacy single-category score
+                            const btn = document.querySelector('.score-btn[data-item="' + baseLabel.replace(/"/g, '\\"') + '"][data-score="' + lastScore + '"]');
+                            if (btn) btn.classList.add('selected');
+                        } else if (typeof lastScore === 'object') {
+                            // Multi-category score
+                            Object.keys(lastScore).forEach(cat => {
+                                const btn = document.querySelector('.score-btn[data-item="' + baseLabel.replace(/"/g, '\\"') + '"][data-category="' + cat + '"][data-score="' + lastScore[cat] + '"]');
+                                if (btn) btn.classList.add('selected');
+                            });
+                        }
                     }
                 } catch (err) { /* ignore UI update errors */ }
             } catch (err) { /* ignore */ }
@@ -591,6 +672,56 @@
                     }
                 }
             } catch (err) { console.warn('doUndo error', err); }
+        }
+
+        function initializeReportCollapsibles(rootElement) {
+            try {
+                const root = rootElement || document;
+                const toggles = root.querySelectorAll('.collapsible-toggle');
+                if (!toggles || !toggles.length) return;
+
+                toggles.forEach(toggle => {
+                    if (toggle.dataset.collapseInit === 'true') return;
+                    toggle.dataset.collapseInit = 'true';
+
+                    if (toggle.closest('details.collapsible-section')) {
+                        // Native <details>/<summary> handles toggling without JS.
+                        return;
+                    }
+
+                    const content = toggle.nextElementSibling;
+                    if (content && content.dataset.collapsePrepared !== 'true') {
+                        if (!content.style.display) {
+                            content.style.display = 'none';
+                        }
+                        content.dataset.collapsePrepared = 'true';
+                    }
+
+                    const icon = toggle.querySelector('.collapse-icon');
+                    if (icon && icon.dataset.collapsePrepared !== 'true') {
+                        if (!icon.style.transform) {
+                            icon.style.transform = 'rotate(-90deg)';
+                        }
+                        icon.dataset.collapsePrepared = 'true';
+                    }
+
+                    toggle.addEventListener('click', function() {
+                        const sectionContent = this.nextElementSibling;
+                        const sectionIcon = this.querySelector('.collapse-icon');
+
+                        if (!sectionContent) return;
+
+                        const isHidden = sectionContent.style.display === 'none' || sectionContent.style.display === '';
+                        sectionContent.style.display = isHidden ? 'block' : 'none';
+
+                        if (sectionIcon) {
+                            sectionIcon.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+                        }
+                    });
+                });
+            } catch (err) {
+                console.warn('initializeReportCollapsibles error', err);
+            }
         }
     const mainContent = document.getElementById('main-content');
     const CUSTOM_PART = 'Part 7: Custom Stimuli';
@@ -1114,11 +1245,37 @@
                 if (e.target.closest('.score-btn')) {
                     const btn = e.target.closest('.score-btn');
                     const item = btn.dataset.item;
+                    const category = btn.dataset.category;
                     const score = btn.dataset.score;
-                    // Create trial via helper so undo can remove it
-                    const createdKey = createTrial(part, subPart, item, { score: score });
-                    // visual updates
-                    btn.parentElement.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+                    
+                    // Get or create the most recent trial for this item
+                    const lastKey = _lastTrialKeyFor(item);
+                    let trialData;
+                    if (lastKey && sessionResults[part][subPart][lastKey]) {
+                        trialData = sessionResults[part][subPart][lastKey];
+                    } else {
+                        trialData = {};
+                    }
+                    
+                    // Update score as an object if multiple categories, or string if single
+                    if (scoringConfig.categories.length === 1) {
+                        trialData.score = score;
+                    } else {
+                        if (typeof trialData.score !== 'object') {
+                            trialData.score = {};
+                        }
+                        trialData.score[category] = score;
+                    }
+                    
+                    // Create or update trial
+                    if (!lastKey) {
+                        createTrial(part, subPart, item, trialData);
+                    } else {
+                        sessionResults[part][subPart][lastKey] = trialData;
+                    }
+                    
+                    // visual updates - only deselect buttons in same category
+                    btn.parentElement.querySelectorAll('.score-btn[data-category="' + category + '"]').forEach(b => b.classList.remove('selected'));
                     btn.classList.add('selected');
                     try { updateItemUI(part, subPart, item); } catch (err) { /* ignore */ }
                 }
@@ -1215,6 +1372,9 @@
             const stimuli = isReadingPassage ? stimuliData[part][subPart] : stimuliData[part][subPart].flatMap(g => g.items);
 
             let currentIndex = 0;
+            // Track recently viewed cards to weight against them in random selection
+            const recentHistory = [];
+            const RECENT_HISTORY_SIZE = Math.min(5, Math.floor(stimuli.length / 3)); // Track last 5 cards or 1/3 of deck, whichever is smaller
             
             if (!sessionResults[part]) sessionResults[part] = {};
             if (!sessionResults[part][subPart]) sessionResults[part][subPart] = {};
@@ -1391,6 +1551,7 @@
                     </div>
                     <div class="flex justify-between items-center mt-4 flex-shrink-0">
                         <button id="prev-card" class="flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50" ${currentIndex === 0 ? 'disabled' : ''}>&larr; Previous</button>
+                        <button id="random-card" class="flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20" title="Jump to random card" ${stimuli.length <= 1 ? 'disabled' : ''}>🎲 Random</button>
                         <button id="next-card" class="flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-50" ${currentIndex === stimuli.length - 1 ? 'disabled' : ''}>Next &rarr;</button>
                     </div>
                 `;
@@ -1469,28 +1630,51 @@
 
                 if (e.target.closest('.score-btn')) {
                     const btn = e.target.closest('.score-btn');
+                    const category = btn.dataset.category;
                     const score = btn.dataset.score;
 
-                    // For carrier/fillable items, capture the completion text; otherwise use base item
-                    const completionInput = overlay.querySelector('.carrier-completion-input');
-                    const commentInput = overlay.querySelector('.comment-input');
-                    const completionText = completionInput ? completionInput.value.trim() : '';
-                    const commentText = commentInput ? (commentInput.value || '').trim() : '';
+                    // Store pending score in overlay for this category
+                    overlay._pendingScores = overlay._pendingScores || {};
+                    overlay._pendingScores[category] = score;
 
-                    let saveLabel = item;
-                    if ((isCarrierPhrase || isFillable) && completionText) {
-                        if (isFillable) {
-                            saveLabel = item.replace(/(\[.*?\]|\.\.\.)/, `"${completionText}"`);
-                        } else {
-                            saveLabel = `${item} ${completionText}`;
+                    // Visual update - deselect other buttons in same category only
+                    const categoryBtns = overlay.querySelectorAll('.score-btn[data-category="' + category + '"]');
+                    categoryBtns.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    
+                    // Check if all categories have been scored
+                    const allScored = scoringConfig.categories.every(cat => 
+                        overlay._pendingScores && overlay._pendingScores[cat.name]
+                    );
+                    
+                    if (allScored) {
+                        // All categories scored - commit the trial
+                        const completionInput = overlay.querySelector('.carrier-completion-input');
+                        const commentInput = overlay.querySelector('.comment-input');
+                        const completionText = completionInput ? completionInput.value.trim() : '';
+                        const commentText = commentInput ? (commentInput.value || '').trim() : '';
+
+                        let saveLabel = item;
+                        if ((isCarrierPhrase || isFillable) && completionText) {
+                            if (isFillable) {
+                                saveLabel = item.replace(/(\[.*?\]|\.\.\.)/, `"${completionText}"`);
+                            } else {
+                                saveLabel = `${item} ${completionText}`;
+                            }
                         }
-                    }
 
-                    // Use centralized commit so click and Enter behave the same
-                    commitTrial(saveLabel, score, commentText);
-                    try { updateCard(); } catch (e) { /* ignore */ }
-                    // provide focus for quick repeated entries
-                    try { if (completionInput) completionInput.focus(); } catch (err) {}
+                        // Build score object or string
+                        const finalScore = scoringConfig.categories.length === 1 
+                            ? overlay._pendingScores[scoringConfig.categories[0].name]
+                            : {...overlay._pendingScores};
+
+                        // Use centralized commit
+                        commitTrial(saveLabel, finalScore, commentText);
+                        overlay._pendingScores = {};
+                        try { updateCard(); } catch (e) { /* ignore */ }
+                        // provide focus for quick repeated entries
+                        try { if (completionInput) completionInput.focus(); } catch (err) {}
+                    }
                 }
 
                 if (e.target.matches('input[data-field]') || e.target.classList.contains('comment-input')) {
@@ -1569,6 +1753,13 @@
             
             function navigate(direction) {
                 currentIndex = Math.max(0, Math.min(stimuli.length - 1, currentIndex + direction));
+                // Track the card we're moving to in history
+                if (!recentHistory.includes(currentIndex)) {
+                    recentHistory.push(currentIndex);
+                    if (recentHistory.length > RECENT_HISTORY_SIZE) {
+                        recentHistory.shift(); // Remove oldest
+                    }
+                }
                 updateCard();
             }
 
@@ -1680,6 +1871,50 @@
                     window.removeEventListener('keydown', keydownHandler);
                 }
                 if (e.target.id === 'prev-card') navigate(-1);
+                if (e.target.id === 'random-card') {
+                    // Weighted random selection that avoids recently viewed cards
+                    if (stimuli.length > 1) {
+                        // Build weighted pool: cards not in recent history get more weight
+                        const weights = [];
+                        for (let i = 0; i < stimuli.length; i++) {
+                            if (i === currentIndex) {
+                                // Current card gets very low weight (only chosen if no other option)
+                                weights.push(0.1);
+                            } else if (recentHistory.includes(i)) {
+                                // Recent cards get reduced weight based on how recently they were seen
+                                const recencyIndex = recentHistory.indexOf(i);
+                                const recencyFactor = (recencyIndex + 1) / recentHistory.length; // 0.2 to 1.0
+                                weights.push(0.3 * recencyFactor); // More recent = lower weight
+                            } else {
+                                // Cards not recently seen get full weight
+                                weights.push(1.0);
+                            }
+                        }
+                        
+                        // Calculate total weight and pick random weighted index
+                        const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+                        let random = Math.random() * totalWeight;
+                        let selectedIndex = 0;
+                        
+                        for (let i = 0; i < weights.length; i++) {
+                            random -= weights[i];
+                            if (random <= 0) {
+                                selectedIndex = i;
+                                break;
+                            }
+                        }
+                        
+                        currentIndex = selectedIndex;
+                        // Add to recent history
+                        if (!recentHistory.includes(currentIndex)) {
+                            recentHistory.push(currentIndex);
+                            if (recentHistory.length > RECENT_HISTORY_SIZE) {
+                                recentHistory.shift();
+                            }
+                        }
+                        updateCard();
+                    }
+                }
                 if (e.target.id === 'next-card') navigate(1);
                 handleInteraction(e);
             });
@@ -1687,14 +1922,27 @@
             window.addEventListener('keydown', keydownHandler);
         }
 
-        function renderScoreButtons(item, selectedScore) {
-            const scores = ['+', '+/-', '-'];
+        function renderScoreButtons(item, selectedScores) {
+            // selectedScores can be a string (legacy single score) or an object {category: value}
+            const selected = typeof selectedScores === 'string' ? { [scoringConfig.categories[0].name]: selectedScores } : (selectedScores || {});
+            
             return `
-                <div class="flex space-x-2 bg-slate-100 p-2 rounded-full">
-                    ${scores.map(score => `
-                        <button type="button" class="score-btn hover:bg-slate-200" data-item="${item}" data-score="${score}">
-                            <span class="text-lg font-bold">${score}</span>
-                        </button>
+                <div class="flex flex-col gap-2">
+                    ${scoringConfig.categories.map(category => `
+                        <div class="flex flex-col gap-1">
+                            ${scoringConfig.categories.length > 1 ? `<span class="text-xs font-medium text-slate-600">${category.name}</span>` : ''}
+                            <div class="flex space-x-2 bg-slate-100 p-2 rounded-full">
+                                ${category.options.map(option => `
+                                    <button type="button" class="score-btn hover:bg-slate-200 ${selected[category.name] === option.value ? 'selected' : ''}"
+                                            data-item="${item}"
+                                            data-category="${category.name}"
+                                            data-score="${option.value}"
+                                            title="${category.name}: ${(option.label || option.value || '').trim()}">
+                                        <span class="text-sm font-bold">${(option.value || option.label || '').trim()}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
                     `).join('')}
                 </div>
             `;
@@ -1730,92 +1978,984 @@
 
             // Return a compact report body (host manages top-level metadata/prefix)
             let reportHTML = `
-                <div class="p-4 space-y-8">
+                <style>
+                    .report-container { padding: 16px; background-color: white; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+                    .section { background-color: white; border: 1px solid #e2e8f0; border-radius: 4px; padding: 16px; margin-bottom: 16px; }
+                    .section-title { font-size: 18px; font-weight: bold; color: #1e293b; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+                    .summary-grid { display: flex; flex-direction: column; gap: 12px; }
+                    .summary-card { border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px; background-color: #f8fafc; }
+                    .summary-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+                    .summary-card-title { font-weight: 600; font-size: 15px; color: #1e293b; }
+                    .summary-card-badge { font-size: 11px; font-weight: 600; color: #64748b; background-color: white; padding: 3px 6px; border-radius: 3px; }
+                    .stat-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #475569; font-size: 13px; }
+                    .stat-value { font-weight: 600; font-size: 16px; }
+                    .summary-card-meta { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+                    .summary-card-meta { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+                    .category-box { background-color: white; border-radius: 3px; border-left: 3px solid #3b82f6; padding: 8px; margin-bottom: 8px; }
+                    .category-title { font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
+                    .stat-label { font-size: 12px; color: #64748b; }
+                    .stat-number { font-size: 16px; font-weight: 600; color: #2563eb; }
+                    .badge-group { display: flex; flex-wrap: wrap; gap: 6px; }
+                    .badge { display: inline-flex; align-items: center; gap: 3px; background-color: #f1f5f9; padding: 3px 6px; border-radius: 3px; font-size: 11px; }
+                    .badge-value { font-weight: 600; }
+                    .badge-percent { color: #64748b; }
+                    .badge-count { color: #94a3b8; }
+                    .progress-row { display: flex; align-items: center; justify-between; background-color: white; padding: 6px; border-radius: 3px; border: 1px solid #e2e8f0; margin-bottom: 6px; }
+                    .progress-label { font-weight: 600; color: #1e293b; font-size: 13px; }
+                    .progress-bar-container { width: 100px; background-color: #f1f5f9; border-radius: 9999px; height: 6px; overflow: hidden; }
+                    .progress-bar-fill { background-color: #3b82f6; height: 100%; }
+                    .progress-percent { font-size: 13px; font-weight: 600; color: #334155; width: 40px; text-align: right; }
+                    .collapsible-section { border: 1px solid #e2e8f0; border-radius: 4px; background-color: white; margin-bottom: 8px; overflow: hidden; }
+                    .collapsible-section summary { list-style: none; }
+                    .collapsible-section summary::-webkit-details-marker { display: none; }
+                    .collapsible-toggle { background-color: #f8fafc; padding: 8px 12px; cursor: pointer; user-select: none; transition: background-color 0.15s; display: flex; align-items: center; justify-content: space-between; }
+                    .collapsible-section[open] .collapsible-toggle { background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
+                    .collapsible-toggle:hover { background-color: #f1f5f9; }
+                    .collapsible-title-row { display: flex; align-items: center; gap: 6px; }
+                    .collapse-icon { display: inline-block; font-weight: bold; font-size: 0.9em; color: #64748b; transition: transform 0.15s; transform: rotate(-90deg); }
+                    .collapsible-section[open] .collapse-icon { transform: rotate(0deg); }
+                    .collapsible-title { font-weight: 600; color: #1e293b; font-size: 14px; }
+                    .table-container { overflow-x: auto; padding: 12px; display: none; }
+                    .collapsible-section[open] .table-container { display: block; }
+                    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+                    table thead { background-color: #f8fafc; }
+                    table th { padding: 8px 12px; text-align: left; font-weight: 600; color: #334155; border-bottom: 2px solid #e2e8f0; font-size: 12px; }
+                    table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+                    table tbody tr:hover { background-color: #f8fafc; }
+                    .score-badge { display: inline-flex; align-items: center; padding: 3px 6px; border-radius: 3px; font-weight: 500; font-size: 11px; background-color: #f8fafc; border: 1px solid #d4d4d8; color: #1f2937; gap: 4px; }
+                    .score-badge-single { background-color: #ffffff; color: #1f2937; }
+                    .score-badge-multi { background-color: #ffffff; color: #1f2937; margin-right: 4px; }
+                    .score-badge-category { color: #475569; font-weight: 600; margin-right: 2px; }
+                    .comment-empty { color: #cbd5e1; }
+                    .footer { text-align: center; padding: 16px 0; border-top: 1px solid #e2e8f0; margin-top: 8px; }
+                    .footer-content { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: #64748b; }
+                    @media print {
+                        .collapsible-toggle { display: none !important; }
+                        .table-container { display: block !important; }
+                    }
+                </style>
+                <div class="report-container">
             `;
 
             // --- Summary Section ---
-            let summaryHTML = '<section class="space-y-4"><h3 class="text-xl font-bold border-b-2 border-slate-800 pb-1">Summary</h3>';
-            let hasSummaryData = false;
+            const escapeHtml = (value) => {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
 
+            // Create value-to-label mapping from scoringConfig
+            const valueToLabelMap = {};
+            scoringConfig.categories.forEach(cat => {
+                valueToLabelMap[cat.name] = {};
+                cat.options.forEach(opt => {
+                    valueToLabelMap[cat.name][opt.value] = opt.label || opt.value;
+                });
+            });
+            
+            // Helper function to get label for a value
+            const getLabel = (categoryName, value) => {
+                if (valueToLabelMap[categoryName] && valueToLabelMap[categoryName][value]) {
+                    return valueToLabelMap[categoryName][value];
+                }
+                return value; // fallback to value if no label found
+            };
+
+            let summaryHTML = `
+                <section class="section">
+                    <h2 class="section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px; min-width: 24px; color: #2563eb;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Performance Summary
+                    </h2>
+                    <div class="summary-grid">
+            `;
+            
+            // Collect all scored trials (excluding Part 3 reading passages)
+            const allScoredTrials = [];
+            let hasReadingPassages = false;
+            
             for (const part in sessionResults) {
+                const isReadingPassage = part === "Part 3: Paragraph-Level Reading Passages" || part === "Part 3: Paragraph-Length Reading Passages";
+                
                 for (const subPart in sessionResults[part]) {
                     const results = sessionResults[part][subPart];
-                    const isReadingPassage = part === "Part 3: Paragraph-Length Reading Passages";
-                    const scoredItems = Object.values(results).filter(res => res.score && res.score.trim() !== '');
                     
-                    if (scoredItems.length > 0) {
-                        hasSummaryData = true;
-                        summaryHTML += `<div class="p-2"><h3 class="font-semibold text-md">${part}: ${subPart}</h3>`;
-                        
-                        if (isReadingPassage) {
-                            summaryHTML += `<p class="text-sm text-slate-600">Scores/Rates recorded for ${scoredItems.length} passage(s).</p>`;
-                        } else {
-                            const total = scoredItems.length;
-                            const plusCount = scoredItems.filter(s => s.score === '+').length;
-                            const plusMinusCount = scoredItems.filter(s => s.score === '+/-').length;
-                            const minusCount = scoredItems.filter(s => s.score === '-').length;
-
-                            const plusPercent = ((plusCount / total) * 100).toFixed(0);
-                            const plusMinusPercent = ((plusMinusCount / total) * 100).toFixed(0);
-                            const minusPercent = ((minusCount / total) * 100).toFixed(0);
-
-                            summaryHTML += `
-                                <p class="text-sm text-slate-600">Total Scored Trials: ${total}</p>
-                                <p class="text-sm mt-1"><strong>Accuracy:</strong> ${plusPercent}% Accurate (+), ${plusMinusPercent}% Partial (+/-), ${minusPercent}% Off-Target/NR (-)</p>
-                            `;
+                    // Helper to check if score exists (handles both string and object formats)
+                    const hasScore = (res) => {
+                        if (!res.score) return false;
+                        if (typeof res.score === 'string') return res.score.trim() !== '';
+                        if (typeof res.score === 'object') return Object.keys(res.score).length > 0;
+                        return false;
+                    };
+                    
+                    // Collect entries with their keys (stimulus info) preserved
+                    for (const [key, trialData] of Object.entries(results)) {
+                        if (hasScore(trialData)) {
+                            if (isReadingPassage) {
+                                hasReadingPassages = true;
+                            } else {
+                                // Extract stimulus from key (format: "Stimulus [Trial N]")
+                                const stimulusMatch = key.match(/^(.+?)\s*\[Trial\s+\d+\]$/);
+                                const stimulus = stimulusMatch ? stimulusMatch[1].trim() : key;
+                                allScoredTrials.push({ ...trialData, stimulus });
+                            }
                         }
-                        summaryHTML += `</div>`;
                     }
                 }
             }
-            summaryHTML += '</section>';
-            if(hasSummaryData) {
-                reportHTML += summaryHTML;
+            
+            // Generate combined summary for all scored trials
+            if (allScoredTrials.length > 0) {
+                summaryHTML += `
+                    <div class="summary-card">
+                        <div class="summary-card-header">
+                            <h3 class="summary-card-title">Overall Performance</h3>
+                        </div>
+                        <div class="summary-card-meta">${allScoredTrials.length} trials scored across all categories</div>
+                `;
+                
+                // Determine scoring type by checking first trial
+                const firstScore = allScoredTrials[0].score;
+                const isMultiCategory = typeof firstScore === 'object' && firstScore !== null;
+                
+                if (isMultiCategory) {
+                    // Multi-category scoring - show separate stats for each category
+                    const categoriesData = {};
+                    
+                    // Collect scores by category
+                    allScoredTrials.forEach(trial => {
+                        if (trial.score && typeof trial.score === 'object') {
+                            Object.entries(trial.score).forEach(([category, value]) => {
+                                if (value && String(value).trim()) {
+                                    if (!categoriesData[category]) categoriesData[category] = [];
+                                    categoriesData[category].push(String(value).trim());
+                                }
+                            });
+                        }
+                    });
+                    
+                    // Display each category separately
+                    Object.entries(categoriesData).forEach(([category, scores], index) => {
+                        if (index > 0) summaryHTML += `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;"></div>`;
+                        
+                        summaryHTML += `
+                            <div style="margin-top: 8px;">
+                                <div style="font-weight: 600; color: #334155; margin-bottom: 6px;">${category}</div>
+                        `;
+                        
+                        // Check if this category's scores are numeric
+                        const allNumeric = scores.every(sc => {
+                            const num = parseFloat(sc);
+                            return !isNaN(num) && String(num) === String(sc);
+                        });
+                        
+                        if (allNumeric) {
+                            // Numeric scoring - calculate statistics
+                            const numericScores = scores.map(v => parseFloat(v));
+                            const sum = numericScores.reduce((a, b) => a + b, 0);
+                            const mean = (sum / numericScores.length).toFixed(2);
+                            const min = Math.min(...numericScores);
+                            const max = Math.max(...numericScores);
+                            
+                            summaryHTML += `
+                                <div style="display: flex; align-items: center; gap: 16px; margin: 6px 0 6px 12px;">
+                                    <div style="display: flex; align-items: baseline; gap: 6px;">
+                                        <span style="font-size: 11px; color: #64748b;">Average:</span>
+                                        <span style="font-size: 18px; font-weight: bold; color: #2563eb;">${mean}</span>
+                                    </div>
+                                    <div style="font-size: 11px; color: #64748b;">
+                                        Range: ${min}–${max}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Distribution breakdown
+                            const distribution = {};
+                            numericScores.forEach(score => {
+                                distribution[score] = (distribution[score] || 0) + 1;
+                            });
+                            
+                            summaryHTML += `<div class="badge-group" style="margin-top: 6px; margin-left: 12px;">`;
+                            Object.entries(distribution)
+                                .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]))
+                                .forEach(([val, count]) => {
+                                    const percent = ((count / scores.length) * 100).toFixed(0);
+                                    const label = getLabel(category, val);
+                                    const displayText = label !== val ? `${val} (${label})` : val;
+                                    summaryHTML += `
+                                        <span class="badge">
+                                            <span class="badge-value">${displayText}:</span>
+                                            <span class="badge-percent">${percent}%</span>
+                                            <span class="badge-count">(${count})</span>
+                                        </span>
+                                    `;
+                                });
+                            summaryHTML += `</div>`;
+                        } else {
+                            // Non-numeric scoring - show percentage breakdown
+                            const distribution = {};
+                            scores.forEach(score => {
+                                distribution[score] = (distribution[score] || 0) + 1;
+                            });
+                            
+                            summaryHTML += `<div class="badge-group" style="margin-top: 6px; margin-left: 12px;">`;
+                            Object.entries(distribution)
+                                .sort((a, b) => b[1] - a[1])
+                                .forEach(([val, count]) => {
+                                    const percent = ((count / scores.length) * 100).toFixed(0);
+                                    const label = getLabel(category, val);
+                                    const displayText = label !== val ? `${val} (${label})` : val;
+                                    summaryHTML += `
+                                        <span class="badge">
+                                            <span class="badge-value">${displayText}:</span>
+                                            <span class="badge-percent">${percent}%</span>
+                                            <span class="badge-count">(${count})</span>
+                                        </span>
+                                    `;
+                                });
+                            summaryHTML += `</div>`;
+                        }
+                        
+                        summaryHTML += `</div>`;
+                    });
+                } else {
+                    // Single category scoring - collect all scores
+                    const allScores = [];
+                    allScoredTrials.forEach(trial => {
+                        if (trial.score && String(trial.score).trim()) {
+                            allScores.push(String(trial.score).trim());
+                        }
+                    });
+                    
+                    if (allScores.length > 0) {
+                        // Check if all scores are numeric
+                        const allNumeric = allScores.every(sc => {
+                            const num = parseFloat(sc);
+                            return !isNaN(num) && String(num) === String(sc);
+                        });
+                        
+                        if (allNumeric) {
+                            // Numeric scoring - calculate statistics
+                            const numericScores = allScores.map(v => parseFloat(v));
+                            const sum = numericScores.reduce((a, b) => a + b, 0);
+                            const mean = (sum / numericScores.length).toFixed(2);
+                            const min = Math.min(...numericScores);
+                            const max = Math.max(...numericScores);
+                            
+                            summaryHTML += `
+                                <div style="display: flex; align-items: center; gap: 16px; margin: 12px 0;">
+                                    <div style="display: flex; align-items: baseline; gap: 6px;">
+                                        <span style="font-size: 12px; color: #64748b;">Average:</span>
+                                        <span style="font-size: 20px; font-weight: bold; color: #2563eb;">${mean}</span>
+                                    </div>
+                                    <div style="font-size: 12px; color: #64748b;">
+                                        Range: ${min}–${max}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Distribution breakdown
+                            const distribution = {};
+                            numericScores.forEach(score => {
+                                distribution[score] = (distribution[score] || 0) + 1;
+                            });
+                            
+                            summaryHTML += `<div class="badge-group">`;
+                            Object.entries(distribution)
+                                .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]))
+                                .forEach(([val, count]) => {
+                                    const percent = ((count / allScores.length) * 100).toFixed(0);
+                                    const categoryName = scoringConfig.categories[0].name;
+                                    const label = getLabel(categoryName, val);
+                                    const displayText = label !== val ? `${val} (${label})` : val;
+                                    summaryHTML += `
+                                        <span class="badge">
+                                            <span class="badge-value">${displayText}:</span>
+                                            <span class="badge-percent">${percent}%</span>
+                                            <span class="badge-count">(${count})</span>
+                                        </span>
+                                    `;
+                                });
+                            summaryHTML += `</div>`;
+                        } else {
+                            // Non-numeric scoring - show percentage breakdown
+                            const distribution = {};
+                            allScores.forEach(score => {
+                                distribution[score] = (distribution[score] || 0) + 1;
+                            });
+                            
+                            summaryHTML += `<div class="badge-group" style="margin-top: 8px;">`;
+                            Object.entries(distribution)
+                                .sort((a, b) => b[1] - a[1])
+                                .forEach(([val, count]) => {
+                                    const percent = ((count / allScores.length) * 100).toFixed(0);
+                                    const categoryName = scoringConfig.categories[0].name;
+                                    const label = getLabel(categoryName, val);
+                                    const displayText = label !== val ? `${val} (${label})` : val;
+                                    summaryHTML += `
+                                        <span class="badge">
+                                            <span class="badge-value">${displayText}:</span>
+                                            <span class="badge-percent">${percent}%</span>
+                                            <span class="badge-count">(${count})</span>
+                                        </span>
+                                    `;
+                                });
+                            summaryHTML += `</div>`;
+                        }
+                    }
+                }
+                
+                // --- Add Visualization Graph (collapsible) ---
+                if (allScoredTrials.length > 0) {
+                    summaryHTML += `
+                        <details style="margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 12px;" open data-print-open>
+                            <summary style="cursor: pointer; font-weight: 600; color: #334155; padding: 8px 0; user-select: none; list-style: none; display: flex; align-items: center; gap: 8px;">
+                                <span style="transition: transform 0.2s; display: inline-block; font-size: 12px;">▶</span>
+                                <span>Visualization</span>
+                            </summary>
+                            <div id="performance-chart" style="margin-top: 12px; padding: 16px; background: #f8fafc; border-radius: 8px; min-height: 200px;">
+                    `;
+                    
+                    // Determine if we have single or dual category scoring
+                    const firstScore = allScoredTrials[0].score;
+                    const isMultiCategory = typeof firstScore === 'object' && firstScore !== null;
+                    
+                    if (isMultiCategory) {
+                        // Extract the two categories
+                        const categoriesData = {};
+                        allScoredTrials.forEach(trial => {
+                            if (trial.score && typeof trial.score === 'object') {
+                                Object.entries(trial.score).forEach(([category, value]) => {
+                                    if (value && String(value).trim()) {
+                                        if (!categoriesData[category]) categoriesData[category] = [];
+                                        categoriesData[category].push(String(value).trim());
+                                    }
+                                });
+                            }
+                        });
+                        
+                        const categories = Object.keys(categoriesData);
+                        if (categories.length === 2) {
+                            const cat1 = categories[0];
+                            const cat2 = categories[1];
+                            const scores1 = categoriesData[cat1];
+                            const scores2 = categoriesData[cat2];
+                            
+                            // Check if both are numeric
+                            const cat1Numeric = scores1.every(s => !isNaN(parseFloat(s)));
+                            const cat2Numeric = scores2.every(s => !isNaN(parseFloat(s)));
+                            
+                            if (cat1Numeric && cat2Numeric) {
+                                // Dual numeric: scatter plot with hover tooltips
+                                summaryHTML += `
+                                    <div class="summary-visualization-title">${cat1} vs ${cat2}</div>
+                                    <div class="scatter-chart-wrapper">
+                                        <svg class="scatter-chart" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid meet">
+                                `;
+
+                                // Calculate ranges for axes
+                                const nums1 = scores1.map(s => parseFloat(s));
+                                const nums2 = scores2.map(s => parseFloat(s));
+                                const min1 = Math.min(...nums1);
+                                const max1 = Math.max(...nums1);
+                                const min2 = Math.min(...nums2);
+                                const max2 = Math.max(...nums2);
+
+                                // Determine tick values and layout padding
+                                const cat1Config = scoringConfig.categories.find(c => c.name === cat1);
+                                const cat2Config = scoringConfig.categories.find(c => c.name === cat2);
+
+                                let cat1Values = cat1Config
+                                    ? cat1Config.options.map(opt => parseFloat(opt.value)).filter(v => !isNaN(v)).sort((a, b) => a - b)
+                                    : [];
+                                let cat2Values = cat2Config
+                                    ? cat2Config.options.map(opt => parseFloat(opt.value)).filter(v => !isNaN(v)).sort((a, b) => a - b)
+                                    : [];
+
+                                const uniqueNumericValues = values => [...new Set(values.filter(v => !isNaN(v)))].sort((a, b) => a - b);
+
+                                if (!cat1Values.length) cat1Values = uniqueNumericValues(nums1);
+                                if (!cat2Values.length) cat2Values = uniqueNumericValues(nums2);
+
+                                const cat1TickData = cat1Values.map(value => {
+                                    const label = getLabel(cat1, String(value));
+                                    const displayText = label !== String(value) ? `${value} (${label})` : String(value);
+                                    return { value, displayText };
+                                });
+
+                                let maxYLabelWidth = 0;
+                                const cat2TickData = cat2Values.map(value => {
+                                    const label = getLabel(cat2, String(value));
+                                    const displayText = label !== String(value) ? `${value} (${label})` : String(value);
+                                    const estimatedWidth = displayText.length * 7.5;
+                                    maxYLabelWidth = Math.max(maxYLabelWidth, estimatedWidth);
+                                    return { value, displayText };
+                                });
+
+                                const basePadding = 50;
+                                const topPadding = 50;
+                                const rightPadding = 42;
+                                const bottomPadding = 46;
+                                const leftPadding = Math.max(basePadding - 8, maxYLabelWidth + 26);
+
+                                const chartWidth = 400 - leftPadding - rightPadding;
+                                const chartHeight = 250 - topPadding - bottomPadding;
+                                const chartLeft = leftPadding;
+                                const chartRight = 400 - rightPadding;
+                                const chartTop = topPadding;
+                                const chartBottom = 250 - bottomPadding;
+
+                                const xAxisLabelX = chartLeft + chartWidth / 2;
+                                const xAxisLabelY = chartBottom + bottomPadding - 10;
+                                const yAxisLabelY = chartTop + chartHeight / 2;
+                                const yAxisLabelOffset = Math.min(maxYLabelWidth + 18, chartLeft - 10);
+                                const yAxisLabelX = chartLeft - yAxisLabelOffset;
+
+                                // Draw axes
+                                summaryHTML += `
+                                    <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="#cbd5e1" stroke-width="2"/>
+                                    <line x1="${chartLeft}" y1="${chartTop}" x2="${chartLeft}" y2="${chartBottom}" stroke="#cbd5e1" stroke-width="2"/>
+                                `;
+
+                                // Add tick marks and labels for x-axis (cat1)
+                                cat1TickData.forEach(({ value, displayText }) => {
+                                    const x = chartLeft + ((value - min1) / (max1 - min1 || 1)) * chartWidth;
+                                    summaryHTML += `
+                                        <line x1="${x}" y1="${chartBottom}" x2="${x}" y2="${chartBottom + 5}" stroke="#94a3b8" stroke-width="1"/>
+                                        <text x="${x}" y="${chartBottom + 18}" text-anchor="middle" font-size="10" fill="#64748b">${escapeHtml(displayText)}</text>
+                                    `;
+                                });
+
+                                // Add tick marks and labels for y-axis (cat2)
+                                cat2TickData.forEach(({ value, displayText }) => {
+                                    const y = chartBottom - ((value - min2) / (max2 - min2 || 1)) * chartHeight;
+                                    summaryHTML += `
+                                        <line x1="${chartLeft - 5}" y1="${y}" x2="${chartLeft}" y2="${y}" stroke="#94a3b8" stroke-width="1"/>
+                                        <text x="${chartLeft - 8}" y="${y + 3}" text-anchor="end" font-size="10" fill="#64748b">${escapeHtml(displayText)}</text>
+                                    `;
+                                });
+
+                                // Axis labels
+                                summaryHTML += `
+                                    <text x="${xAxisLabelX}" y="${xAxisLabelY}" text-anchor="middle" font-size="12" fill="#64748b" font-weight="600">${escapeHtml(cat1)}</text>
+                                    <text x="${yAxisLabelX}" y="${yAxisLabelY}" text-anchor="middle" font-size="12" fill="#64748b" font-weight="600" transform="rotate(-90, ${yAxisLabelX}, ${yAxisLabelY})">${escapeHtml(cat2)}</text>
+                                `;
+
+                                const chartPoints = {};
+                                const describeTrial = (trial, idx) => {
+                                    const trialNumber = idx + 1;
+                                    let content = '';
+                                    if (trial) {
+                                        const candidates = [trial.stimulus, trial.prompt, trial.display, trial.label];
+                                        for (const candidate of candidates) {
+                                            if (candidate && String(candidate).trim()) {
+                                                content = String(candidate).trim();
+                                                break;
+                                            }
+                                        }
+                                        if (!content && trial.comment && String(trial.comment).trim()) {
+                                            content = `Comment: ${trial.comment.trim()}`;
+                                        }
+                                    }
+                                    return { number: trialNumber, content };
+                                };
+
+                                allScoredTrials.forEach((trial, trialIdx) => {
+                                    if (!trial || !trial.score || typeof trial.score !== 'object') return;
+                                    const raw1 = trial.score[cat1];
+                                    const raw2 = trial.score[cat2];
+                                    const v1 = parseFloat(raw1);
+                                    const v2 = parseFloat(raw2);
+                                    if (isNaN(v1) || isNaN(v2)) return;
+
+                                    const x = chartLeft + ((v1 - min1) / (max1 - min1 || 1)) * chartWidth;
+                                    const y = chartBottom - ((v2 - min2) / (max2 - min2 || 1)) * chartHeight;
+                                    const key = `${Math.round(x)},${Math.round(y)}`;
+
+                                    if (!chartPoints[key]) {
+                                        chartPoints[key] = {
+                                            x: Math.round(x),
+                                            y: Math.round(y),
+                                            v1Raw: String(raw1 ?? ''),
+                                            v2Raw: String(raw2 ?? ''),
+                                            trials: []
+                                        };
+                                    }
+
+                                    chartPoints[key].trials.push(describeTrial(trial, trialIdx));
+                                });
+
+                                Object.values(chartPoints).forEach(point => {
+                                    const count = point.trials.length;
+                                    const radius = Math.max(3, Math.min(22, 3 + (count - 1) * 1.6));
+                                    const label1 = escapeHtml(getLabel(cat1, point.v1Raw));
+                                    const label2 = escapeHtml(getLabel(cat2, point.v2Raw));
+
+                                    const maxItems = 5;
+                                    const visibleTrials = point.trials.slice(0, maxItems);
+                                    const tooltipItems = visibleTrials.map(trialInfo => {
+                                        const baseLabel = `Trial ${trialInfo.number}`;
+                                        const normalized = trialInfo.content ? String(trialInfo.content) : '';
+                                        const truncated = normalized.length > 60 ? `${normalized.slice(0, 57)}…` : normalized;
+                                        const detail = normalized
+                                            ? ` <span class="scatter-tooltip-content">&ndash; ${escapeHtml(truncated)}</span>`
+                                            : '';
+                                        return `<li class="scatter-tooltip-item"><span class="scatter-tooltip-index">${escapeHtml(baseLabel)}</span>${detail}</li>`;
+                                    }).join('');
+                                    const remaining = count - visibleTrials.length;
+                                    const moreLine = remaining > 0 ? `<div class="scatter-tooltip-more">+${remaining} more trial${remaining > 1 ? 's' : ''}</div>` : '';
+                                    const tooltipHeight = 72 + visibleTrials.length * 18 + (remaining > 0 ? 18 : 0);
+                                    const tooltipContent = `
+                                        <div class="scatter-tooltip-header">${label1} / ${label2}</div>
+                                        <div class="scatter-tooltip-count">${count} trial${count > 1 ? 's' : ''}</div>
+                                        <ul class="scatter-tooltip-list">${tooltipItems}</ul>
+                                        ${moreLine}
+                                    `;
+                                    const tooltipX = radius + 8;
+                                    const tooltipY = -(tooltipHeight + radius + 8);
+
+                                    summaryHTML += `
+                                        <g class="scatter-point" transform="translate(${point.x}, ${point.y})">
+                                            <circle cx="0" cy="0" r="${radius}" class="scatter-point-dot"/>
+                                            <foreignObject class="scatter-tooltip-wrapper" x="${tooltipX}" y="${tooltipY}" width="220" height="${tooltipHeight}" pointer-events="none">
+                                                <div xmlns="http://www.w3.org/1999/xhtml" class="scatter-tooltip">
+                                                    ${tooltipContent}
+                                                </div>
+                                            </foreignObject>
+                                        </g>
+                                    `;
+                                });
+
+                                summaryHTML += `
+                                        </svg>
+                                    </div>
+                                `;
+                            } else {
+                                // One or both categorical: grouped bar chart
+                                const cat1Values = [...new Set(scores1)].sort();
+                                const cat2Values = [...new Set(scores2)].sort();
+                                
+                                // Count co-occurrences
+                                const cooccurrence = {};
+                                scores1.forEach((v1, i) => {
+                                    const v2 = scores2[i];
+                                    const key = `${v1}|${v2}`;
+                                    cooccurrence[key] = (cooccurrence[key] || 0) + 1;
+                                });
+                                
+                                summaryHTML += `
+                                    <div style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 12px; text-align: center;">${cat1} × ${cat2}</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+                                `;
+                                
+                                cat1Values.forEach(v1 => {
+                                    const counts = cat2Values.map(v2 => cooccurrence[`${v1}|${v2}`] || 0);
+                                    const total = counts.reduce((a, b) => a + b, 0);
+                                    if (total > 0) {
+                                        const label1 = getLabel(cat1, v1);
+                                        summaryHTML += `
+                                            <div style="padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                                <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px;">${label1}</div>
+                                        `;
+                                        cat2Values.forEach((v2, idx) => {
+                                            const count = counts[idx];
+                                            if (count > 0) {
+                                                const pct = ((count / total) * 100).toFixed(0);
+                                                const label2 = getLabel(cat2, v2);
+                                                summaryHTML += `
+                                                    <div style="display: flex; align-items: center; gap: 6px; margin: 2px 0;">
+                                                        <div style="width: 60px; height: 16px; background: #e0f2fe; border-radius: 3px; overflow: hidden;">
+                                                            <div style="height: 100%; background: #3b82f6; width: ${pct}%;"></div>
+                                                        </div>
+                                                        <span style="font-size: 10px; color: #475569;">${label2}: ${count}</span>
+                                                    </div>
+                                                `;
+                                            }
+                                        });
+                                        summaryHTML += `</div>`;
+                                    }
+                                });
+                                
+                                summaryHTML += `</div>`;
+                            }
+                        }
+                    } else {
+                        // Single category: simple distribution chart
+                        const allScores = allScoredTrials.map(t => String(t.score).trim()).filter(s => s);
+                        const isNumeric = allScores.every(s => !isNaN(parseFloat(s)));
+                        
+                        if (isNumeric) {
+                            // Numeric: line/area chart showing distribution
+                            const nums = allScores.map(s => parseFloat(s)).sort((a, b) => a - b);
+                            const distribution = {};
+                            nums.forEach(n => { distribution[n] = (distribution[n] || 0) + 1; });
+                            
+                            const entries = Object.entries(distribution).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
+                            const maxCount = Math.max(...Object.values(distribution));
+                            
+                            summaryHTML += `
+                                <div style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 12px; text-align: center;">Score Distribution</div>
+                                <svg viewBox="0 0 400 200" style="width: 100%; max-width: 500px; margin: 0 auto; display: block;">
+                            `;
+                            
+                            const barWidth = 320 / entries.length;
+                            entries.forEach(([val, count], i) => {
+                                const height = (count / maxCount) * 140;
+                                const x = 40 + i * barWidth;
+                                const y = 170 - height;
+                                // For single-category, get the first category name
+                                const categoryName = scoringConfig.categories[0].name;
+                                const label = getLabel(categoryName, val);
+                                summaryHTML += `
+                                    <rect x="${x}" y="${y}" width="${barWidth - 4}" height="${height}" fill="#3b82f6" rx="2"/>
+                                    <text x="${x + (barWidth - 4) / 2}" y="${190}" text-anchor="middle" font-size="10" fill="#64748b">${label}</text>
+                                    <text x="${x + (barWidth - 4) / 2}" y="${y - 4}" text-anchor="middle" font-size="9" fill="#475569">${count}</text>
+                                `;
+                            });
+                            
+                            summaryHTML += `</svg>`;
+                        } else {
+                            // Categorical: pie/donut chart
+                            const distribution = {};
+                            allScores.forEach(s => { distribution[s] = (distribution[s] || 0) + 1; });
+                            const total = allScores.length;
+                            const entries = Object.entries(distribution).sort((a, b) => b[1] - a[1]);
+                            
+                            summaryHTML += `
+                                <div style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 12px; text-align: center;">Performance Distribution</div>
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap;">
+                                    <svg viewBox="0 0 120 120" style="width: 120px; height: 120px;">
+                            `;
+                            
+                            const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#6366f1'];
+                            let currentAngle = -90;
+                            
+                            entries.forEach(([val, count], i) => {
+                                const percent = count / total;
+                                const angle = percent * 360;
+                                const endAngle = currentAngle + angle;
+                                
+                                const startRad = (currentAngle * Math.PI) / 180;
+                                const endRad = (endAngle * Math.PI) / 180;
+                                
+                                const x1 = 60 + 50 * Math.cos(startRad);
+                                const y1 = 60 + 50 * Math.sin(startRad);
+                                const x2 = 60 + 50 * Math.cos(endRad);
+                                const y2 = 60 + 50 * Math.sin(endRad);
+                                
+                                const largeArc = angle > 180 ? 1 : 0;
+                                
+                                summaryHTML += `
+                                    <path d="M 60 60 L ${x1} ${y1} A 50 50 0 ${largeArc} 1 ${x2} ${y2} Z" 
+                                          fill="${colors[i % colors.length]}" opacity="0.85"/>
+                                `;
+                                
+                                currentAngle = endAngle;
+                            });
+                            
+                            summaryHTML += `
+                                        <circle cx="60" cy="60" r="25" fill="#f8fafc"/>
+                                    </svg>
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                            `;
+                            
+                            // For single-category, get the first category name
+                            const categoryName = scoringConfig.categories[0].name;
+                            entries.forEach(([val, count], i) => {
+                                const percent = ((count / total) * 100).toFixed(0);
+                                const label = getLabel(categoryName, val);
+                                summaryHTML += `
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="width: 12px; height: 12px; background: ${colors[i % colors.length]}; border-radius: 2px;"></div>
+                                        <span style="font-size: 12px; color: #475569;"><strong>${label}</strong>: ${percent}% (${count})</span>
+                                    </div>
+                                `;
+                            });
+                            
+                            summaryHTML += `
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    summaryHTML += `
+                            </div>
+                        </details>
+                    `;
+                    
+                    // Add visualization-specific styles
+                    summaryHTML += `
+                        <style>
+                            details[open] summary span:first-child { transform: rotate(90deg); }
+                            .summary-visualization-title { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 12px; text-align: center; }
+                            .scatter-chart-wrapper { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
+                            .scatter-chart { width: 100%; display: block; overflow: visible; }
+                            .scatter-point-dot { fill: #3b82f6; opacity: 0.7; transition: opacity 0.2s ease, r 0.2s ease; }
+                            .scatter-point:hover .scatter-point-dot { opacity: 1; }
+                            .scatter-tooltip-wrapper { display: none; }
+                            .scatter-point:hover .scatter-tooltip-wrapper { display: block; }
+                            .scatter-tooltip { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: #fff; padding: 10px 12px; border-radius: 8px; box-shadow: 0 8px 16px rgba(15,23,42,0.35); font-size: 12px; line-height: 1.4; max-width: 200px; pointer-events: none; }
+                            .scatter-tooltip-header { font-weight: 600; margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+                            .scatter-tooltip-count { font-size: 11px; color: rgba(255,255,255,0.85); margin-bottom: 6px; }
+                            .scatter-tooltip-list { list-style: none; margin: 0; padding: 0; max-height: 96px; overflow: hidden; }
+                            .scatter-tooltip-item { display: flex; gap: 6px; font-size: 11px; margin-bottom: 4px; color: rgba(255,255,255,0.92); }
+                            .scatter-tooltip-index { color: rgba(255,255,255,0.6); min-width: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+                            .scatter-tooltip-content { color: rgba(255,255,255,0.92); }
+                            .scatter-tooltip-more { margin-top: 4px; font-size: 11px; color: rgba(255,255,255,0.7); }
+                        </style>
+                    `;
+                }
+                
+                summaryHTML += `</div>`;
             }
+            
+            // Skip old per-part/subpart loop entirely - jump to closing the section
+            if (allScoredTrials.length === 0 && !hasReadingPassages) {
+                summaryHTML += `
+                    <div class="summary-card">
+                        <p style="color: #64748b; text-align: center;">No scored trials yet. Complete some trials to see your performance summary.</p>
+                    </div>
+                `;
+            }
+            
+            summaryHTML += `
+                    </div>
+                </section>
+            `;
+            reportHTML += summaryHTML;
 
-
-            // --- Detailed Results Section ---
+            // --- Trial Details Section ---
+            reportHTML += `
+                <section class="section">
+                    <h2 class="section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px; min-width: 24px; color: #2563eb;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Trial Details
+                    </h2>
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+            `;
+            
             for (const part in sessionResults) {
                 for (const subPart in sessionResults[part]) {
                     const results = sessionResults[part][subPart];
-                    // scoredTrials are those with explicit score text (used for summary/accuracy)
-                    const scoredTrials = Object.keys(results).filter(k => results[k] && results[k].score && String(results[k].score).trim() !== '');
-                    // allTrials includes empty-score trials (NR) so they appear in the detailed report
+                    // allTrials includes all trials so they appear in the detailed report
                     const allTrials = Object.keys(results || {});
 
                     if (allTrials.length > 0) {
+                        const categoryNames = (scoringConfig && Array.isArray(scoringConfig.categories))
+                            ? scoringConfig.categories.map(cat => cat.name)
+                            : [];
+                        const isMultiCategoryScoring = categoryNames.length > 1;
+                        const scoreHeaderCells = isMultiCategoryScoring
+                            ? categoryNames.map(cat => `<th class="score-col">${escapeHtml(cat)}</th>`).join('')
+                            : `<th class="score-col">Score</th>`;
+
                         reportHTML += `
-                            <section class="space-y-2">
-                                <h3 class="text-xl font-bold border-b-2 border-slate-800 pb-1">${part}: ${subPart}</h3>
-                                <table class="min-w-full text-sm">
-                                    <thead class="bg-slate-100">
-                                        <tr>
-                                            <th class="p-2 text-left font-semibold">Stimulus</th>
-                                            <th class="p-2 text-left font-semibold w-24">Score</th>
-                                            <th class="p-2 text-left font-semibold">Comments</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y">
-                                        ${allTrials.map(item => `
+                            <details class="collapsible-section" open data-print-open>
+                                <summary class="collapsible-toggle">
+                                    <div class="collapsible-title-row">
+                                        <span class="collapse-icon">▼</span>
+                                        <span class="collapsible-title">${subPart}</span>
+                                    </div>
+                                    <span class="summary-card-badge">${part.replace(/^Part \d+: /, '')}</span>
+                                </summary>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td class="p-2">${item.replace(/ \[Trial \d+\]$/, '')}</td>
-                                                <td class="p-2">${(results[item] && results[item].score && String(results[item].score).trim() !== '') ? results[item].score : ''}</td>
-                                                <td class="p-2">${(results[item] && results[item].comment) ? results[item].comment : ''}</td>
+                                                <th>Stimulus</th>
+                                                ${scoreHeaderCells}
+                                                <th>Comments</th>
                                             </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </section>
+                                        </thead>
+                                        <tbody>
+                                            ${allTrials.map((item, idx) => {
+                                                const result = results[item];
+                                                const rawScore = result && result.score;
+                                                const scoreCells = [];
+
+                                                if (isMultiCategoryScoring) {
+                                                    categoryNames.forEach((catName, index) => {
+                                                        let cellContent = '<span class="comment-empty">—</span>';
+                                                        if (rawScore) {
+                                                            if (typeof rawScore === 'object' && rawScore !== null && rawScore.hasOwnProperty(catName)) {
+                                                                const valueRaw = String(rawScore[catName] ?? '').trim();
+                                                                if (valueRaw) {
+                                                                    const label = getLabel(catName, valueRaw);
+                                                                    const displayText = label && label !== valueRaw
+                                                                        ? `${escapeHtml(label)} (${escapeHtml(valueRaw)})`
+                                                                        : escapeHtml(valueRaw);
+                                                                    cellContent = `<span class="score-badge">${displayText}</span>`;
+                                                                }
+                                                            } else if (typeof rawScore === 'string' && index === 0) {
+                                                                const valueRaw = rawScore.trim();
+                                                                if (valueRaw) {
+                                                                    const label = getLabel(catName, valueRaw);
+                                                                    const displayText = label && label !== valueRaw
+                                                                        ? `${escapeHtml(label)} (${escapeHtml(valueRaw)})`
+                                                                        : escapeHtml(valueRaw);
+                                                                    cellContent = `<span class="score-badge">${displayText}</span>`;
+                                                                }
+                                                            }
+                                                        }
+                                                        scoreCells.push(`<td class="score-col">${cellContent}</td>`);
+                                                    });
+                                                } else {
+                                                    let cellContent = '<span class="comment-empty">—</span>';
+                                                    if (rawScore && String(rawScore).trim()) {
+                                                        const valueRaw = String(rawScore).trim();
+                                                        const catName = categoryNames[0] || 'Score';
+                                                        const label = getLabel(catName, valueRaw);
+                                                        const displayText = label && label !== valueRaw
+                                                            ? `${escapeHtml(label)} (${escapeHtml(valueRaw)})`
+                                                            : escapeHtml(valueRaw);
+                                                        cellContent = `<span class="score-badge score-badge-single">${displayText}</span>`;
+                                                    }
+                                                    scoreCells.push(`<td class="score-col">${cellContent}</td>`);
+                                                }
+
+                                                const commentHtml = (result && result.comment && String(result.comment).trim())
+                                                    ? escapeHtml(String(result.comment))
+                                                    : '<span class="comment-empty">—</span>';
+                                                const stimulusText = escapeHtml(item.replace(/ \[Trial \d+\]$/, ''));
+
+                                                return `
+                                                <tr>
+                                                    <td>${stimulusText}</td>
+                                                    ${scoreCells.join('')}
+                                                    <td style="font-size: 12px; color: #4b5563;">${commentHtml}</td>
+                                                </tr>
+                                                `;
+                                            }).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
                         `;
                     }
                 }
             }
             
             reportHTML += `
-                    <footer class="pt-12 text-center text-xs text-slate-500">
-                        <p>Report generated on ${new Date().toLocaleString()}</p>
+                    </div>
+                </section>
+            `;
+            
+            reportHTML += `
+                    <footer class="footer">
+                        <div class="footer-content">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; min-width: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Report generated ${new Date().toLocaleString()}</span>
+                        </div>
                     </footer>
                 </div>
+                
+                <style>
+                    @media print {
+                        .collapsible-toggle { display: none !important; }
+                        .table-container { display: block !important; }
+                    }
+
+                    .collapsible-section {
+                        border: 1px solid #e2e8f0;
+                        border-radius: 4px;
+                        background-color: white;
+                        margin-bottom: 8px;
+                        overflow: hidden;
+                    }
+
+                    .collapsible-section summary { list-style: none; }
+                    .collapsible-section summary::-webkit-details-marker { display: none; }
+                    .collapsible-toggle {
+                        cursor: pointer;
+                        user-select: none;
+                        transition: background-color 0.2s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 8px 12px;
+                        background-color: #f8fafc;
+                    }
+
+                    .collapsible-section[open] .collapsible-toggle {
+                        background-color: #f1f5f9;
+                        border-bottom: 1px solid #e2e8f0;
+                    }
+
+                    .collapsible-toggle:hover {
+                        background-color: rgba(0, 0, 0, 0.02);
+                    }
+
+                    .collapse-icon {
+                        transition: transform 0.2s;
+                        display: inline-block;
+                        transform: rotate(-90deg);
+                    }
+
+                    .collapsible-section[open] .collapse-icon {
+                        transform: rotate(0deg);
+                    }
+
+                    .table-container {
+                        padding: 0 6px 6px;
+                        display: none;
+                        overflow-x: auto;
+                    }
+
+                    .collapsible-section[open] .table-container {
+                        display: block;
+                    }
+
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 12px;
+                        color: #111827;
+                    }
+
+                    table thead {
+                        background-color: #f3f4f6;
+                        border-bottom: 1px solid #d1d5db;
+                    }
+
+                    table th {
+                        padding: 8px 10px;
+                        text-align: left;
+                        font-weight: 600;
+                        letter-spacing: 0.01em;
+                        color: #0f172a;
+                        border-bottom: 1px solid #d1d5db;
+                    }
+
+                    table td {
+                        padding: 7px 10px;
+                        border-bottom: 1px solid #e5e7eb;
+                        vertical-align: top;
+                    }
+
+                    table th.score-col,
+                    table td.score-col {
+                        width: 140px;
+                        white-space: nowrap;
+                    }
+
+                    table tbody tr:nth-child(even) {
+                        background-color: #fafafa;
+                    }
+
+                    table tbody tr:hover {
+                        background-color: #f4f4f5;
+                    }
+                <\/style>
             `;
 
             return reportHTML;
@@ -1839,7 +2979,11 @@
             }
 
             const reportHTML = buildReportHTML();
-            document.getElementById('print-area').innerHTML = reportHTML;
+            const printArea = document.getElementById('print-area');
+            printArea.innerHTML = reportHTML;
+
+            initializeReportCollapsibles(printArea);
+            
             window.print();
         
         });
@@ -1867,6 +3011,177 @@
             if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
             e.preventDefault();
             doUndo();
+        });
+
+        // Scoring Settings Modal Logic
+        const scoringModal = document.getElementById('scoring-settings-modal');
+        const scoringBtn = document.getElementById('scoring-settings-btn');
+        const closeModalBtn = document.getElementById('close-scoring-modal');
+        const cancelScoringBtn = document.getElementById('cancel-scoring-btn');
+        const saveScoringBtn = document.getElementById('save-scoring-btn');
+        const addCategoryBtn = document.getElementById('add-category-btn');
+        const resetToDefaultBtn = document.getElementById('reset-to-default-btn');
+        const categoriesContainer = document.getElementById('scoring-categories-container');
+        
+        let tempScoringConfig = null;
+        
+        function renderScoringSettings() {
+            tempScoringConfig = JSON.parse(JSON.stringify(scoringConfig)); // deep clone
+            updateCategoryUI();
+        }
+        
+        function updateCategoryUI() {
+            categoriesContainer.innerHTML = '';
+            tempScoringConfig.categories.forEach((category, catIndex) => {
+                const catDiv = document.createElement('div');
+                catDiv.className = 'border border-slate-300 rounded-lg p-4';
+                catDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <input type="text" value="${category.name}" data-cat-index="${catIndex}" class="category-name-input font-semibold text-lg border-none focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1" placeholder="Category Name" />
+                        <button class="delete-category-btn text-red-600 hover:text-red-800 text-xl" data-cat-index="${catIndex}" ${tempScoringConfig.categories.length === 1 ? 'disabled' : ''}>&times;</button>
+                    </div>
+                    <div class="space-y-2">
+                        ${category.options.map((opt, optIndex) => `
+                            <div class="flex gap-2 items-center">
+                                <input type="text" value="${opt.value}" data-cat-index="${catIndex}" data-opt-index="${optIndex}" class="option-value-input flex-1 px-2 py-1 border border-slate-300 rounded text-sm" placeholder="Score (e.g., 5)" />
+                                <input type="text" value="${opt.label}" data-cat-index="${catIndex}" data-opt-index="${optIndex}" class="option-label-input flex-1 px-2 py-1 border border-slate-300 rounded text-sm" placeholder="Label (e.g., Accurate)" />
+                                <button class="delete-option-btn text-red-600 hover:text-red-800" data-cat-index="${catIndex}" data-opt-index="${optIndex}" ${category.options.length === 1 ? 'disabled' : ''}>🗑</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="add-option-btn mt-2 text-sm text-blue-600 hover:text-blue-800 font-semibold" data-cat-index="${catIndex}" ${category.options.length >= 5 ? 'disabled' : ''}>+ Add Option</button>
+                `;
+                categoriesContainer.appendChild(catDiv);
+            });
+            
+            // Update add category button
+            addCategoryBtn.disabled = tempScoringConfig.categories.length >= 2;
+            
+            // Event listeners
+            categoriesContainer.querySelectorAll('.category-name-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const catIndex = parseInt(e.target.dataset.catIndex);
+                    tempScoringConfig.categories[catIndex].name = e.target.value.trim() || 'Category';
+                });
+            });
+            
+            categoriesContainer.querySelectorAll('.option-value-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const catIndex = parseInt(e.target.dataset.catIndex);
+                    const optIndex = parseInt(e.target.dataset.optIndex);
+                    tempScoringConfig.categories[catIndex].options[optIndex].value = e.target.value.trim();
+                });
+            });
+            
+            categoriesContainer.querySelectorAll('.option-label-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const catIndex = parseInt(e.target.dataset.catIndex);
+                    const optIndex = parseInt(e.target.dataset.optIndex);
+                    tempScoringConfig.categories[catIndex].options[optIndex].label = e.target.value.trim();
+                });
+            });
+            
+            categoriesContainer.querySelectorAll('.delete-category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const catIndex = parseInt(e.target.dataset.catIndex);
+                    if (tempScoringConfig.categories.length > 1) {
+                        tempScoringConfig.categories.splice(catIndex, 1);
+                        updateCategoryUI();
+                    }
+                });
+            });
+            
+            categoriesContainer.querySelectorAll('.delete-option-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const catIndex = parseInt(e.target.dataset.catIndex);
+                    const optIndex = parseInt(e.target.dataset.optIndex);
+                    if (tempScoringConfig.categories[catIndex].options.length > 1) {
+                        tempScoringConfig.categories[catIndex].options.splice(optIndex, 1);
+                        updateCategoryUI();
+                    }
+                });
+            });
+            
+            categoriesContainer.querySelectorAll('.add-option-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const catIndex = parseInt(e.target.dataset.catIndex);
+                    if (tempScoringConfig.categories[catIndex].options.length < 5) {
+                        tempScoringConfig.categories[catIndex].options.push({ value: '', label: '' });
+                        updateCategoryUI();
+                    }
+                });
+            });
+        }
+        
+        scoringBtn.addEventListener('click', () => {
+            renderScoringSettings();
+            scoringModal.classList.remove('hidden');
+        });
+        
+        [closeModalBtn, cancelScoringBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                scoringModal.classList.add('hidden');
+                tempScoringConfig = null;
+            });
+        });
+        
+        addCategoryBtn.addEventListener('click', () => {
+            if (tempScoringConfig.categories.length < 2) {
+                tempScoringConfig.categories.push({
+                    name: 'Category ' + (tempScoringConfig.categories.length + 1),
+                    options: [{ value: '1', label: '1' }]
+                });
+                updateCategoryUI();
+            }
+        });
+        
+        resetToDefaultBtn.addEventListener('click', () => {
+            tempScoringConfig = {
+                categories: [
+                    {
+                        name: 'Performance',
+                        options: [
+                            { value: '+', label: 'Accurate' },
+                            { value: '+/-', label: 'Partial' },
+                            { value: '-', label: 'Off-Target/NR' }
+                        ]
+                    }
+                ]
+            };
+            updateCategoryUI();
+        });
+        
+        saveScoringBtn.addEventListener('click', () => {
+            // Validate
+            let valid = true;
+            tempScoringConfig.categories.forEach(cat => {
+                if (!cat.name.trim()) valid = false;
+                cat.options.forEach(opt => {
+                    if (!opt.value.trim()) valid = false;
+                });
+            });
+            
+            if (!valid) {
+                alert('Please fill in all category names and option values.');
+                return;
+            }
+            
+            // Apply
+            scoringConfig = tempScoringConfig;
+            localStorage.setItem('speechDeck_scoringConfig', JSON.stringify(scoringConfig));
+            scoringModal.classList.add('hidden');
+            tempScoringConfig = null;
+            
+            // Show confirmation
+            alert('Scoring system updated! New settings will apply to future trials.');
+        });
+        
+        // Close modal on background click
+        scoringModal.addEventListener('click', (e) => {
+            if (e.target === scoringModal) {
+                scoringModal.classList.add('hidden');
+                tempScoringConfig = null;
+            }
         });
 
         renderPartSelector();

@@ -215,7 +215,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 .speech-deck-embedded-report { font-size: 9.5pt; }
                 .speech-deck-summary-header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px; }
                 .speech-deck-summary-title { font-weight:600; }
-                .speech-deck-summary-total { font-size:0.95em; color:var(--print-muted); }
                 .speech-deck-summary .component-block { padding:6px; margin-bottom:6px; }
                 .speech-deck-summary p, .speech-deck-summary .component-content { margin:2px 0; }
 
@@ -2416,7 +2415,8 @@ class SpeechDeckComponent extends BaseComponent {
                     // fallback: look for any table rows that aren't header rows
                     rows = Array.from(temp.querySelectorAll('table tr')).filter(r => !r.closest('thead'));
                 }
-                let total = 0, scored = 0;
+                let total = 0;
+                let scored = 0;
                 rows.forEach(r => {
                     const tds = Array.from(r.querySelectorAll('td'));
                     if (tds.length === 0) return; // skip non-data rows
@@ -2450,14 +2450,13 @@ class SpeechDeckComponent extends BaseComponent {
                     }
                 });
 
-                const unrated = Math.max(0, total - scored);
                 const header = document.createElement('div');
                 header.className = 'speech-deck-summary-header';
                 header.style.display = 'flex';
                 header.style.justifyContent = 'space-between';
                 header.style.alignItems = 'center';
                 header.style.marginBottom = '6px';
-                header.innerHTML = `<div class="speech-deck-summary-title"><strong>Practice Results</strong></div><div class="speech-deck-summary-total">Scored: ${scored} / ${total} trials</div>`;
+                header.innerHTML = `<div class="speech-deck-summary-title"><strong>Practice Results</strong></div>`;
                 this.resultsDisplay.appendChild(header);
 
                 // Insert the report HTML directly. It's generated locally by the
@@ -2477,28 +2476,13 @@ class SpeechDeckComponent extends BaseComponent {
             this.resultsDisplay.innerHTML = '<em>No practice results yet.</em>';
             return;
         }
-        // Compute aggregate trial count across all parts/subparts and how many were rated
-        let aggregateTrials = 0;
-        let scoredTrials = 0;
-        parts.forEach(p => {
-            Object.keys(this.data.sessionResults[p] || {}).forEach(sub => {
-                const scores = this.data.sessionResults[p][sub] || {};
-                Object.keys(scores).forEach(k => {
-                    aggregateTrials += 1;
-                    const e = scores[k] || {};
-                    if (e && e.score !== undefined && e.score !== null && String(e.score).trim() !== '') scoredTrials += 1;
-                });
-            });
-        });
-
         const header = document.createElement('div');
         header.className = 'speech-deck-summary-header';
         header.style.display = 'flex';
         header.style.justifyContent = 'space-between';
         header.style.alignItems = 'center';
         header.style.marginBottom = '6px';
-    const unratedTrials = Math.max(0, aggregateTrials - scoredTrials);
-    header.innerHTML = `<div class="speech-deck-summary-title"><strong>Practice Results</strong></div><div class="speech-deck-summary-total">Rated: ${scoredTrials} / ${aggregateTrials} trials (Unrated: ${unratedTrials})</div>`;
+        header.innerHTML = `<div class="speech-deck-summary-title"><strong>Practice Results</strong></div>`;
         this.resultsDisplay.appendChild(header);
         // If there are persisted custom decks, render controls to rename/delete
         if (this.data && this.data.customDecks && Object.keys(this.data.customDecks).length) {
