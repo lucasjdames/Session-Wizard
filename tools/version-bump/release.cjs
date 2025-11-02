@@ -228,7 +228,8 @@ const createGitHubRelease = (notes) => {
   const bodyFile = path.join(distDir, `release-notes-${targetVersion}.md`);
   writeFile(bodyFile, notes);
 
-  const ghCmd = `gh release create ${tagName} ${files.map(f => path.join(distDir, f)).join(' ')} --title "Session Wizard ${targetVersion}" --notes-file "${bodyFile}"`;
+  const assetArgs = files.map(f => `"${path.join(distDir, f)}"`);
+  const ghCmd = `gh release create ${tagName} ${assetArgs.join(' ')} --title "Session Wizard ${targetVersion}" --notes-file "${bodyFile}"`;
   run(ghCmd, { cwd: repoRoot, env: { ...process.env, GITHUB_TOKEN: ghToken } });
 };
 
