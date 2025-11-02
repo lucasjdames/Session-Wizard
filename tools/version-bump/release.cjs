@@ -209,7 +209,19 @@ const createGitHubRelease = (notes) => {
     console.warn('dist directory not found; skipping GitHub release upload');
     return;
   }
-  const files = fs.readdirSync(distDir).filter(name => !name.endsWith('.yaml'));
+  const entries = fs.readdirSync(distDir)
+    .filter(name => !name.endsWith('.yaml'))
+    .map(name => ({
+      name,
+      fullPath: path.join(distDir, name),
+    }));
+  const files = entries.filter(entry => {
+    const isFile = fs.statSync(entry.fullPath).isFile();
+    if (!isFile) {
+      console.log(`Skipping non-file artifact: ${entry.name}`);
+    }
+    return isFile;
+  });
   if (files.length === 0) {
     console.warn('No files found in dist/ to upload. Skipping GitHub release.');
     return;
@@ -228,7 +240,7 @@ const createGitHubRelease = (notes) => {
   const bodyFile = path.join(distDir, `release-notes-${targetVersion}.md`);
   writeFile(bodyFile, notes);
 
-  const assetArgs = files.map(f => `"${path.join(distDir, f)}"`);
+  const assetArgs = files.map(f => `"${f.fullPath}"`);
   const ghCmd = `gh release create ${tagName} ${assetArgs.join(' ')} --title "Session Wizard ${targetVersion}" --notes-file "${bodyFile}"`;
   run(ghCmd, { cwd: repoRoot, env: { ...process.env, GITHUB_TOKEN: ghToken } });
 };
